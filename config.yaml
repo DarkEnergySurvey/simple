@@ -5,12 +5,12 @@ output:
     results_dir    : 'results_dir'
     log_dir        : 'log_dir'
     save_dir       : 'save_dir'
+    # candidate_list ?
 
 batch:
     jobs: 20 # <= 25 for DES cluster computers!
 
-data: 'y3a2' # use argument from standard input rather than value here?
-# or should this not be a parameter and each directory gets it's own config?
+data: 'y3a2'
 
 y3a2:
     nside          : 32
@@ -18,8 +18,6 @@ y3a2:
     candidate_list : 'candidate_list.csv'
     #candidate_list : '/home/s1/kadrlica/projects/y3a2/dsphs/v2/v2.1/search/ugali_candidates.fits' # ugali
 
-    #mag_g_dred              : 'mag_g_dred_flag'
-    #mag_r_dred              : 'mag_r_dred_flag'
     mag_g_dred_flag         : 'PSF_MAG_SFD_G'
     mag_r_dred_flag         : 'PSF_MAG_SFD_R'
     mag_err_g_flag          : 'PSF_MAG_ERR_G'
@@ -28,22 +26,15 @@ y3a2:
     flags_r                 : 'SEXTRACTOR_FLAGS_R'
 
     star_galaxy_classification     : 'EXTENDED_CLASS_MASH'
-    #star_filter             : ((data[star_galaxy_classification] >= 0) & (data[star_galaxy_classification] <= 2))
-    #galaxy_filter           : (data[star_galaxy_classification] > 2)
-    #blue_star_filter        : ((star_filter(data)) & ((data[mag_g_dred_flag] - data[mag_r_dred_flag]) < 0.4)) # 0.2
 
     #maglim_g : '/home/s1/kadrlica/projects/y3q2/v6/release/depth/y2q1_maglim_g_n1024_ring.fits.gz'
     #maglim_r : '/home/s1/kadrlica/projects/y2q/v6/release/depth/y2q1_maglim_r_n1024_ring.fits.gz'
 
-    #fracdet : None
     fracdet : 'y3a2_griz_o.4096_t.32768_coverfoot_EQU.fits.gz'
 
 bliss: # Need to update this
     nside          : 32
     datadir        : '/home/s1/kadrlica/projects/bliss/cat/v2/cat'
-    results_dir    : 'results_dir'
-    log_dir        : 'log_dir'
-    save_dir       : 'save_dir_bliss'
     candidate_list : 'candidate_list.csv'
 
     mag_g_dred_flag         : 'PSF_MAG_SFD_G'
@@ -61,12 +52,11 @@ bliss: # Need to update this
     flags_g                 : 'SEXTRACTOR_FLAGS_G'
     flags_r                 : 'SEXTRACTOR_FLAGS_R'
 
+    fracdet : None
+
 maglites: # Update
     nside          : 32
     datadir        : '/home/s1/kadrlica/projects/maglites/r4/v1/cat'
-    results_dir    : 'results_dir'
-    log_dir        : 'log_dir'
-    save_dir       : 'save_dir_maglites'
     candidate_list : 'candidate_list.csv'
 
     #mag_g_dred_flag         : 'PSF_MAG_SFD_G'
@@ -84,7 +74,9 @@ maglites: # Update
     flags_g                 : 'SEXTRACTOR_FLAGS_G'
     flags_r                 : 'SEXTRACTOR_FLAGS_R'
 
-panstarrs: # update
+    fracdet : None
+
+panstarrs: # Init
 
 example:
     nside          : 32
