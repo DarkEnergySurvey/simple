@@ -4,6 +4,10 @@ This code has been adapted from [Keith Bechtol](https://github/com/bechtol)'s or
 
 Maintained by [Sidney Mau](https://github.com/SidneyMau).
 
+## Dependencies
+
+This code assumes a working [ugali](https://github.com/DarkEnergySurvey/ugali) toolkit.
+
 ## Configuration and use
 
 `config.yaml` handles most of the setup and can be modified according to use. You will need to modify the value for the `simple_dir` key to be the path to your `simple` folder that contains these source files.
