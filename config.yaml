@@ -5,7 +5,6 @@ output:
     results_dir : 'results_dir'
     log_dir     : 'log_dir'
     save_dir    : 'save_dir'
-    # candidate_list ?
 
 batch:
     jobs: 20 # <= 25 for DES cluster computers!
@@ -46,7 +45,7 @@ bliss: # Need to update this
     #extinction_g_flag         : 'EXTINCTION_G'
     #extinction_r_flag         : 'EXTINCTION_R'
     star_galaxy_classification : 'EXTENDED_CLASS_MASH' #spread_model_r_flag
-    #star_filter               : ''
+
     spread_model_r_flag        : 'CM_T' # use for BISS/MagLiteS
     spread_model_r_err_flag    : 'CM_T_ERR'
     flags_g                    : 'SEXTRACTOR_FLAGS_G'
@@ -68,7 +67,7 @@ maglites: # Update
     extinction_g_flag           : 'EXTINCTION_G'
     extinction_r_flag           : 'EXTINCTION_R'
     #star_galaxy_classification : 'EXTENDED_CLASS_MASH' # adapt this for dif data sets
-    #star_filter                : ''
+
     spread_model_r_flag         : 'WAVG_SPREAD_MODEL_R' # use for BISS/MagLiteS
     spread_model_r_err_flag     : 'SPREADERR_MODEL_R'
     flags_g                     : 'SEXTRACTOR_FLAGS_G'
