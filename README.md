@@ -6,6 +6,13 @@ Maintained by [Sidney Mau](https://github.com/SidneyMau).
 
 ## Dependencies
 
+<!--python
+numpy
+scipy
+matplotlib
+fitsio # I think
+healpy # I think
+ugali-->
 This code assumes a working [ugali](https://github.com/DarkEnergySurvey/ugali) toolkit.
 
 ## Configuration and use
