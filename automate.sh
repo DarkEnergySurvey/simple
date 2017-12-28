@@ -11,18 +11,26 @@ farm_simple="$simple_dir/farm_simple.py"
 #python $farm_simple
 
 # wait...
+#echo "Waiting for search to finish..."
+#wait
+#echo "Search finished."
 
 # Run make_list.py
 echo "Compiling candidate list..."
 make_list="$simple_dir/make_list.py"
-#python $make_list
+python $make_list
 
 # Run farm_plots.py
 echo "Farming plots..."
 farm_plots="$simple_dir/farm_plots.py"
-#python $farm_plots
+python $farm_plots
 
+# TODO: Does not wait for all the cjobs to finish before continuing.
+#       Need for all parallel jobs to complete before moving on.
 # wait...
+echo "Waiting for plots to finish..."
+wait
+echo "Plots finished."
 
 # Tarball deliverable
 echo "Tarring..."
