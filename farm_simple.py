@@ -37,7 +37,9 @@ if not os.path.exists(log_dir):
     os.mkdir(log_dir)
 
 #infiles = glob.glob('%s/cat_hpx_*.fits'%(datadir))
-infiles = glob.glob ('%s/y3a2_ngmix_cm_*.fits'%(datadir))
+#infiles = glob.glob ('%s/y3a2_ngmix_cm_*.fits'%(datadir))
+infiles = glob.glob ('%s/*.fits'%(datadir))
+
 ############################################################
 
 print('Pixelizing...')
