@@ -1,6 +1,6 @@
 # Simple Binning Search 
 
-This code has been adapted from [Keith Bechtol](https://github/com/bechtol)'s original simple binning code program to be more modular and ready-to-use for future searches.
+This code has been adapted from [Keith Bechtol](https://github.com/bechtol)'s original simple binning code program to be more modular and ready-to-use for future searches.
 
 Maintained by [Sidney Mau](https://github.com/SidneyMau).
 
