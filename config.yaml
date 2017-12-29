@@ -9,7 +9,7 @@ output:
 batch:
     jobs: 20 # <= 25 for DES cluster computers!
 
-data: 'y3a2'
+data: 'y3a2' # parameter to change for runs across different data
 
 y3a2:
     nside          : 32
