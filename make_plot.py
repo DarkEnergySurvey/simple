@@ -72,20 +72,24 @@ diagnostic_plots.starPlot(targ_ra, targ_dec, data, iso, g_radius, nbhd)
 fig.add_subplot(gs[2,1:3])
 diagnostic_plots.radialPlot(targ_ra, targ_dec, data, iso, g_radius, nbhd)
 
-# Check for possible associations
-glon_peak, glat_peak = ugali.utils.projector.celToGal(targ_ra, targ_dec)
-catalog_array = ['McConnachie15', 'Harris96', 'Corwen04', 'Nilson73', 'Webbink85', 'Kharchenko13', 'WEBDA14','ExtraDwarfs','ExtraClusters']
-catalog = ugali.candidate.associate.SourceCatalog()
-for catalog_name in catalog_array:
-    catalog += ugali.candidate.associate.catalogFactory(catalog_name)
+# Name
+try: # ugali
+    association_string = candidate_list[candidate]['NAME'] # for ugali
+except: # simple
+    # Check for possible associations
+    glon_peak, glat_peak = ugali.utils.projector.celToGal(targ_ra, targ_dec)
+    catalog_array = ['McConnachie15', 'Harris96', 'Corwen04', 'Nilson73', 'Webbink85', 'Kharchenko13', 'WEBDA14','ExtraDwarfs','ExtraClusters']
+    catalog = ugali.candidate.associate.SourceCatalog()
+    for catalog_name in catalog_array:
+        catalog += ugali.candidate.associate.catalogFactory(catalog_name)
 
-idx1, idx2, sep = catalog.match(glon_peak, glat_peak, tol=0.5, nnearest=1)
-match = catalog[idx2]
-if len(match) > 0:
-    association_string = '{} at {:0.3f} deg'.format(match[0]['name'], float(sep))
-else:
-    association_string = 'No association within 0.5 deg'
-#association_string = candidate_list[candidate]['NAME'] # for ugali
+    idx1, idx2, sep = catalog.match(glon_peak, glat_peak, tol=0.5, nnearest=1)
+    match = catalog[idx2]
+    if len(match) > 0:
+        association_string = '{} at {:0.3f} deg'.format(match[0]['name'], float(sep))
+    else:
+        association_string = 'No association within 0.5 deg'
+
 association_string = str(np.char.strip(association_string))
 
 plt.suptitle('{}\n'.format(association_string) + r'($\alpha$, $\delta$, $\mu$, $\sigma$) = ({}, {}, {}, {})'.format(targ_ra, targ_dec, mod, sig), fontsize=24)

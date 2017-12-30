@@ -14,7 +14,7 @@ data: 'y3a2' # parameter to change for runs across different data
 y3a2:
     nside          : 32
     datadir        : '/home/s1/kadrlica/projects/y3a2/dsphs/v2/skim'
-    candidate_list : 'candidate_list.csv'
+    candidate_list : 'candidate_list.fits'
     #candidate_list : '/home/s1/kadrlica/projects/y3a2/dsphs/v2/v2.1/search/ugali_candidates.fits' # ugali
 
     mag_g_dred_flag : 'PSF_MAG_SFD_G'

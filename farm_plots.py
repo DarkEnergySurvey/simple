@@ -37,11 +37,11 @@ log_dir = os.path.join(os.getcwd(), cfg['output']['save_dir'], cfg['output']['lo
 if not os.path.exists(log_dir):
     os.mkdir(log_dir)
 
-if candidate_list.endswith('.csv'):
-    candidate_list = np.genfromtxt(candidate_list, delimiter=',', names=['SIG', 'RA', 'DEC', 'MODULUS', 'r'])[1:] #, 'association', 'association_angsep'])[1:]
-    candidate_list = candidate_list[candidate_list['SIG'] > 5.5] # get arg from standard input?
-elif candidate_list.endswith('.fits'):
-    candidate_list = fits.read(candidate_list)
+candidate_list = fits.read(candidate_list)
+try: # simple
+    candidate_list = candidate_list[candidate_list['SIG'] > 5.5]
+except: # ugali
+    candidate_list = candidate_list[candidate_list['TS'] > 25]
 
 ############################################################
 
