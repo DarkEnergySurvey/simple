@@ -8,7 +8,6 @@ import glob
 import yaml
 
 from astropy.io import fits
-# import fitsio
 import numpy as np
 import csv
 
@@ -27,6 +26,8 @@ for file in glob.glob('{}/*.csv'.format(cfg['output']['results_dir'])):
             results.append([float(val) for val in row])
 
 data = np.asarray(results)
+dt = np.dtype([('SIG', '>f4'), ('RA', '>f4'), ('DEC', '>f4'), ('MODULUS', '>f4'), ('r', '>f4')])
+data = data.astype(dt)
 
 # Create fits columns
 c1 = fits.Column(name='SIG',     format='E', array=data[:,0])
@@ -38,3 +39,11 @@ c5 = fits.Column(name='r',       format='E', array=data[:,4])
 # Write fits output
 t = fits.BinTableHDU.from_columns([c1, c2, c3, c4, c5])
 t.writeto(candidate_list)
+
+#from fitsio import FITS
+#
+#fits = FITS(candidate_list, 'rw')
+##names = ['SIG', 'RA', 'DEC', 'MODULUS', 'r']
+##fits.write(data, names=names)
+#fits.write(data)
+#fits.close()
