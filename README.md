@@ -28,7 +28,7 @@ You will need to create a directory such as `simple_run/` (the name can be anyth
 
 ### Manual
 
-To run the simple binning search, run `farm_simple.py` from `simple_run/`. This will run `search_algorithm.py` over the given data set and write the output to `results_dir/`, logging each job in `results_dir/log_dir`. The results can then be compiled into a candidate list by running `make_list.py` from `simple_run/` (this currently returns both a `.fits` and a `.csv` file; the `.csv` is currently an intermediate step tht will hopefully be phased out, and the `.fits` file is used for the remainder of the program).
+To run the simple binning search, run `farm_simple.py` from `simple_run/`. This will run `search_algorithm.py` over the given data set and write the output to `results_dir/`, logging each job in `results_dir/log_dir`. The results can then be compiled into a candidate list by running `make_list.py` from `simple_run/` (this currently returns both a `.fits` and a `.csv` file; the `.csv` is currently an intermediate step that will hopefully be phased out, and the `.fits` file is used for the remainder of the program).
 
 To render plots from a candidate list, run `farm_plots.py` from `simple_run/`. The output will be written to `save_dir/` with logs in `save_dir/log_dir/`.
 
