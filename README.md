@@ -14,10 +14,11 @@ python;
 numpy,
 scipy,
 healpy,
-matplotlib
+astropy,
+matplotlib,
+[fitsio](https://github.com/esheldon/fitsio)
 
-[ugali](https://github.com/DarkEnergySurvey/ugali), 
-[fitsio](https://github.com/esheldon/fitsio),
+[ugali](https://github.com/DarkEnergySurvey/ugali),
 [batchtools](https://github.com/kadrlica/batchtools) (for farming)
 
 ## Configuration and use
