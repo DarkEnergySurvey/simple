@@ -36,9 +36,6 @@ log_dir = os.path.join(os.getcwd(), cfg['output']['results_dir'], cfg['output'][
 if not os.path.exists(log_dir):
     os.mkdir(log_dir)
 
-#infiles = glob.glob('%s/cat_hpx_*.fits'%(datadir))
-#infiles = glob.glob ('%s/y3a2_ngmix_cm_*.fits'%(datadir))
-#infiles = glob.glob ('%s/*.fits'%(datadir))
 infiles = glob.glob ('{}/*.fits'.format(datadir))
 
 ############################################################
@@ -55,9 +52,8 @@ for ii in range(0, len(pix_nside)):
 
     print('({}/{})').format(ii, len(pix_nside))
 
-    #pix_nside[ii] = pix_nside_select
     logfile = '{}/results_nside_{}_{}.log'.format(log_dir, nside, pix_nside[ii])
-    batch = 'csub -n {} -o {} '.format(jobs, logfile) # q local for debugging
+    batch = 'csub -n {} -o {} '.format(jobs, logfile)
     command = 'python {}/search_algorithm.py {:0.2} {:0.2f}'.format(simple_dir, ra, dec)
     command_queue = batch + command
     print(command_queue)

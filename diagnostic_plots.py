@@ -93,13 +93,6 @@ def analysis(targ_ra, targ_dec, mod):
     pix_nside_neighbors = np.concatenate([[pix_nside_select], healpy.get_all_neighbours(nside, pix_nside_select)])
     data_array = []
     for pix_nside in pix_nside_neighbors:
-        #infile = '%s/cat_hpx_%05i.fits'%(datadir, pix_nside) # old des, bliss, maglites
-        #infile = '%s/y3a2_ngmix_cm_%05i.fits'%(datadir, pix_nside) # des y3a2
-        #if not os.path.exists(infile):
-        #    continue
-        #reader = pyfits.open(infile)
-        #data_array.append(reader[1].data)
-        #reader.close()
         inlist = glob.glob('{}/*_{:05d}.fits'.format(datadir, pix_nside))
         for infile in inlist:
             if not os.path.exists(infile):
@@ -183,7 +176,6 @@ def analysis(targ_ra, targ_dec, mod):
         g_radius = g_max
     else:
         g_radius = half_point # deg
-    #g_radius = 0.05 # for ugali candidate debugging
 
     #c1 = SkyCoord(targ_ra, targ_dec, unit='deg') # frame is ICRS
     #nbhd = c1.separation(SkyCoord(data['RA'], data['DEC'], unit='deg')).deg < g_radius # selects objects inside the galactic radius
@@ -209,7 +201,7 @@ def densityPlot(targ_ra, targ_dec, data, iso, g_radius, nbhd, type):
 
     # projection of image
     proj = ugali.utils.projector.Projector(targ_ra, targ_dec)
-    x, y = proj.sphereToImage(data[filter & iso_filter]['RA'], data[filter & iso_filter]['DEC']) # filter & iso_filter
+    x, y = proj.sphereToImage(data[filter & iso_filter]['RA'], data[filter & iso_filter]['DEC'])
 
     bound = 0.5 #1.
     steps = 100.
@@ -217,7 +209,7 @@ def densityPlot(targ_ra, targ_dec, data, iso, g_radius, nbhd, type):
 
     signal = np.histogram2d(x, y, bins=[bins, bins])[0]
 
-    sigma = 0.01 * (0.25 * np.arctan(0.25*g_radius*60. - 1.5) + 1.3) # full range, arctan
+    sigma = 0.01 * (0.25 * np.arctan(0.25*g_radius*60. - 1.5) + 1.3)
     
     convolution = scipy.ndimage.filters.gaussian_filter(signal, sigma/(bound/steps))
     plt.pcolormesh(bins, bins, convolution.T, cmap='Greys')
@@ -296,7 +288,7 @@ def hessPlot(targ_ra, targ_dec, data, iso, g_radius, nbhd):
 
     c1 = SkyCoord(targ_ra, targ_dec, unit='deg')
 
-    r_near = 2.*g_radius # annulus begins at 3*g_radius away from centroid
+    r_near = 2.*g_radius # annulus begins at 2*g_radius away from centroid
     r_far = np.sqrt(5.)*g_radius # annulus has same area as inner area
 
     inner = (c1.separation(SkyCoord(data['RA'], data['DEC'], unit='deg')).deg < g_radius)
@@ -333,11 +325,6 @@ def hessPlot(targ_ra, targ_dec, data, iso, g_radius, nbhd):
     plt.gca().set_aspect(1./4.)
     plt.xlabel('g-r (mag)')
     plt.ylabel('g (mag)')
-
-    #ax = plt.gca()
-    #divider = make_axes_locatable(ax)
-    #cax = divider.append_axes('right', size = '5%', pad=0)
-    #plt.colorbar(cax=cax)
 
 def radialPlot(targ_ra, targ_dec, data, iso, g_radius, nbhd):
     """Radial distribution plot"""

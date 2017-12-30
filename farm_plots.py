@@ -43,8 +43,6 @@ try: # simple
 except: # ugali
     candidate_list = candidate_list[candidate_list['TS'] > 25]
 
-############################################################
-
 print('{} candidates found...').format(len(candidate_list))
 
 ############################################################
@@ -59,7 +57,7 @@ for candidate in candidate_list:
     mod     = round(candidate['MODULUS'], 2)
 
     logfile = '{}/candidate_{}_{}.log'.format(log_dir, ra, dec)
-    batch = 'csub -n {} -o {} '.format(jobs, logfile) # q local for debugging
+    batch = 'csub -n {} -o {} '.format(jobs, logfile)
     command = 'python {}/make_plot.py {:0.2f} {:0.2f} {:0.2f} {:0.2f}'.format(simple_dir, ra, dec, mod, sig)
     command_queue = batch + command
     print(command_queue)

@@ -24,6 +24,7 @@ for file in glob.glob('{}/*.csv'.format(cfg['output']['results_dir'])):
         reader = csv.reader(csvfile)
         for row in reader:
             results.append([float(val) for val in row])
+    csvfile.close()
 
 data = np.asarray(results)
 dt = np.dtype([('SIG', '>f4'), ('RA', '>f4'), ('DEC', '>f4'), ('MODULUS', '>f4'), ('r', '>f4')])

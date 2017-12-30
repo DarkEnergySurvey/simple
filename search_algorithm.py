@@ -138,13 +138,6 @@ pix_nside_neighbors = numpy.concatenate([[pix_nside_select], healpy.get_all_neig
 
 data_array = []
 for pix_nside in pix_nside_neighbors:
-    #infile = '%s/cat_hpx_%05i.fits'%(datadir, pix_nside)
-    #infile = '%s/y3a2_ngmix_cm_%05i.fits'%(datadir, pix_nside)
-    #if not os.path.exists(infile):
-    #    continue
-    #reader = pyfits.open(infile)
-    #data_array.append(reader[1].data)
-    #reader.close()
     inlist = glob.glob('{}/*_{:05d}.fits'.format(datadir, pix_nside))
     for infile in inlist:
         if not os.path.exists(infile):
