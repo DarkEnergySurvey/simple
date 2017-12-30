@@ -24,7 +24,7 @@ matplotlib
 
 `config.yaml` handles most of the setup and can be modified according to use. You will need to modify the value for the `simple_dir` key to be the path to your `simple` folder that contains these source files.
 
-First, you will need to create a directory such as `simple_run/` (the name can be anything). In `simple_run/`, create a symbolic link to `config.yaml` with `ln -s /path/to/simple/config.yaml`. This will let the the scripts know where to source the config info from as well as where to write the output. If you have fracdet or maglim files, those should also be copied or linked here; otherwise, they may be specified in `config.yaml`.
+You will need to create a directory such as `simple_run/` (the name can be anything). In `simple_run/`, create a symbolic link to `config.yaml` with `ln -s /path/to/simple/config.yaml`. This will let the the scripts know where to source the config info from as well as where to write the output. If you have fracdet or maglim files, those should also be copied or linked here; otherwise, they may be specified in `config.yaml`.
 
 ### Manual
 
@@ -35,3 +35,7 @@ To render plots from a candidate list, run `farm_plots.py` from `simple_run/`. T
 ### Automatic
 
 Alternatively, running the script `automate.sh` from `simple_run/` will run the simple binning search, create a candidate list, produce plots, and compress a tarball deliverable. This is not currently recommended as it does not work.
+
+## Notes
+
+By default, `farm_plots.py` will only produce plots for hotspots with statistical significance greater than 5.5 sigma. This threshold has intentionally chosen to be low (such that investigations can be made of very low-significance hotsposts and candidates) but also to minimize junk.
