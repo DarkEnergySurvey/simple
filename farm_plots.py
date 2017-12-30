@@ -62,7 +62,7 @@ for candidate in range(len(candidate_list)):
     batch = 'csub -n {} -o {} '.format(jobs, logfile) # q local for debugging
     #command = 'python make_plot.py %.2f %.2f %.2f'%(ra, dec, mod, sig)
     #command = 'python make_plot.py {} {} {} {}'.format(ra, dec, mod, sig)
-    command = 'python %s/make_plot.py %.2f %.2f %.2f %.2f'%(simple_dir, ra, dec, mod, sig)
+    command = 'python {}/make_plot.py {:0.2f} {:0.2f} {:0.2f} {:0.2f}'.format(simple_dir, ra, dec, mod, sig)
     command_queue = batch + command
     print command_queue
     #os.system('./' + command) # Run locally

@@ -100,7 +100,7 @@ def analysis(targ_ra, targ_dec, mod):
         #reader = pyfits.open(infile)
         #data_array.append(reader[1].data)
         #reader.close()
-        inlist = glob.glob('%s/*_%05i.fits'%(datadir, pix_nside))
+        inlist = glob.glob('{}/*_{:05d}.fits'.format(datadir, pix_nside))
         for infile in inlist:
             if not os.path.exists(infile):
                 continue
@@ -158,7 +158,7 @@ def analysis(targ_ra, targ_dec, mod):
 
     try:
         if len(relmin) > 0:
-            #half_point = f_range[relmin[0]] # TODO rename
+            #half_point = f_range[relmin[0]]
             i = 0
             while ((f_range[relmin[i]] <= f_range[peak_index(pairs,peak)]) & (i <= len(relmin)-1)):
                 i+=1
@@ -419,7 +419,7 @@ def radialPlot(targ_ra, targ_dec, data, iso, g_radius, nbhd):
     plt.plot(f_range, f_val, '-b', label='Filtered Stars')
 
     ymax = plt.ylim()[1]
-    plt.annotate(r'$\approx %0.1f$'+str(round(g_radius, 3))+'$^\circ$', (g_radius*1.1, ymax/50.), color='red', bbox=dict(boxstyle='round,pad=0.0', fc='white', alpha=0.75, ec='white', lw=0))
+    plt.annotate(r'$\approx %0.1f$' + str(round(g_radius, 3)) + '$^\circ$', (g_radius*1.1, ymax/50.), color='red', bbox=dict(boxstyle='round,pad=0.0', fc='white', alpha=0.75, ec='white', lw=0))
     plt.xlim(bins[0], bins[-1])
     plt.ylim(0., ymax)
     plt.legend(loc='upper right')

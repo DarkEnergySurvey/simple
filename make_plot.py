@@ -82,7 +82,7 @@ for catalog_name in catalog_array:
 idx1, idx2, sep = catalog.match(glon_peak, glat_peak, tol=0.5, nnearest=1)
 match = catalog[idx2]
 if len(match) > 0:
-    association_string = '{} at {:.3f} deg'.format(match[0]['name'], float(sep))
+    association_string = '{} at {:0.3f} deg'.format(match[0]['name'], float(sep))
 else:
     association_string = 'No association within 0.5 deg'
 #association_string = candidate_list[candidate]['NAME'] # for ugali
