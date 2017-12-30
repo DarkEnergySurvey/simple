@@ -9,11 +9,17 @@ Maintained by [Sidney Mau](https://github.com/SidneyMau).
 ## Dependencies
 
 python
+
 numpy
+
 scipy
+
 matplotlib
+
 healpy
+
 [fitsio](https://github.com/esheldon/fitsio)
+
 [ugali](https://github.com/DarkEnergySurvey/ugali)
 
 ## Configuration and use
