@@ -49,19 +49,17 @@ print('{} candidates found...').format(len(candidate_list))
 
 ############################################################
 
-for candidate in range(len(candidate_list)):
+for candidate in candidate_list:
     try: # simple
-        sig = round(candidate_list[candidate]['SIG'], 2)
+        sig = round(candidate['SIG'], 2)
     except: # ugali
-        sig = round(candidate_list[candidate]['TS'], 2)
-    ra      = round(candidate_list[candidate]['RA'], 2)
-    dec     = round(candidate_list[candidate]['DEC'], 2)
-    mod     = round(candidate_list[candidate]['MODULUS'], 2)
+        sig = round(candidate['TS'], 2)
+    ra      = round(candidate['RA'], 2)
+    dec     = round(candidate['DEC'], 2)
+    mod     = round(candidate['MODULUS'], 2)
 
     logfile = '{}/candidate_{}_{}.log'.format(log_dir, ra, dec)
     batch = 'csub -n {} -o {} '.format(jobs, logfile) # q local for debugging
-    #command = 'python make_plot.py %.2f %.2f %.2f'%(ra, dec, mod, sig)
-    #command = 'python make_plot.py {} {} {} {}'.format(ra, dec, mod, sig)
     command = 'python {}/make_plot.py {:0.2f} {:0.2f} {:0.2f} {:0.2f}'.format(simple_dir, ra, dec, mod, sig)
     command_queue = batch + command
     print(command_queue)
