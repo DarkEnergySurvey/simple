@@ -64,6 +64,6 @@ for candidate in range(len(candidate_list)):
     #command = 'python make_plot.py {} {} {} {}'.format(ra, dec, mod, sig)
     command = 'python {}/make_plot.py {:0.2f} {:0.2f} {:0.2f} {:0.2f}'.format(simple_dir, ra, dec, mod, sig)
     command_queue = batch + command
-    print command_queue
+    print(command_queue)
     #os.system('./' + command) # Run locally
     os.system(command_queue) # Submit to queue
