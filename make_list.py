@@ -39,7 +39,7 @@ c5 = fits.Column(name='r',       format='E', array=data[:,4])
 
 # Write fits output
 t = fits.BinTableHDU.from_columns([c1, c2, c3, c4, c5])
-t.writeto(candidate_list)
+t.writeto(candidate_list, overwrite=True)
 
 #from fitsio import FITS
 #
