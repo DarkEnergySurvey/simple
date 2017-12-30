@@ -8,14 +8,13 @@ Maintained by [Sidney Mau](https://github.com/SidneyMau).
 
 ## Dependencies
 
-<!--python
+python
 numpy
 scipy
 matplotlib
-fitsio # I think
-healpy # I think
-ugali-->
-This code assumes a working [ugali](https://github.com/DarkEnergySurvey/ugali) toolkit.
+healpy
+[fitsio](https://github.com/esheldon/fitsio)
+[ugali](https://github.com/DarkEnergySurvey/ugali)
 
 ## Configuration and use
 
