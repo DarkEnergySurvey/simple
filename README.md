@@ -1,6 +1,8 @@
 # Simple Binning Search 
 
-This code has been adapted from [Keith Bechtol](https://github.com/bechtol)'s original simple binning code program to be more modular and ready-to-use for future searches.
+The simple binning suite includes modules for peforming a simple binning search of stellar overdensities in DES &c data, compiling a candidate list from the resulsts of the search, and producing diagnostic plots from a candidate list.
+
+This code has been adapted from [Keith Bechtol](https://github.com/bechtol)'s original simple binning program to be more modular and ready-to-use for future searches.
 
 Maintained by [Sidney Mau](https://github.com/SidneyMau).
 
