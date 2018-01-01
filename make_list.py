@@ -31,14 +31,16 @@ dt = np.dtype([('SIG', '>f4'), ('RA', '>f4'), ('DEC', '>f4'), ('MODULUS', '>f4')
 data = data.astype(dt)
 
 # Create fits columns
-c1 = fits.Column(name='SIG',     format='E', array=data[:,0])
-c2 = fits.Column(name='RA',      format='E', array=data[:,1])
-c3 = fits.Column(name='DEC',     format='E', array=data[:,2])
-c4 = fits.Column(name='MODULUS', format='E', array=data[:,3])
-c5 = fits.Column(name='r',       format='E', array=data[:,4])
+c0 = fits.Column(name='SIG',     format='E', array=data[:,0])
+c1 = fits.Column(name='RA',      format='E', array=data[:,1])
+c2 = fits.Column(name='DEC',     format='E', array=data[:,2])
+c3 = fits.Column(name='MODULUS', format='E', array=data[:,3])
+c4 = fits.Column(name='r',       format='E', array=data[:,4])
+#c5 = fits.Column(name='ASSOC',   format='E', array=data[:,5])
+#c6 = fits.Column(name='ANGSEP',  format='E', array=data[:,6])
 
 # Write fits output
-t = fits.BinTableHDU.from_columns([c1, c2, c3, c4, c5])
+t = fits.BinTableHDU.from_columns([c0, c1, c2, c3, c4])
 t.writeto(candidate_list, overwrite=True)
 
 #from fitsio import FITS

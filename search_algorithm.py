@@ -398,7 +398,7 @@ def searchByDistance(nside, data, distance_modulus, ra_select, dec_select, magni
                 print(float(len(subpix_annulus_region)) / len(subpix_annulus))
                 if (float(len(subpix_annulus_region)) / len(subpix_annulus)) < 0.25:
                     characteristic_density_local = characteristic_density
-                    print('characteristic_density_local spotty {}'.format(characteristic_density_local)
+                    print('characteristic_density_local spotty {}').format(characteristic_density_local)
                 else:
                     characteristic_density_local = float(np.sum(np.in1d(subpix, subpix_annulus_region))) \
                                                    / (healpy.nside2pixarea(nside_fracdet, degrees=True) * len(subpix_annulus_region)) # deg^-2
@@ -591,8 +591,24 @@ for ii in range(0, len(sig_peak_array)):
 
 outfile = '{}/results_nside_{}_{}.csv'.format(results_dir, nside, pix_nside_select)
 writer = open(outfile, 'w')
-#writer.write('SIG, RA, DEC, MODULUS, r\n')
 for ii in range(0, len(sig_peak_array)):
+    # Write 'SIG, RA, DEC, MODULUS, r, ASSOC, ANGSEP\n'
+
+    ## Check for possible associations
+    #glon_peak, glat_peak = ugali.utils.projector.celToGal(ra_peak_array[ii], dec_peak_array[ii])
+    #catalog_array = ['McConnachie15', 'Harris96', 'Corwen04', 'Nilson73', 'Webbink85', 'Kharchenko13', 'WEBDA14','ExtraDwarfs','ExtraClusters']
+    #catalog = ugali.candidate.associate.SourceCatalog()
+    #for catalog_name in catalog_array:
+    #    catalog += ugali.candidate.associate.catalogFactory(catalog_name)
+    #idx1, idx2, sep = catalog.match(glon_peak, glat_peak, tol=0.5, nnearest=1)
+    #match = catalog[idx2]
+    #if len(match) > 0:
+    #    assoc  = '{}'.format(match[0]['name'])
+    #    angsep = float(sep)
+    #else:
+    #    assoc  = 'nan'
+    #    angsep = 0.000
+
     writer.write('{:10.2f}, {:10.2f}, {:10.2f}, {:10.2f}, {:10.2f}\n'.format(sig_peak_array[ii], 
                                                              ra_peak_array[ii], 
                                                              dec_peak_array[ii], 

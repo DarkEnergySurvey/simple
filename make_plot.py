@@ -74,7 +74,7 @@ diagnostic_plots.radialPlot(targ_ra, targ_dec, data, iso, g_radius, nbhd)
 
 # Name
 try: # ugali
-    association_string = candidate_list[candidate]['NAME'] # for ugali
+    association_string = candidate_list[candidate]['NAME']
 except: # simple
     # Check for possible associations
     glon_peak, glat_peak = ugali.utils.projector.celToGal(targ_ra, targ_dec)
@@ -89,6 +89,17 @@ except: # simple
         association_string = '{} at {:0.3f} deg'.format(match[0]['name'], float(sep))
     else:
         association_string = 'No association within 0.5 deg'
+
+# Currently in development -- not passing candidate into this program anymore
+#try: # ugali
+#    association_string = candidate_list[candidate]['NAME']
+#except: # simple
+#    assoc  = candidate_list[candidate]['ASSOC']
+#    angsep = candidate_list[candidate]['ANGSEP']
+#    if assoc == 'nan':
+#        association_string = 'No association within 0.5 deg'
+#    else:
+#        association_string = '{} at {:0.3f} deg'.format(assoc, float(angsep))
 
 association_string = str(np.char.strip(association_string))
 
