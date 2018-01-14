@@ -29,6 +29,8 @@ import matplotlib
 from matplotlib import mlab
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
+import filters
+
 ################################################################################
 
 with open('config.yaml', 'r') as ymlfile:
@@ -37,51 +39,30 @@ with open('config.yaml', 'r') as ymlfile:
 nside   = cfg[cfg['data']]['nside']
 datadir = cfg[cfg['data']]['datadir']
 
-#maglim_g = cfg[cfg['data']]['maglim_g']
-#maglim_r = cfg[cfg['data']]['maglim_r']
+mag_g = cfg[cfg['data']]['mag_g']
+mag_r = cfg[cfg['data']]['mag_r']
 
-#mag_g_dred = cfg[cfg['data']]['mag_g_dred']
-#mag_r_dred = cfg[cfg['data']]['mag_r_dred']
-mag_g_dred_flag         = cfg[cfg['data']]['mag_g_dred_flag']
-mag_r_dred_flag         = cfg[cfg['data']]['mag_r_dred_flag']
-#mag_g_flag              = cfg[cfg['data']]['mag_g_flag']
-#mag_r_flag              = cfg[cfg['data']]['mag_r_flag']
-mag_err_g_flag          = cfg[cfg['data']]['mag_err_g_flag']
-mag_err_r_flag          = cfg[cfg['data']]['mag_err_r_flag']
-#extinction_g_flag       = cfg[cfg['data']]['extinction_g_flag']
-#extinction_r_flag       = cfg[cfg['data']]['extinction_r_flag']
-star_galaxy_classification = cfg[cfg['data']]['star_galaxy_classification']
-#star_filter_cfg = cfg[cfg['data']]['star_filter']
-#galaxy_filter_cfg = cfg[cfg['data']]['galaxy_filter']
-#blue_star_filter_cfg = cfg[cfg['data']]['blue_star_filter']
-#spread_model_r_flag     = cfg[cfg['data']]['spread_model_r_flag']
-#spread_model_r_err_flag = cfg[cfg['data']]['spread_model_r_err_flag']
-flags_g                 = cfg[cfg['data']]['flags_g']
-flags_r                 = cfg[cfg['data']]['flags_r']
-
-################################################################################
-
-def star_filter(data):
-    """Selects stars from the data set"""
-    filter = (data[star_galaxy_classification] >= 0) & (data[star_galaxy_classification] <= 2)
-    #filter = (data[spread_model_r_flag] < 0.003)
-    #filter = star_filter_cfg
-    return filter
-
-def galaxy_filter(data):
-    """Selects galaxies from the data set"""
-    filter = (data[star_galaxy_classification] > 2)
-    #filter = (data[spread_model_r_flag] > 0.005)
-    #filter = galaxy_filter_cfg
-    return filter
-
-def blue_star_filter(data):
-    """Selects blue stars from the data set"""
-    filter = (star_filter(data)) & ((data[mag_g_dred_flag] - data[mag_r_dred_flag]) < 0.4) # 0.2
-    #filter = blue_star_filter_cfg
-    return filter
-
-# apply filter to cut out background galaxy contamination
+##maglim_g = cfg[cfg['data']]['maglim_g']
+##maglim_r = cfg[cfg['data']]['maglim_r']
+#
+##mag_g_dred = cfg[cfg['data']]['mag_g_dred']
+##mag_r_dred = cfg[cfg['data']]['mag_r_dred']
+#mag_g_dred_flag         = cfg[cfg['data']]['mag_g_dred_flag']
+#mag_r_dred_flag         = cfg[cfg['data']]['mag_r_dred_flag']
+##mag_g_flag              = cfg[cfg['data']]['mag_g_flag']
+##mag_r_flag              = cfg[cfg['data']]['mag_r_flag']
+#mag_err_g_flag          = cfg[cfg['data']]['mag_err_g_flag']
+#mag_err_r_flag          = cfg[cfg['data']]['mag_err_r_flag']
+##extinction_g_flag       = cfg[cfg['data']]['extinction_g_flag']
+##extinction_r_flag       = cfg[cfg['data']]['extinction_r_flag']
+#star_galaxy_classification = cfg[cfg['data']]['star_galaxy_classification']
+##star_filter_cfg = cfg[cfg['data']]['star_filter']
+##galaxy_filter_cfg = cfg[cfg['data']]['galaxy_filter']
+##blue_star_filter_cfg = cfg[cfg['data']]['blue_star_filter']
+##spread_model_r_flag     = cfg[cfg['data']]['spread_model_r_flag']
+##spread_model_r_err_flag = cfg[cfg['data']]['spread_model_r_err_flag']
+#flags_g                 = cfg[cfg['data']]['flags_g']
+#flags_r                 = cfg[cfg['data']]['flags_r']
 
 ################################################################################
 
@@ -102,6 +83,8 @@ def analysis(targ_ra, targ_dec, mod):
             reader.close()
     print('Assembling data...')
     data = np.concatenate(data_array)
+    quality_cut = filters.quality_filter(cfg['data'], data)
+    data = data[quality_cut]
     print('Found {} objects...').format(len(data))
     print('Loading data...')
 
@@ -118,20 +101,21 @@ def analysis(targ_ra, targ_dec, mod):
 
     #mag_g = data[mag_g_dred_flag]
     #mag_r = data[mag_r_dred_flag]
+    data = filters.dered_mag(cfg['data'], data)
 
     iso = isochrone_factory('Bressan2012', age=12, z=0.0001, distance_modulus=mod)
 
     # g_radius estimate
-    filter_s = star_filter(data)
+    filter = filters.star_filter(cfg['data'], data)
 
-    iso_filter = (iso.separation(data[mag_g_dred_flag], data[mag_r_dred_flag]) < 0.1)
+    iso_filter = (iso.separation(data[mag_g], data[mag_r]) < 0.1)
 
     angsep = ugali.utils.projector.angsep(targ_ra, targ_dec, data['RA'], data['DEC'])
 
     bins = np.linspace(0, 0.4, 21) # deg
     centers = 0.5*(bins[1:] + bins[0:-1])
     area = np.pi*(bins[1:]**2 - bins[0:-1]**2) * 60**2
-    hist = np.histogram(angsep[(angsep < 0.4) & filter_s & iso_filter], bins=bins)[0] # counts
+    hist = np.histogram(angsep[(angsep < 0.4) & filter & iso_filter], bins=bins)[0] # counts
 
     f_interp = interpolate.interp1d(np.linspace(centers[0], centers[-1], len(hist)), hist/area, 'cubic')
     f_range = np.linspace(centers[0], centers[-1], 1000)
@@ -188,16 +172,17 @@ def densityPlot(targ_ra, targ_dec, data, iso, g_radius, nbhd, type):
     """Stellar density plot"""
 
     if type == 'stars':
-        filter = star_filter(data)
+        filter = filters.star_filter(cfg['data'], data)
         plt.title('Stellar Density')
     elif type == 'galaxies':
-        filter = galaxy_filter(data)
+        filter = filters.galaxy_filter(cfg['data'], data)
         plt.title('Galactic Density')
     elif type == 'blue_stars':
-        filter = blue_star_filter(data)
+        filter = filters.color_filter(cfg['data'], data) \
+               & filters.star_filter(cfg['data'], data)
         plt.title('Blue Stellar Density')
 
-    iso_filter = (iso.separation(data[mag_g_dred_flag], data[mag_r_dred_flag]) < 0.1)
+    iso_filter = (iso.separation(data[mag_g], data[mag_r]) < 0.1)
 
     # projection of image
     proj = ugali.utils.projector.Projector(targ_ra, targ_dec)
@@ -228,9 +213,9 @@ def densityPlot(targ_ra, targ_dec, data, iso, g_radius, nbhd, type):
 def starPlot(targ_ra, targ_dec, data, iso, g_radius, nbhd):
     """Star bin plot"""
 
-    filter = star_filter(data)
+    filter = filters.star_filter(cfg['data'], data)
 
-    iso_filter = (iso.separation(data[mag_g_dred_flag], data[mag_r_dred_flag]) < 0.1)
+    iso_filter = (iso.separation(data[mag_g], data[mag_r]) < 0.1)
 
     # projection of image
     proj = ugali.utils.projector.Projector(targ_ra, targ_dec)
@@ -252,25 +237,25 @@ def cmPlot(targ_ra, targ_dec, data, iso, g_radius, nbhd, type):
     annulus = (angsep > g_radius) & (angsep < 1.)
 
     if type == 'stars':
-        filter = star_filter(data)
+        filter = filters.star_filter(cfg['data'], data)
         plt.title('Stellar Color-Magnitude')
     elif type == 'galaxies':
-        filter = galaxy_filter(data)
+        filter = filters.galaxy_filter(cfg['data'], data)
         plt.title('Galactic Color-Magnitude')
 
-    iso_filter = (iso.separation(data[mag_g_dred_flag], data[mag_r_dred_flag]) < 0.1)
+    iso_filter = (iso.separation(data[mag_g], data[mag_r]) < 0.1)
 
     # Plot background objects
-    plt.scatter(data[mag_g_dred_flag][filter & annulus] - data[mag_r_dred_flag][filter & annulus], data[mag_g_dred_flag][filter & annulus], c='k', alpha=0.1, edgecolor='none', s=1)
+    plt.scatter(data[mag_g][filter & annulus] - data[mag_r][filter & annulus], data[mag_g][filter & annulus], c='k', alpha=0.1, edgecolor='none', s=1)
 
     # Plot isochrone
     ugali.utils.plotting.drawIsochrone(iso, lw=2, label='{} Gyr, z = {}'.format(iso.age, iso.metallicity))
 
     # Plot objects in nbhd
-    plt.scatter(data[mag_g_dred_flag][filter & nbhd] - data[mag_r_dred_flag][filter & nbhd], data[mag_g_dred_flag][filter & nbhd], c='g', s=5, label='r < {:.3f}$^\circ$'.format(g_radius))
+    plt.scatter(data[mag_g][filter & nbhd] - data[mag_r][filter & nbhd], data[mag_g][filter & nbhd], c='g', s=5, label='r < {:.3f}$^\circ$'.format(g_radius))
 
     # Plot objects in nbhd and near isochrone
-    plt.scatter(data[mag_g_dred_flag][filter & nbhd & iso_filter] - data[mag_r_dred_flag][filter & nbhd & iso_filter], data[mag_g_dred_flag][filter & nbhd & iso_filter], c='r', s=5, label='$\Delta$CM < 0.1')
+    plt.scatter(data[mag_g][filter & nbhd & iso_filter] - data[mag_r][filter & nbhd & iso_filter], data[mag_g][filter & nbhd & iso_filter], c='r', s=5, label='$\Delta$CM < 0.1')
 
     plt.axis([-0.5, 1, 16, 25])
     plt.gca().invert_yaxis()
@@ -282,7 +267,7 @@ def cmPlot(targ_ra, targ_dec, data, iso, g_radius, nbhd, type):
 def hessPlot(targ_ra, targ_dec, data, iso, g_radius, nbhd):
     """Hess plot"""
 
-    filter_s = star_filter(data)
+    filter = filters.star_filter(cfg['data'], data)
 
     plt.title('Hess')
 
@@ -297,8 +282,8 @@ def hessPlot(targ_ra, targ_dec, data, iso, g_radius, nbhd):
     xbins = np.arange(-0.5, 1.1, 0.1)
     ybins = np.arange(16., 25.5, 0.5)
 
-    foreground = np.histogram2d(data[mag_g_dred_flag][inner & filter_s] - data[mag_r_dred_flag][inner & filter_s], data[mag_g_dred_flag][inner & filter_s], bins=[xbins, ybins])
-    background = np.histogram2d(data[mag_g_dred_flag][outer & filter_s] - data[mag_r_dred_flag][outer & filter_s], data[mag_g_dred_flag][outer & filter_s], bins=[xbins, ybins])
+    foreground = np.histogram2d(data[mag_g][inner & filter] - data[mag_r][inner & filter], data[mag_g][inner & filter], bins=[xbins, ybins])
+    background = np.histogram2d(data[mag_g][outer & filter] - data[mag_r][outer & filter], data[mag_g][outer & filter], bins=[xbins, ybins])
 
     fg = foreground[0].T
     bg = background[0].T
@@ -329,16 +314,17 @@ def hessPlot(targ_ra, targ_dec, data, iso, g_radius, nbhd):
 def radialPlot(targ_ra, targ_dec, data, iso, g_radius, nbhd):
     """Radial distribution plot"""
 
-    filter_s = star_filter(data)
-    filter_g = galaxy_filter(data)
+    ## Deprecated?
+    #filter_s = filters.star_filter(cfg['data'], data)
+    #filter_g = filters.galaxy_filter(cfg['data'], data)
 
     plt.title('Radial Distribution')
 
     angsep = ugali.utils.projector.angsep(targ_ra, targ_dec, data['RA'], data['DEC'])
 
     # Isochrone filtered/unfiltered
-    iso_seln_f = (iso.separation(data[mag_g_dred_flag], data[mag_r_dred_flag]) < 0.1)
-    iso_seln_u = (iso.separation(data[mag_g_dred_flag], data[mag_r_dred_flag]) >= 0.1)
+    iso_seln_f = (iso.separation(data[mag_g], data[mag_r]) < 0.1)
+    iso_seln_u = (iso.separation(data[mag_g], data[mag_r]) >= 0.1)
 
     bins = np.linspace(0, 0.4, 21) # deg
     centers = 0.5*(bins[1:] + bins[0:-1])
@@ -346,9 +332,9 @@ def radialPlot(targ_ra, targ_dec, data, iso, g_radius, nbhd):
 
     def interp_values(type, seln):
         if type == 'stars':
-            filter = star_filter(data)
+            filter = filters.star_filter(cfg['data'], data)
         elif type == 'galaxies':
-            filter = galaxy_filter(data)
+            filter = filters.galaxy_filter(cfg['data'], data)
 
         if seln == 'f':
             iso_filter = iso_seln_f
@@ -365,9 +351,9 @@ def radialPlot(targ_ra, targ_dec, data, iso, g_radius, nbhd):
 
     def value_errors(type, seln):
         if type == 'stars':
-            filter = star_filter(data)
+            filter = filters.star_filter(cfg['data'], data)
         elif type == 'galaxies':
-            filter = galaxy_filter(data)
+            filter = filters.galaxy_filter(cfg['data'], data)
         if seln == 'f':
             iso_filter = iso_seln_f
         elif seln == 'u':
