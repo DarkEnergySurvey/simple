@@ -13,12 +13,13 @@ import sys
 import os
 import glob
 import yaml
-import numpy
+#import numpy
 import numpy as np
 from matplotlib import mlab
 import pyfits
 import astropy.io.fits as pyfits
-import healpy
+#import healpy
+import healpy as hp
 import scipy.interpolate
 from scipy import interpolate
 import scipy.ndimage
@@ -35,6 +36,8 @@ import ugali.candidate.associate
 from ugali.isochrone import factory as isochrone_factory
 from astropy.coordinates import SkyCoord
 
+import filters
+
 #pylab.ion() # For interactive plotting
 
 ###########################################################
@@ -50,19 +53,13 @@ datadir = cfg[cfg['data']]['datadir']
 
 fracdet_map = cfg[cfg['data']]['fracdet']
 
+mag_g = cfg[cfg['data']]['mag_g']
+mag_r = cfg[cfg['data']]['mag_r']
+
 mag_g_dred_flag         = cfg[cfg['data']]['mag_g_dred_flag']
 mag_r_dred_flag         = cfg[cfg['data']]['mag_r_dred_flag']
-#mag_g_flag              = cfg[cfg['data']]['mag_g_flag']
-#mag_r_flag              = cfg[cfg['data']]['mag_r_flag']
 mag_err_g_flag          = cfg[cfg['data']]['mag_err_g_flag']
 mag_err_r_flag          = cfg[cfg['data']]['mag_err_r_flag']
-#extinction_g_flag       = cfg[cfg['data']]['extinction_g_flag']
-#extinction_r_flag       = cfg[cfg['data']]['extinction_r_flag']
-star_galaxy_classification = cfg[cfg['data']]['star_galaxy_classification']
-#spread_model_r_flag     = cfg[cfg['data']]['spread_model_r_flag']
-#spread_model_r_err_flag = cfg[cfg['data']]['spread_model_r_err_flag']
-flags_g                 = cfg[cfg['data']]['flags_g']
-flags_r                 = cfg[cfg['data']]['flags_r']
 
 results_dir = os.path.join(os.getcwd(), cfg['output']['results_dir'])
 if not os.path.exists(results_dir):
@@ -78,12 +75,12 @@ def cutIsochronePath(g, r, g_err, r_err, isochrone, radius=0.1, return_all=False
     """
     Cut to identify objects within isochrone cookie-cutter.
     """
-    if numpy.all(isochrone.stage == 'Main'):
+    if np.all(isochrone.stage == 'Main'):
         # Dotter case
         index_transition = len(isochrone.stage)
     else:
         # Other cases
-        index_transition = numpy.nonzero(isochrone.stage > 3)[0][0] + 1    
+        index_transition = np.nonzero(isochrone.stage > 3)[0][0] + 1    
     mag_1_rgb = isochrone.mag_1[0: index_transition] + isochrone.distance_modulus
     mag_2_rgb = isochrone.mag_2[0: index_transition] + isochrone.distance_modulus
     
@@ -92,22 +89,22 @@ def cutIsochronePath(g, r, g_err, r_err, isochrone, radius=0.1, return_all=False
     
     # Cut one way...
     f_isochrone = scipy.interpolate.interp1d(mag_2_rgb, mag_1_rgb - mag_2_rgb, bounds_error=False, fill_value = 999.)
-    color_diff = numpy.fabs((g - r) - f_isochrone(r))
-    cut_2 = (color_diff < numpy.sqrt(0.1**2 + r_err**2 + g_err**2))
+    color_diff = np.fabs((g - r) - f_isochrone(r))
+    cut_2 = (color_diff < np.sqrt(0.1**2 + r_err**2 + g_err**2))
 
      # ...and now the other
     f_isochrone = scipy.interpolate.interp1d(mag_1_rgb, mag_1_rgb - mag_2_rgb, bounds_error=False, fill_value = 999.)
-    color_diff = numpy.fabs((g - r) - f_isochrone(g))
-    cut_1 = (color_diff < numpy.sqrt(0.1**2 + r_err**2 + g_err**2))
+    color_diff = np.fabs((g - r) - f_isochrone(g))
+    cut_1 = (color_diff < np.sqrt(0.1**2 + r_err**2 + g_err**2))
 
-    cut = numpy.logical_or(cut_1, cut_2)
+    cut = np.logical_or(cut_1, cut_2)
 
-    mag_bins = numpy.arange(17., 24.1, 0.1)
+    mag_bins = np.arange(17., 24.1, 0.1)
     mag_centers = 0.5 * (mag_bins[1:] + mag_bins[0:-1])
-    magerr = numpy.tile(0., len(mag_centers))
+    magerr = np.tile(0., len(mag_centers))
     for ii in range(0, len(mag_bins) - 1):
         cut_mag_bin = (g > mag_bins[ii]) & (g < mag_bins[ii + 1])
-        magerr[ii] = numpy.median(numpy.sqrt(0.1**2 + r_err[cut_mag_bin]**2 + g_err[cut_mag_bin]**2))
+        magerr[ii] = np.median(np.sqrt(0.1**2 + r_err[cut_mag_bin]**2 + g_err[cut_mag_bin]**2))
 
     if return_all:
         return cut, mag_centers[f_isochrone(mag_centers) < 100], (f_isochrone(mag_centers) + magerr)[f_isochrone(mag_centers) < 100], (f_isochrone(mag_centers) - magerr)[f_isochrone(mag_centers) < 100]
@@ -117,8 +114,8 @@ def cutIsochronePath(g, r, g_err, r_err, isochrone, radius=0.1, return_all=False
 ############################################################
 
 def circle(x, y, r):
-    phi = numpy.linspace(0, 2 * numpy.pi, 1000)
-    return x + (r * numpy.cos(phi)), y + (r * numpy.sin(phi))
+    phi = np.linspace(0, 2 * np.pi, 1000)
+    return x + (r * np.cos(phi)), y + (r * np.sin(phi))
 
 ############################################################
 
@@ -132,7 +129,7 @@ print('Search coordinates: (RA, Dec) = ({:0.2f}, {:0.2f})').format(ra_select, de
 # Now cut for a single pixel
 pix_nside_select = ugali.utils.healpix.angToPix(nside, ra_select, dec_select)
 ra_select, dec_select = ugali.utils.healpix.pixToAng(nside, pix_nside_select)
-pix_nside_neighbors = numpy.concatenate([[pix_nside_select], healpy.get_all_neighbours(nside, pix_nside_select)])
+pix_nside_neighbors = np.concatenate([[pix_nside_select], hp.get_all_neighbours(nside, pix_nside_select)])
 
 ############################################################
 
@@ -146,33 +143,21 @@ for pix_nside in pix_nside_neighbors:
         data_array.append(reader[1].data)
         reader.close()
 print('Assembling data...')
-data = numpy.concatenate(data_array) # TODO reduce this to just use needed columns so there is no excessive use of memory
+data = np.concatenate(data_array)
 
-# De-redden magnitudes
-#try:
-#    data = mlab.rec_append_fields(data, ['WAVG_MAG_PSF_DRED_G', 'WAVG_MAG_PSF_DRED_R'], [data[mag_g_dred_flag], data[mag_r_dred_flag]])
-#except:
-#    data = mlab.rec_append_fields(data, ['WAVG_MAG_PSF_DRED_G', 'WAVG_MAG_PSF_DRED_R'], [data[mag_g_flag] - data[extinction_g_flag], data[mag_r_flag] - data[extinction_r_flag]])
-#except:
-#    data = mlab.rec_append_fields(data, ['WAVG_MAG_PSF_DRED_G', 'WAVG_MAG_PSF_DRED_R'], [data[mag_g_flag], data[mag_r_flag]])
+# Quality cut
+data = filters.quality_filter(cfg['data'], data)
+
+# Deredden magnitudes
+data = filters.dered_mag(cfg['data'], data)
 
 print('Found {} objects...').format(len(data))
 
 ############################################################
 
 print('Applying cuts...')
-#cut = (data[flags_g] < 4) & (data[flags_r] < 4) \
-#      & (data['WAVG_MAG_PSF_DRED_G'] < 24.0) \
-#      & ((data['WAVG_MAG_PSF_DRED_G'] - data['WAVG_MAG_PSF_DRED_R']) < 1.) \
-#      & (numpy.fabs(data[spread_model_r_flag]) < 0.003 + data[spread_model_r_err_flag])
-#
-#cut_gal = (data[flags_g] < 4) & (data[flags_r] < 4) \
-#          & (data['WAVG_MAG_PSF_DRED_G'] < 24.0) \
-#          & ((data['WAVG_MAG_PSF_DRED_G'] - data['WAVG_MAG_PSF_DRED_R']) < 1.) \
-#          & (numpy.fabs(data[spread_model_r_flag]) > 0.003 + data[spread_model_r_err_flag])
-
-cut = (data[star_galaxy_classification] >= 0) & (data[star_galaxy_classification] <= 2)
-cut_gal = (data[star_galaxy_classification] > 2)
+cut = filters.star_filter(cfg['data'], data)
+cut_gal = filters.galaxy_filter(cfg['data'], data)
 
 data_gal = data[cut_gal]
 data = data[cut]
@@ -184,7 +169,7 @@ print('{} galaxy-like objects in ROI...').format(len(data_gal))
 
 if (fracdet_map is not None) and (fracdet_map.lower().strip() != 'none') and (fracdet_map != ''):
     print('Reading fracdet map {} ...').format(fracdet_map)
-    fracdet = healpy.read_map(fracdet_map)
+    fracdet = hp.read_map(fracdet_map)
 else:
     print('No fracdet map specified ...')
     fracdet = None
@@ -204,7 +189,7 @@ def searchByDistance(nside, data, distance_modulus, ra_select, dec_select, magni
     fracdet corresponds to a fracdet map (numpy array, assumed to be EQUATORIAL and RING)
     """
 
-    SCALE = 2.75 * (healpy.nside2resol(nside, arcmin=True) / 60.) # deg, scale for 2D histogram and various plotting
+    SCALE = 2.75 * (hp.nside2resol(nside, arcmin=True) / 60.) # deg, scale for 2D histogram and various plotting
 
     print('Distance = {:0.1f} kpc (m-M = {:0.1f})').format(ugali.utils.projector.distanceModulusToDistance(distance_modulus), distance_modulus)
 
@@ -215,9 +200,9 @@ def searchByDistance(nside, data, distance_modulus, ra_select, dec_select, magni
     iso.metallicity = 0.0001
     iso.distance_modulus = distance_modulus
 
-    cut = cutIsochronePath(data[mag_g_dred_flag], data[mag_r_dred_flag], data[mag_err_g_flag], data[mag_err_r_flag], iso, radius=0.1)
+    cut = cutIsochronePath(data[mag_g], data[mag_r], data[mag_err_g_flag], data[mag_err_r_flag], iso, radius=0.1)
     data = data[cut]
-    cut_magnitude_threshold = (data[mag_g_dred_flag] < magnitude_threshold)
+    cut_magnitude_threshold = (data[mag_g] < magnitude_threshold)
 
     print('{} objects left after isochrone cut...').format(len(data))
 
@@ -229,11 +214,11 @@ def searchByDistance(nside, data, distance_modulus, ra_select, dec_select, magni
     delta_x = 0.01
     area = delta_x**2
     smoothing = 2. / 60. # Was 3 arcmin
-    bins = numpy.arange(-8., 8. + 1.e-10, delta_x)
+    bins = np.arange(-8., 8. + 1.e-10, delta_x)
     centers = 0.5 * (bins[0: -1] + bins[1:])
-    yy, xx = numpy.meshgrid(centers, centers)
+    yy, xx = np.meshgrid(centers, centers)
 
-    h = numpy.histogram2d(x, y, bins=[bins, bins])[0]
+    h = np.histogram2d(x, y, bins=[bins, bins])[0]
 
     if plot:
         #pylab.figure('raw')
@@ -256,9 +241,9 @@ def searchByDistance(nside, data, distance_modulus, ra_select, dec_select, magni
         reso = 0.25
         pylab.figure('gnom')
         pylab.clf()
-        healpy.gnomview(fracdet, fig='gnom', rot=(ra_select, dec_select, 0.), reso=reso, xsize=(2. * SCALE * 60. / reso), 
+        hp.gnomview(fracdet, fig='gnom', rot=(ra_select, dec_select, 0.), reso=reso, xsize=(2. * SCALE * 60. / reso), 
                         cmap='Greens', title='Fracdet') #binary
-        healpy.projscatter(data['RA'], data['DEC'], edgecolor='none', c='red', lonlat=True, s=2)
+        hp.projscatter(data['RA'], data['DEC'], edgecolor='none', c='red', lonlat=True, s=2)
 
     h_g = scipy.ndimage.filters.gaussian_filter(h, smoothing / delta_x)
 
@@ -281,10 +266,10 @@ def searchByDistance(nside, data, distance_modulus, ra_select, dec_select, magni
     # Use pixels with fracdet ~1.0 to estimate the characteristic density
     if fracdet is not None:
         fracdet_zero = np.tile(0., len(fracdet))
-        cut = (fracdet != healpy.UNSEEN)
+        cut = (fracdet != hp.UNSEEN)
         fracdet_zero[cut] = fracdet[cut]
 
-        nside_fracdet = healpy.npix2nside(len(fracdet))
+        nside_fracdet = hp.npix2nside(len(fracdet))
         
         subpix_region_array = []
         for pix in np.unique(ugali.utils.healpix.angToPix(nside, data['RA'], data['DEC'])):
@@ -292,7 +277,7 @@ def searchByDistance(nside, data, distance_modulus, ra_select, dec_select, magni
         subpix_region_array = np.concatenate(subpix_region_array)
 
         # Compute mean fracdet in the region so that this is available as a correction factor
-        cut = (fracdet[subpix_region_array] != healpy.UNSEEN)
+        cut = (fracdet[subpix_region_array] != hp.UNSEEN)
         mean_fracdet = np.mean(fracdet[subpix_region_array[cut]])
 
         subpix_region_array = subpix_region_array[fracdet[subpix_region_array] > 0.99]
@@ -300,7 +285,7 @@ def searchByDistance(nside, data, distance_modulus, ra_select, dec_select, magni
                                               data['RA'][cut_magnitude_threshold], 
                                               data['DEC'][cut_magnitude_threshold]) # Remember to apply mag threshold to objects
         characteristic_density_fracdet = float(np.sum(np.in1d(subpix, subpix_region_array))) \
-                                         / (healpy.nside2pixarea(nside_fracdet, degrees=True) * len(subpix_region_array)) # deg^-2
+                                         / (hp.nside2pixarea(nside_fracdet, degrees=True) * len(subpix_region_array)) # deg^-2
         print('Characteristic density fracdet = {:0.1f} deg^-2').format(characteristic_density_fracdet)
         
         # Correct the characteristic density by the mean fracdet value
@@ -336,7 +321,7 @@ def searchByDistance(nside, data, distance_modulus, ra_select, dec_select, magni
         pylab.ylabel(r'$\Delta$ Dec (deg)')
         pylab.title('(RA, Dec, mu) = ({:0.2f}, {:0.2f}, {:0.2f})'.format(ra_select, dec_select, distance_modulus))
 
-    factor_array = numpy.arange(1., 5., 0.05)
+    factor_array = np.arange(1., 5., 0.05)
     rara, decdec = proj.imageToSphere(xx.flatten(), yy.flatten())
     cutcut = (ugali.utils.healpix.angToPix(nside, rara, decdec) == pix_nside_select).reshape(xx.shape)
     threshold_density = 5 * characteristic_density * area
@@ -401,7 +386,7 @@ def searchByDistance(nside, data, distance_modulus, ra_select, dec_select, magni
                     print('characteristic_density_local spotty {}').format(characteristic_density_local)
                 else:
                     characteristic_density_local = float(np.sum(np.in1d(subpix, subpix_annulus_region))) \
-                                                   / (healpy.nside2pixarea(nside_fracdet, degrees=True) * len(subpix_annulus_region)) # deg^-2
+                                                   / (hp.nside2pixarea(nside_fracdet, degrees=True) * len(subpix_annulus_region)) # deg^-2
                     print('characteristic_density_local cleaned up {}').format(characteristic_density_local)
         else:
             # Compute the local characteristic density
@@ -479,8 +464,8 @@ def diagnostic(data, data_gal, ra_peak, dec_peak, r_peak, sig_peak, distance_mod
     #iso_alt.metallicity = metallicity
     #iso_alt.distance_modulus = distance_modulus
 
-    cut_iso, g_iso, gr_iso_min, gr_iso_max = cutIsochronePath(data[mag_g_dred_flag], 
-                                                              data[mag_r_dred_flag], 
+    cut_iso, g_iso, gr_iso_min, gr_iso_max = cutIsochronePath(data[mag_g], 
+                                                              data[mag_r], 
                                                               data[mag_err_g_flag], 
                                                               data[mag_err_r_flag], 
                                                               iso, 
@@ -494,8 +479,8 @@ def diagnostic(data, data_gal, ra_peak, dec_peak, r_peak, sig_peak, distance_mod
     #                               iso,
     #                               radius=0.1,
     #                               return_all=False)
-    cut_iso_gal = cutIsochronePath(data_gal[mag_g_dred_flag],
-                                   data_gal[mag_r_dred_flag],
+    cut_iso_gal = cutIsochronePath(data_gal[mag_g],
+                                   data_gal[mag_r],
                                    data_gal[mag_err_g_flag],
                                    data_gal[mag_err_r_flag],
                                    iso,

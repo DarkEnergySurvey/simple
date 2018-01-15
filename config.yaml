@@ -9,7 +9,7 @@ output:
 batch:
     jobs: 20 # <= 25 for DES cluster computers!
 
-data: 'des' # parameter to change for runs across different data
+data: 'panstarrs' # parameter to change for runs across different data
 
 des: #y3a2:
     nside          : 32
@@ -88,14 +88,12 @@ panstarrs:
 
     mag_g : 'MAG_G'
     mag_r : 'MAG_R'
-    mag_g_dred_flag : 'PSF_MAG_SFD_G'
-    mag_r_dred_flag : 'PSF_MAG_SFD_R'
+    mag_g_dred_flag : 'PSF_MAG_SFD_G' #
+    mag_r_dred_flag : 'PSF_MAG_SFD_R' #
     mag_err_g_flag  : 'PSF_MAG_ERR_G'
     mag_err_r_flag  : 'PSF_MAG_ERR_R'
-    flags_g         : 'SEXTRACTOR_FLAGS_G'
-    flags_r         : 'SEXTRACTOR_FLAGS_R'
-
-    #star_galaxy_classification : 'EXTENDED_CLASS_MASH'
+    flags_g         : 'GFLAGS'
+    flags_r         : 'RFLAGS'
 
     fracdet : None
 
@@ -108,8 +106,8 @@ example:
     mag_r : 'MAG_R'
     #mag_g_dred_flag : 'PSF_MAG_SFD_G'
     #mag_r_dred_flag : 'PSF_MAG_SFD_R'
-    #mag_err_g_flag  : 'PSF_MAG_ERR_G'
-    #mag_err_r_flag  : 'PSF_MAG_ERR_R'
+    mag_err_g_flag  : 'PSF_MAG_ERR_G'
+    mag_err_r_flag  : 'PSF_MAG_ERR_R'
     #flags_g         : 'SEXTRACTOR_FLAGS_G'
     #flags_r         : 'SEXTRACTOR_FLAGS_R'
     #star_galaxy_classification : 'EXTENDED_CLASS_MASH'

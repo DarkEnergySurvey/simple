@@ -19,9 +19,15 @@ def quality_filter(survey, data):
     if survey == 'des':
         cut = (data['PSF_MAG_SFD_G'] < 25)
     elif survey == 'bliss':
-        cut = (data['PSF_MAG_SFD_G'] < 25)
+        cut = (data['PSF_MAG_SFD_G'] < 25) \
+            & (data['SEXTRACTOR_FLAGS_G'] < 4) \
+            & (data['SEXTRACTOR_FLAGS_R'] < 4)
+            #& ((data['PSF_MAG_SFD_G'] - data['PSF_MAG_SFD_R']) < 1.)
     elif survey == 'maglites':
         cut = (data['PSF_MAG_SFD_G'] < 25)
+            & (data['SEXTRACTOR_FLAGS_G'] < 4) \
+            & (data['SEXTRACTOR_FLAGS_R'] < 4)
+            #& ((data['PSF_MAG_SFD_G'] - data['PSF_MAG_SFD_R']) < 1.)
     elif survey == 'panstarrs':
         cut = (np.bitwise_and(data['QUALITYFLAG'], 16) > 0) \
             & (data['NSTACKDETECTIONS'] > 1) \
@@ -45,9 +51,9 @@ def star_filter(survey, data):
         cut = (data['EXTENDED_CLASS_MASH'] >= 0) \
             & (data['EXTENDED_CLASS_MASH'] <= 2)
     elif survey == 'bliss':
-        cut = (data['CM_T'] < 0.003) # use CM_T_ERR?
+        cut = (data['CM_T'] < 0.003 + data['CM_T_ERR'])
     elif survey == 'maglites':
-        cut = (data['CM_T'] < 0.003) # use CM_T_ERR?
+        cut = (data['CM_T'] < 0.003 + data['CM_T_ERR'])
     elif survey == 'panstarrs':
         cut = ((data['IFPSFMAG'] - data['IFKRONMAG']) < 0.05) 
     return cut
@@ -57,9 +63,9 @@ def galaxy_filter(survey, data):
     if survey == 'des':
         cut = (data['EXTENDED_CLASS_MASH'] > 2)
     elif survey == 'bliss':
-        cut = (data['CM_T'] > 0.005) # use CM_T_ERR?
+        cut = (data['CM_T'] > 0.003 + data['CM_T_ERR']) # 0.005?
     elif survey == 'maglites':
-        cut = (data['CM_T'] > 0.005) # use CM_T_ERR?
+        cut = (data['CM_T'] > 0.003 + data['CM_T_ERR']) # 0.005?
     elif survey == 'panstarrs':
         cut = ((data['IFPSFMAG'] - data['IFKRONMAG']) > 0.05) # just a guess
     return cut
@@ -68,8 +74,10 @@ def color_filter(survey, data):
     """Return blue objects"""
     if survey == 'des':
         cut = ((data['PSF_MAG_SFD_G'] - data['PSF_MAG_SFD_R']) < 0.4) # 0.2
-    #elif survey == 'bliss':
-    #elif survey == 'maglites':
+    elif survey == 'bliss':
+        cut = ((data['WAVG_MAG_PSF_DRED_G'] - data['WAVG_MAG_PSF_DRED_R']) < 0.4) # 0.2
+    elif survey == 'maglites':
+        cut = ((data['WAVG_MAG_PSF_DRED_G'] - data['WAVG_MAG_PSF_DRED_R']) < 0.4) # 0.2
     elif survey == 'panstarrs':
         cut = ((data['GFPSFMAG'] - data['IFPSFMAG']) > -0.5) \
             & ((data['GFPSFMAG'] - data['IFPSFMAG']) < 1.0)
