@@ -36,11 +36,14 @@ import filters
 with open('config.yaml', 'r') as ymlfile:
     cfg = yaml.load(ymlfile)
 
-nside   = cfg[cfg['data']]['nside']
-datadir = cfg[cfg['data']]['datadir']
+survey = cfg['data']
+nside   = cfg[survey]['nside']
+datadir = cfg[survey]['datadir']
 
-mag_g = cfg[cfg['data']]['mag_g']
-mag_r = cfg[cfg['data']]['mag_r']
+mag_g = cfg[survey]['mag_g']
+mag_r = cfg[survey]['mag_r']
+mag_g_err = cfg[survey]['mag_g_err']
+mag_r_err = cfg[survey]['mag_r_err']
 
 ##maglim_g = cfg[cfg['data']]['maglim_g']
 ##maglim_r = cfg[cfg['data']]['maglim_r']
@@ -83,7 +86,7 @@ def analysis(targ_ra, targ_dec, mod):
             reader.close()
     print('Assembling data...')
     data = np.concatenate(data_array)
-    quality_cut = filters.quality_filter(cfg['data'], data)
+    quality_cut = filters.quality_filter(survey, data)
     data = data[quality_cut]
     print('Found {} objects...').format(len(data))
     print('Loading data...')
@@ -101,7 +104,7 @@ def analysis(targ_ra, targ_dec, mod):
 
     #mag_g = data[mag_g_dred_flag]
     #mag_r = data[mag_r_dred_flag]
-    data = filters.dered_mag(cfg['data'], data)
+    data = filters.dered_mag(survey, data)
 
     iso = isochrone_factory('Bressan2012', age=12, z=0.0001, distance_modulus=mod)
 

@@ -19,6 +19,9 @@ des: #y3a2:
 
     mag_g : 'MAG_G'
     mag_r : 'MAG_R'
+    mag_g_err             : 'PSF_MAG_ERR_G'
+    mag_r_err             : 'PSF_MAG_ERR_R'
+
     mag_g_dred_flag : 'PSF_MAG_SFD_G'
     mag_r_dred_flag : 'PSF_MAG_SFD_R'
     mag_err_g_flag  : 'PSF_MAG_ERR_G'
@@ -28,8 +31,8 @@ des: #y3a2:
 
     star_galaxy_classification : 'EXTENDED_CLASS_MASH'
 
-    #maglim_g : '/home/s1/kadrlica/projects/y3q2/v6/release/depth/y2q1_maglim_g_n1024_ring.fits.gz'
-    #maglim_r : '/home/s1/kadrlica/projects/y2q/v6/release/depth/y2q1_maglim_r_n1024_ring.fits.gz'
+    maglim_g : '/home/s1/kadrlica/projects/y3q2/v6/release/depth/y2q1_maglim_g_n1024_ring.fits.gz'
+    maglim_r : '/home/s1/kadrlica/projects/y2q/v6/release/depth/y2q1_maglim_r_n1024_ring.fits.gz'
 
     fracdet : 'y3a2_griz_o.4096_t.32768_coverfoot_EQU.fits.gz'
 
@@ -40,20 +43,23 @@ bliss: # Need to update this
 
     mag_g : 'MAG_G'
     mag_r : 'MAG_R'
-    mag_g_dred_flag            : 'PSF_MAG_SFD_G'
-    mag_r_dred_flag            : 'PSF_MAG_SFD_R'
-    #mag_g_flag                : 'CM_MAG_G'
-    #mag_r_flag                : 'CM_MAG_R'
-    mag_err_g_flag             : 'PSF_MAG_ERR_G'
-    mag_err_r_flag             : 'PSF_MAG_ERR_R'
-    #extinction_g_flag         : 'EXTINCTION_G'
-    #extinction_r_flag         : 'EXTINCTION_R'
-    star_galaxy_classification : 'EXTENDED_CLASS_MASH' #spread_model_r_flag
+    mag_g_err             : 'PSF_MAG_ERR_G'
+    mag_r_err             : 'PSF_MAG_ERR_R'
 
-    spread_model_r_flag        : 'CM_T' # use for BISS/MagLiteS
-    spread_model_r_err_flag    : 'CM_T_ERR'
-    flags_g                    : 'SEXTRACTOR_FLAGS_G'
-    flags_r                    : 'SEXTRACTOR_FLAGS_R'
+    #mag_g_dred_flag            : 'PSF_MAG_SFD_G'
+    #mag_r_dred_flag            : 'PSF_MAG_SFD_R'
+    ##mag_g_flag                : 'CM_MAG_G'
+    ##mag_r_flag                : 'CM_MAG_R'
+    #mag_err_g_flag             : 'PSF_MAG_ERR_G'
+    #mag_err_r_flag             : 'PSF_MAG_ERR_R'
+    ##extinction_g_flag         : 'EXTINCTION_G'
+    ##extinction_r_flag         : 'EXTINCTION_R'
+    #star_galaxy_classification : 'EXTENDED_CLASS_MASH' #spread_model_r_flag
+
+    #spread_model_r_flag        : 'CM_T' # use for BISS/MagLiteS
+    #spread_model_r_err_flag    : 'CM_T_ERR'
+    #flags_g                    : 'SEXTRACTOR_FLAGS_G'
+    #flags_r                    : 'SEXTRACTOR_FLAGS_R'
 
     fracdet : None
 
@@ -88,10 +94,8 @@ panstarrs:
 
     mag_g : 'MAG_G'
     mag_r : 'MAG_R'
-    mag_g_dred_flag : 'PSF_MAG_SFD_G' #
-    mag_r_dred_flag : 'PSF_MAG_SFD_R' #
-    mag_err_g_flag  : 'PSF_MAG_ERR_G'
-    mag_err_r_flag  : 'PSF_MAG_ERR_R'
+    mag_g_err : 'GFPSFMAGERR'
+    mag_r_err : 'RFPSFMAGERR'
     flags_g         : 'GFLAGS'
     flags_r         : 'RFLAGS'
 

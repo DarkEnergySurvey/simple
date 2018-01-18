@@ -45,21 +45,24 @@ import filters
 with open('config.yaml', 'r') as ymlfile:
     cfg = yaml.load(ymlfile)
 
-nside   = cfg[cfg['data']]['nside']
-datadir = cfg[cfg['data']]['datadir']
+survey = cfg['data']
+nside   = cfg[survey]['nside']
+datadir = cfg[survey]['datadir']
 
-#maglim_g = cfg[cfg['data']]['maglim_g']
-#maglim_r = cfg[cfg['data']]['maglim_r']
+#maglim_g = cfg[survey]['maglim_g']
+#maglim_r = cfg[survey]['maglim_r']
 
-fracdet_map = cfg[cfg['data']]['fracdet']
+fracdet_map = cfg[survey]['fracdet']
 
-mag_g = cfg[cfg['data']]['mag_g']
-mag_r = cfg[cfg['data']]['mag_r']
+mag_g = cfg[survey]['mag_g']
+mag_r = cfg[survey]['mag_r']
+mag_g_err = cfg[survey]['mag_g_err']
+mag_r_err = cfg[survey]['mag_r_err']
 
-mag_g_dred_flag         = cfg[cfg['data']]['mag_g_dred_flag']
-mag_r_dred_flag         = cfg[cfg['data']]['mag_r_dred_flag']
-mag_err_g_flag          = cfg[cfg['data']]['mag_err_g_flag']
-mag_err_r_flag          = cfg[cfg['data']]['mag_err_r_flag']
+#mag_g_dred_flag = cfg[survey]['mag_g_dred_flag']
+#mag_r_dred_flag = cfg[survey]['mag_r_dred_flag']
+#mag_err_g_flag  = cfg[survey]['mag_err_g_flag']
+#mag_err_r_flag  = cfg[survey]['mag_err_r_flag']
 
 results_dir = os.path.join(os.getcwd(), cfg['output']['results_dir'])
 if not os.path.exists(results_dir):
@@ -145,19 +148,23 @@ for pix_nside in pix_nside_neighbors:
 print('Assembling data...')
 data = np.concatenate(data_array)
 
+#import pdb
+#pdb.set_trace()
+
 # Quality cut
-data = filters.quality_filter(cfg['data'], data)
+quality = filters.quality_filter(survey, data)
+data = data[quality]
 
 # Deredden magnitudes
-data = filters.dered_mag(cfg['data'], data)
+data = filters.dered_mag(survey, data)
 
 print('Found {} objects...').format(len(data))
 
 ############################################################
 
 print('Applying cuts...')
-cut = filters.star_filter(cfg['data'], data)
-cut_gal = filters.galaxy_filter(cfg['data'], data)
+cut = filters.star_filter(survey, data)
+cut_gal = filters.galaxy_filter(survey, data)
 
 data_gal = data[cut_gal]
 data = data[cut]
@@ -200,7 +207,7 @@ def searchByDistance(nside, data, distance_modulus, ra_select, dec_select, magni
     iso.metallicity = 0.0001
     iso.distance_modulus = distance_modulus
 
-    cut = cutIsochronePath(data[mag_g], data[mag_r], data[mag_err_g_flag], data[mag_err_r_flag], iso, radius=0.1)
+    cut = cutIsochronePath(data[mag_g], data[mag_r], data[mag_g_err], data[mag_r_err], iso, radius=0.1)
     data = data[cut]
     cut_magnitude_threshold = (data[mag_g] < magnitude_threshold)
 
@@ -466,8 +473,8 @@ def diagnostic(data, data_gal, ra_peak, dec_peak, r_peak, sig_peak, distance_mod
 
     cut_iso, g_iso, gr_iso_min, gr_iso_max = cutIsochronePath(data[mag_g], 
                                                               data[mag_r], 
-                                                              data[mag_err_g_flag], 
-                                                              data[mag_err_r_flag], 
+                                                              data[mag_g_err], 
+                                                              data[mag_r_err], 
                                                               iso, 
                                                               radius=0.1, 
                                                               return_all=True)
@@ -481,8 +488,8 @@ def diagnostic(data, data_gal, ra_peak, dec_peak, r_peak, sig_peak, distance_mod
     #                               return_all=False)
     cut_iso_gal = cutIsochronePath(data_gal[mag_g],
                                    data_gal[mag_r],
-                                   data_gal[mag_err_g_flag],
-                                   data_gal[mag_err_r_flag],
+                                   data_gal[mag_g_err],
+                                   data_gal[mag_r_err],
                                    iso,
                                    radius=0.1,
                                    return_all=False)
@@ -503,19 +510,19 @@ def diagnostic(data, data_gal, ra_peak, dec_peak, r_peak, sig_peak, distance_mod
 
     ##########
 
-    # Check for possible associations
-    glon_peak, glat_peak = ugali.utils.projector.celToGal(ra_peak, dec_peak)
-    catalog_array = ['McConnachie15', 'Harris96', 'Corwen04', 'Nilson73', 'Webbink85', 'Kharchenko13', 'WEBDA14','ExtraDwarfs','ExtraClusters']
-    catalog = ugali.candidate.associate.SourceCatalog()
-    for catalog_name in catalog_array:
-        catalog += ugali.candidate.associate.catalogFactory(catalog_name)
+    ## Check for possible associations
+    #glon_peak, glat_peak = ugali.utils.projector.celToGal(ra_peak, dec_peak)
+    #catalog_array = ['McConnachie15', 'Harris96', 'Corwen04', 'Nilson73', 'Webbink85', 'Kharchenko13', 'WEBDA14','ExtraDwarfs','ExtraClusters']
+    #catalog = ugali.candidate.associate.SourceCatalog()
+    #for catalog_name in catalog_array:
+    #    catalog += ugali.candidate.associate.catalogFactory(catalog_name)
 
-    idx1, idx2, sep = catalog.match(glon_peak, glat_peak, tol=0.5, nnearest=1)
-    match = catalog[idx2]
-    if len(match) > 0:
-        association_string = '; {} at {:0.3f} deg'.format(match[0]['name'], sep)
-    else:
-        association_string = '; no association within 0.5 deg'
+    #idx1, idx2, sep = catalog.match(glon_peak, glat_peak, tol=0.5, nnearest=1)
+    #match = catalog[idx2]
+    #if len(match) > 0:
+    #    association_string = '; {} at {:0.3f} deg'.format(match[0]['name'], sep)
+    #else:
+    #    association_string = '; no association within 0.5 deg'
 
 ############################################################
 

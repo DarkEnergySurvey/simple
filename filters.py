@@ -24,7 +24,7 @@ def quality_filter(survey, data):
             & (data['SEXTRACTOR_FLAGS_R'] < 4)
             #& ((data['PSF_MAG_SFD_G'] - data['PSF_MAG_SFD_R']) < 1.)
     elif survey == 'maglites':
-        cut = (data['PSF_MAG_SFD_G'] < 25)
+        cut = (data['PSF_MAG_SFD_G'] < 25) \
             & (data['SEXTRACTOR_FLAGS_G'] < 4) \
             & (data['SEXTRACTOR_FLAGS_R'] < 4)
             #& ((data['PSF_MAG_SFD_G'] - data['PSF_MAG_SFD_R']) < 1.)
@@ -75,12 +75,13 @@ def color_filter(survey, data):
     if survey == 'des':
         cut = ((data['PSF_MAG_SFD_G'] - data['PSF_MAG_SFD_R']) < 0.4) # 0.2
     elif survey == 'bliss':
-        cut = ((data['WAVG_MAG_PSF_DRED_G'] - data['WAVG_MAG_PSF_DRED_R']) < 0.4) # 0.2
+        cut = ((data[mag_g] - data[mag_r]) < 0.4) # 0.2
     elif survey == 'maglites':
-        cut = ((data['WAVG_MAG_PSF_DRED_G'] - data['WAVG_MAG_PSF_DRED_R']) < 0.4) # 0.2
+        cut = ((data[mag_g] - data[mag_r]) < 0.4) # 0.2
     elif survey == 'panstarrs':
-        cut = ((data['GFPSFMAG'] - data['IFPSFMAG']) > -0.5) \
-            & ((data['GFPSFMAG'] - data['IFPSFMAG']) < 1.0)
+        cut = ((data[mag_g] - data[mag_r]) < 0.4) # 0.2
+        #cut = ((data['GFPSFMAG'] - data['IFPSFMAG']) > -0.5) \
+        #    & ((data['GFPSFMAG'] - data['IFPSFMAG']) < 1.0)
     return cut
 
 def dered_mag(survey, data):
@@ -94,5 +95,5 @@ def dered_mag(survey, data):
     elif survey == 'maglites':
         data = mlab.rec_append_fields(data, [mag_g, mag_r], [data['WAVG_MAG_PSF_G'] - data['EXINCTION_G'], data['WAVG_MAG_PSF_R'] - data['EXTINCTION_R']])
     elif survey == 'panstarrs':
-        data = mlab.rec_append_fields(data, [mag_g, mag_r], [data['EXTSFD_G'], data['EXTSFD_R']]) # is this right?
+        data = mlab.rec_append_fields(data, [mag_g, mag_r], [data['GFPSFMAG'] - data['EXTSFD_G'], data['RFPSFMAG'] - data['EXTSFD_R']])
     return data
