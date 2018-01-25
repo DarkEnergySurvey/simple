@@ -523,6 +523,8 @@ def diagnostic(data, data_gal, ra_peak, dec_peak, r_peak, sig_peak, distance_mod
     #    association_string = '; {} at {:0.3f} deg'.format(match[0]['name'], sep)
     #else:
     #    association_string = '; no association within 0.5 deg'
+    #
+    #association_string = repr(association_string)
 
 ############################################################
 

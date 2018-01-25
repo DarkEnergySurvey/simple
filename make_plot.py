@@ -103,6 +103,8 @@ except: # simple
 #        association_string = '{} at {:0.3f} deg'.format(assoc, float(angsep))
 
 association_string = str(np.char.strip(association_string))
+#association_string = association_string.encode('utf-8')
+association_string = repr(association_string)
 
 plt.suptitle('{}\n'.format(association_string) + r'($\alpha$, $\delta$, $\mu$, $\sigma$) = ({}, {}, {}, {})'.format(targ_ra, targ_dec, mod, sig), fontsize=24)
 
