@@ -54,7 +54,7 @@ for ii in range(0, len(pix_nside)):
 
     logfile = '{}/results_nside_{}_{}.log'.format(log_dir, nside, pix_nside[ii])
     batch = 'csub -n {} -o {} '.format(jobs, logfile)
-    command = 'python {}/search_algorithm.py {:0.2} {:0.2f}'.format(simple_dir, ra, dec)
+    command = 'python {}/search_algorithm.py {:0.2f} {:0.2f}'.format(simple_dir, ra, dec)
     command_queue = batch + command
     print(command_queue)
     #os.system('./' + command) # Run locally
