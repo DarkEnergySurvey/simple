@@ -10,6 +10,7 @@ import yaml
 from astropy.io import fits
 import numpy as np
 import csv
+import fitsio
 
 with open('config.yaml', 'r') as ymlfile:
     cfg = yaml.load(ymlfile)
@@ -50,3 +51,15 @@ t.writeto(candidate_list, overwrite=True)
 ##fits.write(data, names=names)
 #fits.write(data)
 #fits.close()
+
+# Diagnostic output
+data = fitsio.read(candidate_list)
+print("{} hotspots found with SIG > 5.5.").format(len(data))
+cut_1 = (data['SIG'] > 10)
+print("{} hotspots found with SIG > 10.").format(len(data[cut_1]))
+cut_2 = (data['SIG'] > 15)
+print("{} hotspots found with SIG > 15.").format(len(data[cut_2]))
+cut_3 = (data['SIG'] > 20)
+print("{} hotspots found with SIG > 20.").format(len(data[cut_3]))
+cut_4 = (data['SIG'] >= 25)
+print("{} hotspots found with SIG >= 25.").format(len(data[cut_4]))
