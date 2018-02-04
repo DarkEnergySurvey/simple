@@ -42,7 +42,8 @@ def quality_filter(survey, data):
             & (np.bitwise_and(data['IINFOFLAG2'], 4194304) == 0) \
             & (np.bitwise_and(data['GINFOFLAG2'], 8192) == 0) \
             & (np.bitwise_and(data['RINFOFLAG2'], 8192) == 0) \
-            & (np.bitwise_and(data['IINFOFLAG2'], 8192) == 0)
+            & (np.bitwise_and(data['IINFOFLAG2'], 8192) == 0) \
+            & (data['GFPSFMAG'] < 22) # observed magnitude - not extinction corrected
     return cut
 
 def star_filter(survey, data):
