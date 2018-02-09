@@ -24,8 +24,7 @@ with open('config.yaml', 'r') as ymlfile:
     datadir = cfg[survey]['datadir']
     candidate_list = cfg[survey]['candidate_list']
 
-file = "candidate_list.fits"
-data = fits.read(file)
+data = fits.read(candidate_list)
 
 ra = data['RA']
 dec = data['DEC']

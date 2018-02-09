@@ -75,6 +75,7 @@ def analysis(targ_ra, targ_dec, mod):
     pix_nside_select = ugali.utils.healpix.angToPix(nside, targ_ra, targ_dec)
     ra_select, dec_select = ugali.utils.healpix.pixToAng(nside, pix_nside_select)
     pix_nside_neighbors = np.concatenate([[pix_nside_select], healpy.get_all_neighbours(nside, pix_nside_select)])
+    print('Loading data...')
     data_array = []
     for pix_nside in pix_nside_neighbors:
         inlist = glob.glob('{}/*_{:05d}.fits'.format(datadir, pix_nside))
@@ -89,7 +90,6 @@ def analysis(targ_ra, targ_dec, mod):
     quality_cut = filters.quality_filter(survey, data)
     data = data[quality_cut]
     print('Found {} objects...').format(len(data))
-    print('Loading data...')
 
     ## De-redden magnitudes
     #try:
