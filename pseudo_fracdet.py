@@ -27,12 +27,15 @@ infiles = glob.glob ('{}/*.fits'.format(datadir))
 nside = 2048
 pix = []
 for infile in infiles:
+    print('loading {}'.format(infile))
     data = fits.read(infile, columns=['RA','DEC'])
     p = hp.ang2pix(nside, data['RA'], data['DEC'], lonlat=True)
     pix.append(p)
+print('Constructing map')
 pix = np.unique(pix)
 max = hp.zeros(hp.nside2npix(nside))
 map[pix] = 1
 
+print('Writing output')
 result = '{}_pseudo_fracdet.csv'.format(survey)
 hp.write_map(result, map)
