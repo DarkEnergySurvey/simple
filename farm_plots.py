@@ -39,7 +39,7 @@ if not os.path.exists(log_dir):
 
 candidate_list = fits.read(candidate_list)
 try: # simple
-    candidate_list = candidate_list[candidate_list['SIG'] > 5.5] # > 5.5
+    candidate_list = candidate_list[candidate_list['SIG'] >= 25] # > 5.5
 except: # ugali
     candidate_list = candidate_list[candidate_list['TS'] > 25]
 

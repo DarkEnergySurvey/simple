@@ -4,7 +4,7 @@ setup:
 output:
     results_dir : 'results_dir'
     log_dir     : 'log_dir'
-    save_dir    : 'save_dir'
+    save_dir    : 'save_dir_sig_25'
 
 batch:
     jobs: 20 # <= 25 for DES cluster computers!
@@ -99,7 +99,7 @@ panstarrs:
     flags_g         : 'GFLAGS'
     flags_r         : 'RFLAGS'
 
-    fracdet : None
+    fracdet : 'panstarrs_pseudo_fracdet.fits.gz'
 
 example:
     nside          : 32

@@ -54,7 +54,9 @@ t.writeto(candidate_list, overwrite=True)
 
 # Diagnostic output
 data = fitsio.read(candidate_list)
-print("{} hotspots found with SIG > 5.5.").format(len(data))
+print("{} hotspots found.").format(len(data))
+cut_0 = (data['SIG'] > 5.5)
+print("{} hotspots found with SIG > 5.5.").format(len(data[cut_0]))
 cut_1 = (data['SIG'] > 10)
 print("{} hotspots found with SIG > 10.").format(len(data[cut_1]))
 cut_2 = (data['SIG'] > 15)

@@ -31,11 +31,14 @@ for infile in infiles:
     data = fits.read(infile, columns=['RA','DEC'])
     p = hp.ang2pix(nside, data['RA'], data['DEC'], lonlat=True)
     pix.append(p)
+    #pix.append(np.unique(p))
+
 print('Constructing map')
+pix = np.concatenate(pix)
 pix = np.unique(pix)
-max = hp.zeros(hp.nside2npix(nside))
-map[pix] = 1
+coverage_map = np.zeros(hp.nside2npix(nside))
+coverage_map[pix] = 1
 
 print('Writing output')
-result = '{}_pseudo_fracdet.csv'.format(survey)
-hp.write_map(result, map)
+result = '{}_pseudo_fracdet.fits.gz'.format(survey)
+hp.write_map(result, coverage_map)
