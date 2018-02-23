@@ -4,7 +4,7 @@ setup:
 output:
     results_dir : 'results_dir'
     log_dir     : 'log_dir'
-    save_dir    : 'save_dir_sig_25'
+    save_dir    : 'save_dir_temp'
 
 batch:
     jobs: 20 # <= 25 for DES cluster computers!
@@ -96,24 +96,7 @@ panstarrs:
     mag_r : 'MAG_R'
     mag_g_err : 'GFPSFMAGERR'
     mag_r_err : 'RFPSFMAGERR'
-    flags_g         : 'GFLAGS'
-    flags_r         : 'RFLAGS'
+    flags_g : 'GFLAGS'
+    flags_r : 'RFLAGS'
 
     fracdet : 'panstarrs_pseudo_fracdet.fits.gz'
-
-example:
-    nside          : 32
-    datadir        : '/home/s1/kadrlica/projects/y3a2/dsphs/v2/skim'
-    candidate_list : 'candidate_list.fits'
-
-    mag_g : 'MAG_G'
-    mag_r : 'MAG_R'
-    #mag_g_dred_flag : 'PSF_MAG_SFD_G'
-    #mag_r_dred_flag : 'PSF_MAG_SFD_R'
-    mag_err_g_flag  : 'PSF_MAG_ERR_G'
-    mag_err_r_flag  : 'PSF_MAG_ERR_R'
-    #flags_g         : 'SEXTRACTOR_FLAGS_G'
-    #flags_r         : 'SEXTRACTOR_FLAGS_R'
-    #star_galaxy_classification : 'EXTENDED_CLASS_MASH'
-
-    fracdet : 'y3a2_griz_o.4096_t.32768_coverfoot_EQU.fits.gz'

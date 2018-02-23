@@ -30,8 +30,8 @@ for infile in infiles:
     print('loading {}'.format(infile))
     data = fits.read(infile, columns=['RA','DEC'])
     p = hp.ang2pix(nside, data['RA'], data['DEC'], lonlat=True)
-    pix.append(p)
-    #pix.append(np.unique(p))
+    #pix.append(p)
+    pix.append(np.unique(p))
 
 print('Constructing map')
 pix = np.concatenate(pix)
