@@ -36,7 +36,8 @@ for infile in infiles:
 print('Constructing map')
 pix = np.concatenate(pix)
 pix = np.unique(pix)
-coverage_map = np.zeros(hp.nside2npix(nside))
+#coverage_map = np.zeros(hp.nside2npix(nside))
+coverage_map = np.tile(hp.UNSEEN, hp.nside2npix(nside))
 coverage_map[pix] = 1
 
 print('Writing output')
