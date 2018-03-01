@@ -4,51 +4,68 @@ Simple binning search algorithm
 """
 __author__ = "Keith Bechtol"
 
-# Python libraries
+# Set the backend first!
+import matplotlib
+matplotlib.use('Agg')
+import pylab
+
 import sys
 import os
 import glob
 import yaml
+#import numpy
 import numpy as np
-import healpy as hp
+from matplotlib import mlab
+import pyfits
 import astropy.io.fits as pyfits
+#import healpy
+import healpy as hp
 import scipy.interpolate
+from scipy import interpolate
 import scipy.ndimage
+import scipy.signal
+import scipy.stats
+import scipy.spatial
 
-# Ugali libraries
 import ugali.utils.healpix
 import ugali.utils.projector
 import ugali.isochrone
+import ugali.utils.plotting
+import ugali.candidate.associate
 
-# Simple binner modules
+from ugali.isochrone import factory as isochrone_factory
+from astropy.coordinates import SkyCoord
+
 import filters
+
+#pylab.ion() # For interactive plotting
 
 ###########################################################
 
 with open('config.yaml', 'r') as ymlfile:
     cfg = yaml.load(ymlfile)
 
-    survey = cfg['data']
-    nside   = cfg[survey]['nside']
-    datadir = cfg[survey]['datadir']
-    
-    fracdet_map = cfg[survey]['fracdet']
-    
-    mag_g = cfg[survey]['mag_g']
-    mag_r = cfg[survey]['mag_r']
-    mag_g_err = cfg[survey]['mag_g_err']
-    mag_r_err = cfg[survey]['mag_r_err']
-    
-    results_dir = os.path.join(os.getcwd(), cfg['output']['results_dir'])
-    if not os.path.exists(results_dir):
-        os.mkdir(results_dir)
+survey = cfg['data']
+nside   = cfg[survey]['nside']
+datadir = cfg[survey]['datadir']
 
-if (fracdet_map is not None) and (fracdet_map.lower().strip() != 'none') and (fracdet_map != ''):
-    print('Reading fracdet map {} ...').format(fracdet_map)
-    fracdet = hp.read_map(fracdet_map)
-else:
-    print('No fracdet map specified ...')
-    fracdet = None
+#maglim_g = cfg[survey]['maglim_g']
+#maglim_r = cfg[survey]['maglim_r']
+
+fracdet_map = cfg[survey]['fracdet']
+
+mag_g = cfg[survey]['mag_g']
+mag_r = cfg[survey]['mag_r']
+mag_g_err = cfg[survey]['mag_g_err']
+mag_r_err = cfg[survey]['mag_r_err']
+
+results_dir = os.path.join(os.getcwd(), cfg['output']['results_dir'])
+if not os.path.exists(results_dir):
+    os.mkdir(results_dir)
+
+###########################################################
+
+print(matplotlib.get_backend())
 
 ############################################################
 
@@ -94,7 +111,71 @@ def cutIsochronePath(g, r, g_err, r_err, isochrone, radius=0.1, return_all=False
 
 ############################################################
 
-def searchByDistance(nside, data, distance_modulus, ra_select, dec_select, magnitude_threshold=24.5, fracdet=None):
+def circle(x, y, r):
+    phi = np.linspace(0, 2 * np.pi, 1000)
+    return x + (r * np.cos(phi)), y + (r * np.sin(phi))
+
+############################################################
+
+try:
+    ra_select, dec_select = float(sys.argv[1]), float(sys.argv[2])
+except:
+    sys.exit('ERROR! Coordinates not given in correct format.')
+
+print('Search coordinates: (RA, Dec) = ({:0.2f}, {:0.2f})').format(ra_select, dec_select)
+
+# Now cut for a single pixel
+pix_nside_select = ugali.utils.healpix.angToPix(nside, ra_select, dec_select)
+ra_select, dec_select = ugali.utils.healpix.pixToAng(nside, pix_nside_select)
+pix_nside_neighbors = np.concatenate([[pix_nside_select], hp.get_all_neighbours(nside, pix_nside_select)])
+
+############################################################
+
+data_array = []
+for pix_nside in pix_nside_neighbors:
+    inlist = glob.glob('{}/*_{:05d}.fits'.format(datadir, pix_nside))
+    for infile in inlist:
+        if not os.path.exists(infile):
+            continue
+        reader = pyfits.open(infile)
+        data_array.append(reader[1].data)
+        reader.close()
+print('Assembling data...')
+data = np.concatenate(data_array)
+
+# Quality cut
+quality = filters.quality_filter(survey, data)
+data = data[quality]
+
+# Deredden magnitudes
+data = filters.dered_mag(survey, data)
+
+print('Found {} objects...').format(len(data))
+
+############################################################
+
+print('Applying cuts...')
+cut = filters.star_filter(survey, data)
+cut_gal = filters.galaxy_filter(survey, data)
+
+data_gal = data[cut_gal]
+data = data[cut]
+
+print('{} star-like objects in ROI...').format(len(data))
+print('{} galaxy-like objects in ROI...').format(len(data_gal))
+
+############################################################
+
+if (fracdet_map is not None) and (fracdet_map.lower().strip() != 'none') and (fracdet_map != ''):
+    print('Reading fracdet map {} ...').format(fracdet_map)
+    fracdet = hp.read_map(fracdet_map)
+else:
+    print('No fracdet map specified ...')
+    fracdet = None
+
+############################################################
+
+def searchByDistance(nside, data, distance_modulus, ra_select, dec_select, magnitude_threshold=24.5, plot=False, fracdet=None):
     """
     Idea: 
     Send a data extension that goes to faint magnitudes, e.g., g < 24.
@@ -103,8 +184,11 @@ def searchByDistance(nside, data, distance_modulus, ra_select, dec_select, magni
     in depth. Then compute the local field density using a small annulus 
     around each individual hotspot, e.g., radius 0.3 to 0.5 deg.
 
+    plot = True enables diagnostic plotting for testings
     fracdet corresponds to a fracdet map (numpy array, assumed to be EQUATORIAL and RING)
     """
+
+    SCALE = 2.75 * (hp.nside2resol(nside, arcmin=True) / 60.) # deg, scale for 2D histogram and various plotting
 
     print('Distance = {:0.1f} kpc (m-M = {:0.1f})').format(ugali.utils.projector.distanceModulusToDistance(distance_modulus), distance_modulus)
 
@@ -135,6 +219,31 @@ def searchByDistance(nside, data, distance_modulus, ra_select, dec_select, magni
 
     h = np.histogram2d(x, y, bins=[bins, bins])[0]
 
+    if plot:
+        #pylab.figure('raw')
+        #pylab.clf()
+        #pylab.imshow(h.T, interpolation='nearest', extent=[-1. * SCALE, SCALE, -1. * SCALE, SCALE], origin='lower', cmap='binary')
+        #pylab.xlim([SCALE, -1. * SCALE])
+        #pylab.ylim([-1. * SCALE, SCALE])
+        #pylab.colorbar()
+
+        ##import skymap
+        ##s = skymap.Skymap(projection='laea',llcrnrlon=340,llcrnrlat=-60,urcrnrlon=360,urcrnrlat=-50,lon_0 =355,lat_0=-55,celestial=False)
+        ##s.draw_hpxmap(fracdet)
+        #pix = skymap.healpix.ang2disc(355,-63,1)
+        #pix = skymap.healpix.ang2disc(4096,355,-63,1)
+        #s = skymap.Skymap()
+        #s.draw_hpxmap(m[pix],pix,4096)
+        #s.zoom_to_fit()
+        #s.zoom_to_fit(4096,m[pix],pix)
+
+        reso = 0.25
+        pylab.figure('gnom')
+        pylab.clf()
+        hp.gnomview(fracdet, fig='gnom', rot=(ra_select, dec_select, 0.), reso=reso, xsize=(2. * SCALE * 60. / reso), 
+                        cmap='Greens', title='Fracdet') #binary
+        hp.projscatter(data['RA'], data['DEC'], edgecolor='none', c='red', lonlat=True, s=2)
+
     h_g = scipy.ndimage.filters.gaussian_filter(h, smoothing / delta_x)
 
     #cut_goodcoverage = (data['NEPOCHS_G'][cut_magnitude_threshold] >= 2) & (data['NEPOCHS_R'][cut_magnitude_threshold] >= 2)
@@ -149,7 +258,6 @@ def searchByDistance(nside, data, distance_modulus, ra_select, dec_select, magni
 
     n_goodcoverage = h_coverage[h_goodcoverage > 0].flatten()
 
-    # TODO choose which; keith was using median
     #characteristic_density = np.mean(n_goodcoverage) / area_coverage # per square degree
     characteristic_density = np.median(n_goodcoverage) / area_coverage # per square degree
     print('Characteristic density = {:0.1f} deg^-2').format(characteristic_density)
@@ -184,6 +292,34 @@ def searchByDistance(nside, data, distance_modulus, ra_select, dec_select, magni
         characteristic_density /= mean_fracdet 
         print('Characteristic density (fracdet corrected) = {:0.1f} deg^-2').format(characteristic_density)
 
+    if plot:
+        pylab.figure('poisson')
+        pylab.clf()
+        n_max = np.max(h_coverage)
+        pylab.hist(n_goodcoverage, bins=np.arange(n_max) - 0.5, color='blue', histtype='step', lw=2, normed=True)
+        pylab.scatter(np.arange(n_max), scipy.stats.poisson.pmf(np.arange(n_max), mu=np.median(n_goodcoverage)), c='red', edgecolor='none', zorder=10)
+        #pylab.plot(np.arange(n_max), scipy.stats.poisson.pmf(np.arange(n_max), mu=np.median(n_goodcoverage)), c='red', lw=2, zorder=10)
+        pylab.axvline(characteristic_density * area_coverage, c='black', ls='--')
+        if fracdet is not None:
+            pylab.axvline(characteristic_density_raw * area_coverage, c='orange', ls='--')
+            pylab.axvline(characteristic_density_fracdet * area_coverage, c='green', ls='--')
+        pylab.xlabel('Counts per {:0.3f} deg^-2 pixel'.format(area_coverage))
+        pylab.ylabel('PDF')
+
+    if plot:
+        vmax = min(3. * characteristic_density * area, np.max(h_g))
+    
+        pylab.figure('smooth')
+        pylab.clf()
+        pylab.imshow(h_g.T,
+                     interpolation='nearest', extent=[-1. * SCALE, SCALE, -1. * SCALE, SCALE], origin='lower', cmap='gist_heat', vmax=vmax)
+        pylab.colorbar()
+        pylab.xlim([SCALE, -1. * SCALE])
+        pylab.ylim([-1. * SCALE, SCALE])
+        pylab.xlabel(r'$\Delta$ RA (deg)')
+        pylab.ylabel(r'$\Delta$ Dec (deg)')
+        pylab.title('(RA, Dec, mu) = ({:0.2f}, {:0.2f}, {:0.2f})'.format(ra_select, dec_select, distance_modulus))
+
     factor_array = np.arange(1., 5., 0.05)
     rara, decdec = proj.imageToSphere(xx.flatten(), yy.flatten())
     cutcut = (ugali.utils.healpix.angToPix(nside, rara, decdec) == pix_nside_select).reshape(xx.shape)
@@ -197,6 +333,14 @@ def searchByDistance(nside, data, distance_modulus, ra_select, dec_select, magni
     
     h_region, n_region = scipy.ndimage.measurements.label((h_g * cutcut) > threshold_density)
     h_region = np.ma.array(h_region, mask=(h_region < 1))
+    if plot:
+        pylab.figure('regions')
+        pylab.clf()
+        pylab.imshow(h_region.T,
+                     interpolation='nearest', extent=[-1. * SCALE, SCALE, -1. * SCALE, SCALE], origin='lower')
+        pylab.colorbar()
+        pylab.xlim([SCALE, -1. * SCALE])
+        pylab.ylim([-1. * SCALE, SCALE])
 
     ra_peak_array = []
     dec_peak_array = []
@@ -204,10 +348,17 @@ def searchByDistance(nside, data, distance_modulus, ra_select, dec_select, magni
     sig_peak_array = []
     distance_modulus_array = []
 
+    pylab.figure('sig')
+    pylab.clf()
     for index in range(1, n_region + 1):
         index_peak = np.argmax(h_g * (h_region == index))
         x_peak, y_peak = xx.flatten()[index_peak], yy.flatten()[index_peak]
         #print index, np.max(h_g * (h_region == index))
+        if plot:
+            pylab.figure('regions')
+            #pylab.scatter(x_peak, y_peak, marker='x', c='white')
+            pylab.scatter(x_peak, y_peak, marker='o', c='none', edgecolor='black', s=50)
+
         
         #angsep_peak = np.sqrt((x_full - x_peak)**2 + (y_full - y_peak)**2) # Use full magnitude range, NOT TESTED!!!
         angsep_peak = np.sqrt((x - x_peak)**2 + (y - y_peak)**2) # Impose magnitude threshold
@@ -262,77 +413,103 @@ def searchByDistance(nside, data, distance_modulus, ra_select, dec_select, magni
             if sig_array[ii] > 25:
                 sig_array[ii] = 25. # Set a maximum significance value
 
+        if plot:
+            pylab.figure('sig')
+            pylab.plot(size_array, sig_array)
+            pylab.xlabel('Radius used to compute significance (deg)')
+            pylab.ylabel('Detection significance')
+
         ra_peak, dec_peak = proj.imageToSphere(x_peak, y_peak)
         r_peak = size_array[np.argmax(sig_array)]
         if np.max(sig_array) == 25.:
             r_peak = 0.5
 
+        #print 'Candidate:', x_peak, y_peak, r_peak, np.max(sig_array), ra_peak, dec_peak
         print('Candidate: {:12.3f} {:12.3f} {:12.3f} {:12.3f} {:12.3f} {:12.3f}').format(x_peak, y_peak, r_peak, np.max(sig_array), ra_peak, dec_peak)
         if np.max(sig_array) > 5.:
+            if plot:
+                x_circle, y_circle = circle(x_peak, y_peak, r_peak)
+                pylab.figure('smooth')
+                pylab.plot(x_circle, y_circle, c='gray')
+                pylab.text(x_peak - r_peak, y_peak + r_peak, r'{:0.2f} $\sigma$'.format(np.max(sig_array)), color='gray')
+    
             ra_peak_array.append(ra_peak)
             dec_peak_array.append(dec_peak)
             r_peak_array.append(r_peak)
             sig_peak_array.append(np.max(sig_array))
             distance_modulus_array.append(distance_modulus)
 
+    if plot:
+        raw_input('Plots are ready...')
+
     return ra_peak_array, dec_peak_array, r_peak_array, sig_peak_array, distance_modulus_array
 
 ############################################################
 
-###############################
-# M     M    A    IIIII N   N #
-# MM   MM   A A     I   NN  N #
-# M M M M  AAAAA    I   N N N #
-# M  M  M A     A IIIII N  NN #
-###############################
-# main
+def diagnostic(data, data_gal, ra_peak, dec_peak, r_peak, sig_peak, distance_modulus, age=12., metallicity=0.0001):
 
-try:
-    ra_select, dec_select = float(sys.argv[1]), float(sys.argv[2])
-except:
-    sys.exit('ERROR! Coordinates not given in correct format.')
+    # Dotter isochrones
+    dirname = '/home/s1/kadrlica/.ugali/isochrones/des/dotter2016/'
+    #dirname = '/Users/keithbechtol/Documents/DES/projects/mw_substructure/ugalidir/isochrones/des/dotter2016/'
+    iso = ugali.isochrone.factory('Dotter', hb_spread=0, dirname=dirname)
+    iso.age = age
+    iso.metallicity = metallicity
+    iso.distance_modulus = distance_modulus
 
-print('Search coordinates: (RA, Dec) = ({:0.2f}, {:0.2f})').format(ra_select, dec_select)
+    ## Padova isochrones
+    #dirname_alt = '/home/s1/kadrlica/.ugali/isochrones/des/bressan2012/' #padova/'
+    #iso_alt = ugali.isochrone.factory('Padova', hb_spread=0, dirname=dirname_alt)
+    #iso_alt.age = age
+    #iso_alt.metallicity = metallicity
+    #iso_alt.distance_modulus = distance_modulus
 
-# Now cut for a single pixel
-pix_nside_select = ugali.utils.healpix.angToPix(nside, ra_select, dec_select)
-ra_select, dec_select = ugali.utils.healpix.pixToAng(nside, pix_nside_select)
-pix_nside_neighbors = np.concatenate([[pix_nside_select], hp.get_all_neighbours(nside, pix_nside_select)])
+    cut_iso, g_iso, gr_iso_min, gr_iso_max = cutIsochronePath(data[mag_g], 
+                                                              data[mag_r], 
+                                                              data[mag_g_err], 
+                                                              data[mag_r_err], 
+                                                              iso, 
+                                                              radius=0.1, 
+                                                              return_all=True)
+    
+    cut_iso_gal = cutIsochronePath(data_gal[mag_g],
+                                   data_gal[mag_r],
+                                   data_gal[mag_g_err],
+                                   data_gal[mag_r_err],
+                                   iso,
+                                   radius=0.1,
+                                   return_all=False)
+    
+    proj = ugali.utils.projector.Projector(ra_peak, dec_peak)
+    x, y = proj.sphereToImage(data['RA'][cut_iso], data['DEC'][cut_iso])
+    x_gal, y_gal = proj.sphereToImage(data_gal['RA'][cut_iso_gal], data_gal['DEC'][cut_iso_gal])
 
-############################################################
+###########################################################
 
-data_array = []
-for pix_nside in pix_nside_neighbors:
-    inlist = glob.glob('{}/*_{:05d}.fits'.format(datadir, pix_nside))
-    for infile in inlist:
-        if not os.path.exists(infile):
-            continue
-        reader = pyfits.open(infile)
-        data_array.append(reader[1].data)
-        reader.close()
-print('Assembling data...')
-data = np.concatenate(data_array)
+    angsep = ugali.utils.projector.angsep(ra_peak, dec_peak, data['RA'], data['DEC'])
+    cut_inner = (angsep < r_peak)
+    cut_annulus = (angsep > 0.5) & (angsep < 1.)
 
-# Quality cut
-quality = filters.quality_filter(survey, data)
-data = data[quality]
+    angsep_gal = ugali.utils.projector.angsep(ra_peak, dec_peak, data_gal['RA'], data_gal['DEC'])
+    cut_inner_gal = (angsep_gal < r_peak)
+    cut_annulus_gal = (angsep_gal > 0.5) & (angsep_gal < 1.)
 
-# Deredden magnitudes
-data = filters.dered_mag(survey, data)
+    ##########
 
-print('Found {} objects...').format(len(data))
+    ## Check for possible associations
+    #glon_peak, glat_peak = ugali.utils.projector.celToGal(ra_peak, dec_peak)
+    #catalog_array = ['McConnachie15', 'Harris96', 'Corwen04', 'Nilson73', 'Webbink85', 'Kharchenko13', 'WEBDA14','ExtraDwarfs','ExtraClusters']
+    #catalog = ugali.candidate.associate.SourceCatalog()
+    #for catalog_name in catalog_array:
+    #    catalog += ugali.candidate.associate.catalogFactory(catalog_name)
 
-############################################################
-
-print('Applying cuts...')
-cut = filters.star_filter(survey, data)
-cut_gal = filters.galaxy_filter(survey, data)
-
-data_gal = data[cut_gal]
-data = data[cut]
-
-print('{} star-like objects in ROI...').format(len(data))
-print('{} galaxy-like objects in ROI...').format(len(data_gal))
+    #idx1, idx2, sep = catalog.match(glon_peak, glat_peak, tol=0.5, nnearest=1)
+    #match = catalog[idx2]
+    #if len(match) > 0:
+    #    association_string = '; {} at {:0.3f} deg'.format(match[0]['name'], sep)
+    #else:
+    #    association_string = '; no association within 0.5 deg'
+    #
+    #association_string = repr(association_string)
 
 ############################################################
 
@@ -386,6 +563,10 @@ for ii in range(0, len(sig_peak_array)):
                  r_peak_array[ii],
                  ugali.utils.projector.distanceModulusToDistance(distance_modulus_array[ii]),
                  distance_modulus_array[ii])
+
+    if (sig_peak_array[ii] > 5.5) & (r_peak_array[ii] < 0.28):
+        diagnostic(data, data_gal, ra_peak_array[ii], dec_peak_array[ii], r_peak_array[ii], sig_peak_array[ii], distance_modulus_array[ii])
+
 
 outfile = '{}/results_nside_{}_{}.csv'.format(results_dir, nside, pix_nside_select)
 writer = open(outfile, 'w')
