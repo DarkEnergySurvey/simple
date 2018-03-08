@@ -138,7 +138,6 @@ def searchByDistance(nside, data, distance_modulus, pix_nside_select, ra_select,
 
     n_goodcoverage = h_coverage[h_goodcoverage > 0].flatten()
 
-    # TODO choose which; keith was using median
     #characteristic_density = np.mean(n_goodcoverage) / area_coverage # per square degree
     characteristic_density = np.median(n_goodcoverage) / area_coverage # per square degree
     print('Characteristic density = {:0.1f} deg^-2').format(characteristic_density)
@@ -180,7 +179,7 @@ def searchByDistance(nside, data, distance_modulus, pix_nside_select, ra_select,
     for factor in factor_array:
         h_region, n_region = scipy.ndimage.measurements.label((h_g * cutcut) > (area * characteristic_density * factor))
         #print 'factor', factor, n_region, n_region < 10
-        if n_region < 10: # TODO 10 # try 100?
+        if n_region < 10: # TODO 10
             threshold_density = area * characteristic_density * factor
             break
     
