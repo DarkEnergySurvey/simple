@@ -38,13 +38,6 @@ with open('config.yaml', 'r') as ymlfile:
     if not os.path.exists(results_dir):
         os.mkdir(results_dir)
 
-if (fracdet_map is not None) and (fracdet_map.lower().strip() != 'none') and (fracdet_map != ''):
-    print('Reading fracdet map {} ...').format(fracdet_map)
-    fracdet = hp.read_map(fracdet_map)
-else:
-    print('No fracdet map specified ...')
-    fracdet = None
-
 ###########################################################
 
 def cutIsochronePath(g, r, g_err, r_err, isochrone, radius=0.1, return_all=False):
@@ -179,19 +172,19 @@ def searchByDistance(nside, data, distance_modulus, pix_nside_select, ra_select,
         characteristic_density /= mean_fracdet 
         print('Characteristic density (fracdet corrected) = {:0.1f} deg^-2').format(characteristic_density)
 
-    factor_array = np.arange(1., 5., 0.05)
+    factor_array = np.arange(1., 5., 0.05) # TODO 1., 5., 0.05
     rara, decdec = proj.imageToSphere(xx.flatten(), yy.flatten())
     cutcut = (ugali.utils.healpix.angToPix(nside, rara, decdec) == pix_nside_select).reshape(xx.shape)
-    threshold_density = 5 * characteristic_density * area
+    threshold_density = 5 * characteristic_density * area # TODO 5
     for factor in factor_array:
         h_region, n_region = scipy.ndimage.measurements.label((h_g * cutcut) > (area * characteristic_density * factor))
-        #print 'factor', factor, n_region, n_region < 10
-        if n_region < 10:
-            threshold_density = area * characteristic_density * factor
-            break
+        ##print 'factor', factor, n_region, n_region < 10
+        #if n_region < 10: # TODO 10 # try 100?
+        #    threshold_density = area * characteristic_density * factor
+        #    break
     
     h_region, n_region = scipy.ndimage.measurements.label((h_g * cutcut) > threshold_density)
-    h_region = np.ma.array(h_region, mask=(h_region < 1))
+    h_region = np.ma.array(h_region, mask=(h_region < 1)) # TODO 1
 
     ra_peak_array = []
     dec_peak_array = []
@@ -217,20 +210,26 @@ def searchByDistance(nside, data, distance_modulus, pix_nside_select, ra_select,
             subpix_annulus = subpix_all[~np.in1d(subpix_all, subpix_inner)]
             mean_fracdet = np.mean(fracdet_zero[subpix_annulus])
             print('mean_fracdet {}').format(mean_fracdet)
-            if mean_fracdet < 0.5:
+            if mean_fracdet < 0.5: # TODO 0.5
                 characteristic_density_local = characteristic_density
                 print('characteristic_density_local baseline {}').format(characteristic_density_local)
             else:
                 # Check pixels in annulus with complete coverage
                 subpix_annulus_region = np.intersect1d(subpix_region_array, subpix_annulus)
-                print(float(len(subpix_annulus_region)) / len(subpix_annulus))
-                if (float(len(subpix_annulus_region)) / len(subpix_annulus)) < 0.25:
+                print('{} percent pixels with complete coverage'.format(float(len(subpix_annulus_region)) / len(subpix_annulus)))
+                if (float(len(subpix_annulus_region)) / len(subpix_annulus)) < 0.25: # TODO 0.25
                     characteristic_density_local = characteristic_density
                     print('characteristic_density_local spotty {}').format(characteristic_density_local)
                 else:
                     characteristic_density_local = float(np.sum(np.in1d(subpix, subpix_annulus_region))) \
                                                    / (hp.nside2pixarea(nside_fracdet, degrees=True) * len(subpix_annulus_region)) # deg^-2
-                    print('characteristic_density_local cleaned up {}').format(characteristic_density_local)
+                    print('characteristic_density_local cleaned up {}'.format(characteristic_density_local))
+            # Check pixels in annulus with complete coverage
+            subpix_annulus_region = np.intersect1d(subpix_region_array, subpix_annulus)
+            print('{} percent pixels with complete coverage'.format(float(len(subpix_annulus_region)) / len(subpix_annulus)))
+            characteristic_density_local = float(np.sum(np.in1d(subpix, subpix_annulus_region))) \
+                                           / (hp.nside2pixarea(nside_fracdet, degrees=True) * len(subpix_annulus_region)) # deg^-2
+            print('characteristic_density_local cleaned up {}').format(characteristic_density_local)
         else:
             # Compute the local characteristic density
             area_field = np.pi * (0.5**2 - 0.3**2)
