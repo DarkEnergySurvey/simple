@@ -29,6 +29,7 @@ with open('config.yaml', 'r') as ymlfile:
     survey = cfg['data']
     nside   = cfg[survey]['nside']
     datadir = cfg[survey]['datadir']
+    mag_max = cfg[survey]['mag_max']
     
     fracdet_map = cfg[survey]['fracdet']
     
@@ -95,7 +96,7 @@ data = data[cut]
 print('{} star-like objects in ROI...').format(len(data))
 print('{} galaxy-like objects in ROI...').format(len(data_gal))
 
-distance_modulus_search_array = np.arange(16., 24., 0.5)
+distance_modulus_search_array = np.arange(16., mag_max, 0.5)
 
 ra_peak_array = []
 dec_peak_array = [] 

@@ -36,37 +36,16 @@ import filters
 with open('config.yaml', 'r') as ymlfile:
     cfg = yaml.load(ymlfile)
 
-survey = cfg['data']
-nside   = cfg[survey]['nside']
-datadir = cfg[survey]['datadir']
-
-mag_g = cfg[survey]['mag_g']
-mag_r = cfg[survey]['mag_r']
-mag_g_err = cfg[survey]['mag_g_err']
-mag_r_err = cfg[survey]['mag_r_err']
-
-##maglim_g = cfg[cfg['data']]['maglim_g']
-##maglim_r = cfg[cfg['data']]['maglim_r']
-#
-##mag_g_dred = cfg[cfg['data']]['mag_g_dred']
-##mag_r_dred = cfg[cfg['data']]['mag_r_dred']
-#mag_g_dred_flag         = cfg[cfg['data']]['mag_g_dred_flag']
-#mag_r_dred_flag         = cfg[cfg['data']]['mag_r_dred_flag']
-##mag_g_flag              = cfg[cfg['data']]['mag_g_flag']
-##mag_r_flag              = cfg[cfg['data']]['mag_r_flag']
-#mag_err_g_flag          = cfg[cfg['data']]['mag_err_g_flag']
-#mag_err_r_flag          = cfg[cfg['data']]['mag_err_r_flag']
-##extinction_g_flag       = cfg[cfg['data']]['extinction_g_flag']
-##extinction_r_flag       = cfg[cfg['data']]['extinction_r_flag']
-#star_galaxy_classification = cfg[cfg['data']]['star_galaxy_classification']
-##star_filter_cfg = cfg[cfg['data']]['star_filter']
-##galaxy_filter_cfg = cfg[cfg['data']]['galaxy_filter']
-##blue_star_filter_cfg = cfg[cfg['data']]['blue_star_filter']
-##spread_model_r_flag     = cfg[cfg['data']]['spread_model_r_flag']
-##spread_model_r_err_flag = cfg[cfg['data']]['spread_model_r_err_flag']
-#flags_g                 = cfg[cfg['data']]['flags_g']
-#flags_r                 = cfg[cfg['data']]['flags_r']
-
+    survey = cfg['data']
+    nside   = cfg[survey]['nside']
+    datadir = cfg[survey]['datadir']
+    mag_max = cfg[survey]['mag_max']
+    
+    mag_g = cfg[survey]['mag_g']
+    mag_r = cfg[survey]['mag_r']
+    mag_g_err = cfg[survey]['mag_g_err']
+    mag_r_err = cfg[survey]['mag_r_err']
+    
 ################################################################################
 
 def analysis(targ_ra, targ_dec, mod):
@@ -91,19 +70,6 @@ def analysis(targ_ra, targ_dec, mod):
     data = data[quality_cut]
     print('Found {} objects...').format(len(data))
 
-    ## De-redden magnitudes
-    #try:
-    #    data = mlab.rec_append_fields(data, ['WAVG_MAG_PSF_DRED_G', 'WAVG_MAG_PSF_DRED_R'], [data[mag_g_dred_flag], data[mag_r_dred_flag]])
-    ##except:
-    ##    data = mlab.rec_append_fields(data, ['WAVG_MAG_PSF_DRED_G', 'WAVG_MAG_PSF_DRED_R'], [data[mag_g_flag] - data[extinction_g_flag], data[mag_r_flag] - data[extinction_r_flag]])
-    #except:
-    #    data = mlab.rec_append_fields(data, ['WAVG_MAG_PSF_DRED_G', 'WAVG_MAG_PSF_DRED_R'], [data[mag_g_flag], data[mag_r_flag]])
-    #
-    #mag_g = data['WAVG_MAG_PSF_DRED_G']
-    #mag_r = data['WAVG_MAG_PSF_DRED_R']
-
-    #mag_g = data[mag_g_dred_flag]
-    #mag_r = data[mag_r_dred_flag]
     data = filters.dered_mag(survey, data)
 
     iso = isochrone_factory('Bressan2012', age=12, z=0.0001, distance_modulus=mod)
@@ -260,7 +226,7 @@ def cmPlot(targ_ra, targ_dec, data, iso, g_radius, nbhd, type):
     # Plot objects in nbhd and near isochrone
     plt.scatter(data[mag_g][filter & nbhd & iso_filter] - data[mag_r][filter & nbhd & iso_filter], data[mag_g][filter & nbhd & iso_filter], c='r', s=5, label='$\Delta$CM < 0.1')
 
-    plt.axis([-0.5, 1, 16, 25])
+    plt.axis([-0.5, 1, 16, mag_max])
     plt.gca().invert_yaxis()
     plt.gca().set_aspect(1./4.)
     plt.legend(loc='upper left')
@@ -283,7 +249,7 @@ def hessPlot(targ_ra, targ_dec, data, iso, g_radius, nbhd):
     outer = (c1.separation(SkyCoord(data['RA'], data['DEC'], unit='deg')).deg > r_near) & (c1.separation(SkyCoord(data['RA'], data['DEC'], unit='deg')).deg < r_far)
 
     xbins = np.arange(-0.5, 1.1, 0.1)
-    ybins = np.arange(16., 25.5, 0.5)
+    ybins = np.arange(16., mag_max + 0.5, 0.5)
 
     foreground = np.histogram2d(data[mag_g][inner & filter] - data[mag_r][inner & filter], data[mag_g][inner & filter], bins=[xbins, ybins])
     background = np.histogram2d(data[mag_g][outer & filter] - data[mag_r][outer & filter], data[mag_g][outer & filter], bins=[xbins, ybins])
@@ -308,7 +274,7 @@ def hessPlot(targ_ra, targ_dec, data, iso, g_radius, nbhd):
 
     ugali.utils.plotting.drawIsochrone(iso, lw=2, c='k', zorder=10, label='Isocrhone')
 
-    plt.axis([-0.5, 1.0, 16, 25])
+    plt.axis([-0.5, 1.0, 16, mag_max])
     plt.gca().invert_yaxis()
     plt.gca().set_aspect(1./4.)
     plt.xlabel('g-r (mag)')

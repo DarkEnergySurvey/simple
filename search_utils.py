@@ -26,6 +26,7 @@ with open('config.yaml', 'r') as ymlfile:
     survey = cfg['data']
     nside   = cfg[survey]['nside']
     datadir = cfg[survey]['datadir']
+    mag_max = cfg[survey]['mag_max']
     
     fracdet_map = cfg[survey]['fracdet']
     
@@ -82,7 +83,7 @@ def cutIsochronePath(g, r, g_err, r_err, isochrone, radius=0.1, return_all=False
 
 ############################################################
 
-def searchByDistance(nside, data, distance_modulus, pix_nside_select, ra_select, dec_select, magnitude_threshold=24.5, fracdet=None):
+def searchByDistance(nside, data, distance_modulus, pix_nside_select, ra_select, dec_select, magnitude_threshold=mag_max, fracdet=None):
     """
     Idea: 
     Send a data extension that goes to faint magnitudes, e.g., g < 24.
@@ -178,10 +179,10 @@ def searchByDistance(nside, data, distance_modulus, pix_nside_select, ra_select,
     threshold_density = 5 * characteristic_density * area # TODO 5
     for factor in factor_array:
         h_region, n_region = scipy.ndimage.measurements.label((h_g * cutcut) > (area * characteristic_density * factor))
-        ##print 'factor', factor, n_region, n_region < 10
-        #if n_region < 10: # TODO 10 # try 100?
-        #    threshold_density = area * characteristic_density * factor
-        #    break
+        #print 'factor', factor, n_region, n_region < 10
+        if n_region < 10: # TODO 10 # try 100?
+            threshold_density = area * characteristic_density * factor
+            break
     
     h_region, n_region = scipy.ndimage.measurements.label((h_g * cutcut) > threshold_density)
     h_region = np.ma.array(h_region, mask=(h_region < 1)) # TODO 1

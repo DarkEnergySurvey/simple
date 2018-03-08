@@ -15,6 +15,7 @@ des: #y3a2:
     nside          : 32
     datadir        : '/home/s1/kadrlica/projects/y3a2/dsphs/v2/skim'
     candidate_list : 'candidate_list.fits'
+    mag_max : 24.5
     #candidate_list : '/home/s1/kadrlica/projects/y3a2/dsphs/v2/v2.1/search/ugali_candidates.fits' # ugali
 
     mag_g : 'MAG_G'
@@ -40,6 +41,7 @@ bliss: # Need to update this
     nside          : 32
     datadir        : '/home/s1/kadrlica/projects/bliss/cat/v2/cat'
     candidate_list : 'candidate_list.fits'
+    mag_max : 24.5
 
     mag_g : 'MAG_G'
     mag_r : 'MAG_R'
@@ -67,6 +69,7 @@ maglites: # Update
     nside          : 32
     datadir        : '/home/s1/kadrlica/projects/maglites/r4/v1/cat'
     candidate_list : 'candidate_list.fits'
+    mag_max : 24.5
 
     mag_g : 'MAG_G'
     mag_r : 'MAG_R'
@@ -91,6 +94,7 @@ panstarrs:
     nside          : 32
     datadir        : '/data/des40.b/data/pan-starrs/dr1/healpix'
     candidate_list : 'candidate_list.fits'
+    mag_max : 22
 
     mag_g : 'MAG_G'
     mag_r : 'MAG_R'
