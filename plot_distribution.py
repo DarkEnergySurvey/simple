@@ -25,27 +25,26 @@ with open('config.yaml', 'r') as ymlfile:
     candidate_list = cfg[survey]['candidate_list']
 
 data = fits.read(candidate_list)
-
-ra = data['RA']
-dec = data['DEC']
+#data = data[data['SIG'] > 15]
 
 plt.figure()
-plt.scatter(ra, dec, edgecolor='none', s=1, c='black', alpha=0.5)
 plt.xlabel("RA")
 plt.ylabel("Dec")
 plt.title("{} Hotspots".format(survey))
+
+# Plot hotspots
+plt.scatter(data['RA'], data['DEC'], edgecolor='none', s=1, c='black', alpha=0.5)
 
 # Overplot known dwarves
 catalog_array = ['McConnachie15', 'ExtraDwarfs']
 catalog = ugali.candidate.associate.SourceCatalog()
 for catalog_name in catalog_array:
     catalog += ugali.candidate.associate.catalogFactory(catalog_name)
-cut = ((catalog['ra'] >= min(ra)) & (catalog['ra'] <= max(ra)) & (catalog['dec'] >= min(dec)) & (catalog['dec'] <= max(dec)))
-catalog = catalog[cut]
-known_ra = catalog['ra']
-known_dec = catalog['dec']
-plt.scatter(known_ra, known_dec, edgecolor='none', s=5, c='red', label='known dwarfs')
+plt.scatter(catalog['ra'], catalog['dec'], edgecolor='red', s=20, linewidth=0.5, c='none', label='known dwarfs')
 
+plt.xlim([min(data['RA']), max(data['RA'])])
+plt.ylim([min(data['DEC']), max(data['DEC'])])
+plt.gca().invert_xaxis()
 plt.legend(loc='upper right')
 plt.savefig("{}_hotspots.png".format(survey), bbox_inches='tight', dpi=300)
 plt.close()

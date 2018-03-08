@@ -18,14 +18,17 @@ with open('config.yaml', 'r') as ymlfile:
     survey = cfg['data']
     nside   = cfg[survey]['nside']
     candidate_list = cfg[survey]['candidate_list']
+    fracdet = cfg[survey]['fracdet']
 
 candidate_list = cfg[survey]['candidate_list']
 
 data = fits.read(candidate_list)
 data = data[data['SIG'] > 15]
 
-fracdet = fits.read('{}_pseudo_fracdet.fits.gz'.format(survey))
+#fracdet = fits.read('{}_pseudo_fracdet.fits.gz'.format(survey))
+fracdet = fits.read(fracdet)
 fracdetrav = fracdet['I'].ravel()
+#fracdetrav = fracdet['SIGNAL'].ravel()
 
 plt.figure()
 
