@@ -50,12 +50,13 @@ for infile in infiles:
 for ii in range(0, len(pix_nside)):
     ra, dec = ugali.utils.healpix.pixToAng(nside, pix_nside[ii])
 
-    print('({}/{})').format(ii, len(pix_nside))
+    if (dec < -20): # TODO
+        print('({}/{})').format(ii, len(pix_nside))
 
-    logfile = '{}/results_nside_{}_{}.log'.format(log_dir, nside, pix_nside[ii])
-    batch = 'csub -n {} -o {} '.format(jobs, logfile)
-    command = 'python {}/search_algorithm.py {:0.2f} {:0.2f}'.format(simple_dir, ra, dec)
-    command_queue = batch + command
-    print(command_queue)
-    #os.system('./' + command) # Run locally
-    os.system(command_queue) # Submit to queue
+        logfile = '{}/results_nside_{}_{}.log'.format(log_dir, nside, pix_nside[ii])
+        batch = 'csub -n {} -o {} '.format(jobs, logfile)
+        command = 'python {}/search_algorithm.py {:0.2f} {:0.2f}'.format(simple_dir, ra, dec)
+        command_queue = batch + command
+        print(command_queue)
+        #os.system('./' + command) # Run locally
+        os.system(command_queue) # Submit to queue

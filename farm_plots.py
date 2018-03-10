@@ -5,6 +5,7 @@ Create simple binner style plots for ugali or simple candidate lists
 __author__ = "Sidney Mau"
 
 import os
+import sys
 import time
 import subprocess
 import glob
@@ -23,11 +24,9 @@ import yaml
 with open('config.yaml', 'r') as ymlfile:
     cfg = yaml.load(ymlfile)
 
-simple_dir = cfg['setup']['simple_dir']
-
-jobs = cfg['batch']['jobs']
-
-candidate_list = cfg[cfg['data']]['candidate_list']
+    simple_dir = cfg['setup']['simple_dir']
+    jobs = cfg['batch']['jobs']
+    candidate_list = cfg[cfg['data']]['candidate_list']
 
 save_dir = os.path.join(os.getcwd(), cfg['output']['save_dir'])
 if not os.path.exists(save_dir):
@@ -37,9 +36,14 @@ log_dir = os.path.join(os.getcwd(), cfg['output']['save_dir'], cfg['output']['lo
 if not os.path.exists(log_dir):
     os.mkdir(log_dir)
 
+try:
+    sig_cut = float(sys.argv[1])
+except:
+    sig_cut = 5.5
+
 candidate_list = fits.read(candidate_list)
 try: # simple
-    candidate_list = candidate_list[candidate_list['SIG'] > 5.5] # > 5.5
+    candidate_list = candidate_list[candidate_list['SIG'] > sig_cut]
     #candidate_list = candidate_list[candidate_list['DEC'] > -25] # panstarrs test
 except: # ugali
     candidate_list = candidate_list[candidate_list['TS'] > 25]
