@@ -21,12 +21,11 @@ import yaml
 with open('config.yaml', 'r') as ymlfile:
     cfg = yaml.load(ymlfile)
 
-simple_dir = cfg['setup']['simple_dir']
-
-jobs = cfg['batch']['jobs']
-
-nside = cfg[cfg['data']]['nside']
-datadir = cfg[cfg['data']]['datadir']
+    simple_dir = cfg['setup']['simple_dir']
+    jobs = cfg['batch']['jobs']
+    nside = cfg[cfg['data']]['nside']
+    datadir = cfg[cfg['data']]['datadir']
+    mode = cfg[survey]['mode']
 
 results_dir = os.path.join(os.getcwd(), cfg['output']['results_dir'])
 if not os.path.exists(results_dir):
@@ -47,16 +46,17 @@ for infile in infiles:
 
 ############################################################
 
+print('mode: {}...'.format(mode))
+
 for ii in range(0, len(pix_nside)):
     ra, dec = ugali.utils.healpix.pixToAng(nside, pix_nside[ii])
 
-    if (dec < -20): # TODO
-        print('({}/{})').format(ii, len(pix_nside))
+    print('({}/{})').format(ii, len(pix_nside))
 
-        logfile = '{}/results_nside_{}_{}.log'.format(log_dir, nside, pix_nside[ii])
-        batch = 'csub -n {} -o {} '.format(jobs, logfile)
-        command = 'python {}/search_algorithm.py {:0.2f} {:0.2f}'.format(simple_dir, ra, dec)
-        command_queue = batch + command
-        print(command_queue)
-        #os.system('./' + command) # Run locally
-        os.system(command_queue) # Submit to queue
+    logfile = '{}/results_nside_{}_{}.log'.format(log_dir, nside, pix_nside[ii])
+    batch = 'csub -n {} -o {} '.format(jobs, logfile)
+    command = 'python {}/search_algorithm.py {:0.2f} {:0.2f}'.format(simple_dir, ra, dec)
+    command_queue = batch + command
+    print(command_queue)
+    #os.system('./' + command) # Run locally
+    os.system(command_queue) # Submit to queue

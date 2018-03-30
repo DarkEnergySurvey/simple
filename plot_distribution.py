@@ -35,12 +35,12 @@ plt.title("{} Hotspots".format(survey))
 # Plot hotspots
 plt.scatter(data['RA'], data['DEC'], edgecolor='none', s=1, c='black', alpha=0.5)
 
-# Overplot known dwarves
+# Overplot known objects
 catalog_array = ['McConnachie15', 'ExtraDwarfs']
 catalog = ugali.candidate.associate.SourceCatalog()
 for catalog_name in catalog_array:
     catalog += ugali.candidate.associate.catalogFactory(catalog_name)
-plt.scatter(catalog['ra'], catalog['dec'], edgecolor='red', s=20, linewidth=0.5, c='none', label='known dwarfs')
+plt.scatter(catalog['ra'], catalog['dec'], edgecolor='red', s=20, linewidth=0.5, c='none', label='known objects')
 
 plt.xlim([min(data['RA']), max(data['RA'])])
 plt.ylim([min(data['DEC']), max(data['DEC'])])
