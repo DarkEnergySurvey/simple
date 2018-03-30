@@ -9,10 +9,10 @@ output:
 batch:
     jobs: 20 # <= 20 for DES cluster computers!
 
-data: 'panstarrs' # parameter to change for runs across different data
+data: 'des' # parameter to change for runs across different data
 
 des: #y3a2:
-    mode : 1
+    mode : 1 # 0: real, 1: sim, 2: real+sim
     sim_catalog : 'sim_catalog.fits'
     sim_population : 'sim_population.fits'
     nside          : 32

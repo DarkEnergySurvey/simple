@@ -9,7 +9,7 @@ import sys
 import os
 import glob
 import yaml
-from matplitlib import mlab
+from matplotlib import mlab
 import numpy as np
 import healpy as hp
 import astropy.io.fits as pyfits
@@ -70,13 +70,13 @@ pix_nside_select = ugali.utils.healpix.angToPix(nside, ra_select, dec_select)
 ra_select, dec_select = ugali.utils.healpix.pixToAng(nside, pix_nside_select)
 pix_nside_neighbors = np.concatenate([[pix_nside_select], hp.get_all_neighbours(nside, pix_nside_select)])
 
-if (mode = 0):
+if (mode == 0):
     print('mode = 0: running only on real data')
     data = search_utils.construct_real_data(pix_nside_neighbors)
-if (mode = 1):
+if (mode == 1):
     print('mode = 1: running only on simulated data')
     data = search_utils.construct_sim_data(pix_nside_neighbors)
-if (mode = 2):
+if (mode == 2):
     print('mode = 2: running on real data and simulated data')
     data_real = search_utils.construct_real_data(pix_nside_neighbors)
     data_sim  = search_utils.construct_sim_data(pix_nside_neighbors)

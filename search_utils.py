@@ -6,8 +6,10 @@ __author__ = "Keith Bechtol"
 
 # Python libraries
 import os
+import glob
 import yaml
 import numpy as np
+from matplotlib import mlab
 import healpy as hp
 import astropy.io.fits as pyfits # migrate to fitsio for consistency with rest of suite
 import scipy.interpolate
@@ -28,6 +30,10 @@ with open('config.yaml', 'r') as ymlfile:
     datadir = cfg[survey]['datadir']
     mag_max = cfg[survey]['mag_max']
     
+    mode = cfg[survey]['mode']
+    sim_catalog = cfg[survey]['sim_catalog']
+    sim_population = cfg[survey]['sim_population']
+
     fracdet_map = cfg[survey]['fracdet']
     
     mag_g = cfg[survey]['mag_g']
@@ -41,7 +47,7 @@ with open('config.yaml', 'r') as ymlfile:
 
 ###########################################################
 
-def construct_real_data(pix_nside_neighbors)
+def construct_real_data(pix_nside_neighbors):
     data_array = []
     for pix_nside in pix_nside_neighbors:
         inlist = glob.glob('{}/*_{:05d}.fits'.format(datadir, pix_nside))
@@ -59,11 +65,11 @@ def construct_real_data(pix_nside_neighbors)
         data['MC_SOURCE_ID']
     except:
         # real data given MC_SOURCE_ID of 0
-        data = mlab.rec_append_fields(data, ['MC_SOURCE_ID'], np.zeros(len(data))) # is this the right array?
+        data = mlab.rec_append_fields(data, ['MC_SOURCE_ID'], [0]) # TODO what should this array be?
 
     return data
 
-def construct_sim_data(pix_nside_neighbors)
+def construct_sim_data(pix_nside_neighbors):
     data_array = []
     reader = pyfits.open(sim_population)
     for pix_nside in pix_nside_neighbors:

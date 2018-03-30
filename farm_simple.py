@@ -21,10 +21,11 @@ import yaml
 with open('config.yaml', 'r') as ymlfile:
     cfg = yaml.load(ymlfile)
 
+    survey = cfg['data']
     simple_dir = cfg['setup']['simple_dir']
     jobs = cfg['batch']['jobs']
-    nside = cfg[cfg['data']]['nside']
-    datadir = cfg[cfg['data']]['datadir']
+    nside = cfg[survey]['nside']
+    datadir = cfg[survey]['datadir']
     mode = cfg[survey]['mode']
 
 results_dir = os.path.join(os.getcwd(), cfg['output']['results_dir'])
