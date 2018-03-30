@@ -4,14 +4,17 @@ setup:
 output:
     results_dir : 'results_dir'
     log_dir     : 'log_dir'
-    save_dir    : 'save_dir_temp'
+    save_dir    : 'save_dir_test'
 
 batch:
-    jobs: 20 # <= 25 for DES cluster computers!
+    jobs: 20 # <= 20 for DES cluster computers!
 
 data: 'panstarrs' # parameter to change for runs across different data
 
 des: #y3a2:
+    mode : 1
+    sim_catalog : 'sim_catalog.fits'
+    sim_population : 'sim_population.fits'
     nside          : 32
     datadir        : '/home/s1/kadrlica/projects/y3a2/dsphs/v2/skim'
     candidate_list : 'candidate_list.fits'

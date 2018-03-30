@@ -9,7 +9,7 @@ import os
 import yaml
 import numpy as np
 import healpy as hp
-import astropy.io.fits as pyfits
+import astropy.io.fits as pyfits # migrate to fitsio for consistency with rest of suite
 import scipy.interpolate
 import scipy.ndimage
 
@@ -38,6 +38,43 @@ with open('config.yaml', 'r') as ymlfile:
     results_dir = os.path.join(os.getcwd(), cfg['output']['results_dir'])
     if not os.path.exists(results_dir):
         os.mkdir(results_dir)
+
+###########################################################
+
+def construct_real_data(pix_nside_neighbors)
+    data_array = []
+    for pix_nside in pix_nside_neighbors:
+        inlist = glob.glob('{}/*_{:05d}.fits'.format(datadir, pix_nside))
+        for infile in inlist:
+            if not os.path.exists(infile):
+                continue
+            reader = pyfits.open(infile)
+            data_array.append(reader[1].data)
+            reader.close()
+    print('Assembling data...')
+    data = np.concatenate(data_array)
+
+    # Guarantee data has MC_SOURCE_ID
+    try:
+        data['MC_SOURCE_ID']
+    except:
+        # real data given MC_SOURCE_ID of 0
+        data = mlab.rec_append_fields(data, ['MC_SOURCE_ID'], np.zeros(len(data))) # is this the right array?
+
+    return data
+
+def construct_sim_data(pix_nside_neighbors)
+    data_array = []
+    reader = pyfits.open(sim_population)
+    for pix_nside in pix_nside_neighbors:
+        pop_data = reader[1].data
+        pix_data = pop_data[pop_data['hpix_32'] == pix_nside]
+        data_array.append(pix_data)
+    print('Assembling data...')
+    data = np.concatenate(data_array)
+    reader.close()
+
+    return data
 
 ###########################################################
 
@@ -94,6 +131,13 @@ def searchByDistance(nside, data, distance_modulus, pix_nside_select, ra_select,
 
     fracdet corresponds to a fracdet map (numpy array, assumed to be EQUATORIAL and RING)
     """
+    
+    ## smau: testing this; should only be necessary for pseudo fracdet
+    #if fracdet is not None:
+    #    interp_val = hp.get_interp_val(fracdet, ra_select, dec_select, lonlat=True)
+    #    print('Bi-linear interpolation of fracdet of 4 nearest neighbors: {}'.format(interp_val))
+    #    if ( interp_val < 1): # too harsh for real fracdet map
+    #        return [], [], [], [], []
 
     print('Distance = {:0.1f} kpc (m-M = {:0.1f})').format(ugali.utils.projector.distanceModulusToDistance(distance_modulus), distance_modulus)
 

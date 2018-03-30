@@ -9,6 +9,7 @@ import sys
 import os
 import glob
 import yaml
+from matplitlib import mlab
 import numpy as np
 import healpy as hp
 import astropy.io.fits as pyfits
@@ -27,17 +28,21 @@ with open('config.yaml', 'r') as ymlfile:
     cfg = yaml.load(ymlfile)
 
     survey = cfg['data']
-    nside   = cfg[survey]['nside']
+    nside = cfg[survey]['nside']
     datadir = cfg[survey]['datadir']
     mag_max = cfg[survey]['mag_max']
-    
+
+    mode = cfg[survey]['mode']
+    sim_catalog = cfg[survey]['sim_catalog']
+    sim_population = cfg[survey]['sim_population']
+
     fracdet_map = cfg[survey]['fracdet']
-    
+
     mag_g = cfg[survey]['mag_g']
     mag_r = cfg[survey]['mag_r']
     mag_g_err = cfg[survey]['mag_g_err']
     mag_r_err = cfg[survey]['mag_r_err']
-    
+
     results_dir = os.path.join(os.getcwd(), cfg['output']['results_dir'])
     if not os.path.exists(results_dir):
         os.mkdir(results_dir)
@@ -65,17 +70,20 @@ pix_nside_select = ugali.utils.healpix.angToPix(nside, ra_select, dec_select)
 ra_select, dec_select = ugali.utils.healpix.pixToAng(nside, pix_nside_select)
 pix_nside_neighbors = np.concatenate([[pix_nside_select], hp.get_all_neighbours(nside, pix_nside_select)])
 
-data_array = []
-for pix_nside in pix_nside_neighbors:
-    inlist = glob.glob('{}/*_{:05d}.fits'.format(datadir, pix_nside))
-    for infile in inlist:
-        if not os.path.exists(infile):
-            continue
-        reader = pyfits.open(infile)
-        data_array.append(reader[1].data)
-        reader.close()
-print('Assembling data...')
-data = np.concatenate(data_array)
+if (mode = 0):
+    print('mode = 0: running only on real data')
+    data = search_utils.construct_real_data(pix_nside_neighbors)
+if (mode = 1):
+    print('mode = 1: running only on simulated data')
+    data = search_utils.construct_sim_data(pix_nside_neighbors)
+if (mode = 2):
+    print('mode = 2: running on real data and simulated data')
+    data_real = search_utils.construct_real_data(pix_nside_neighbors)
+    data_sim  = search_utils.construct_sim_data(pix_nside_neighbors)
+    data = np.concatenate(data_real, data_sim)
+else:
+    print('No mode specified; running only on real data')
+    data = search_utils.construct_real_data(pix_nside_neighbors)
 
 # Quality cut
 quality = filters.quality_filter(survey, data)
@@ -90,7 +98,7 @@ print('Applying cuts...')
 cut = filters.star_filter(survey, data)
 cut_gal = filters.galaxy_filter(survey, data)
 
-data_gal = data[cut_gal]
+data_gal = data[cut_gal] # this isn't used at all other than for noting number of galaxy-like objects in ROI
 data = data[cut]
 
 print('{} star-like objects in ROI...').format(len(data))
