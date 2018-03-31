@@ -25,7 +25,7 @@ import ugali.isochrone
 with open('config.yaml', 'r') as ymlfile:
     cfg = yaml.load(ymlfile)
 
-    survey = cfg['data']
+    survey = cfg['survey']
     nside   = cfg[survey]['nside']
     datadir = cfg[survey]['datadir']
     mag_max = cfg[survey]['mag_max']
@@ -57,7 +57,6 @@ def construct_real_data(pix_nside_neighbors):
             reader = pyfits.open(infile)
             data_array.append(reader[1].data)
             reader.close()
-    print('Assembling data...')
     data = np.concatenate(data_array)
 
     # Guarantee data has MC_SOURCE_ID
@@ -70,15 +69,26 @@ def construct_real_data(pix_nside_neighbors):
     return data
 
 def construct_sim_data(pix_nside_neighbors):
-    data_array = []
-    reader = pyfits.open(sim_population)
-    for pix_nside in pix_nside_neighbors:
-        pop_data = reader[1].data
-        pix_data = pop_data[pop_data['hpix_32'] == pix_nside]
-        data_array.append(pix_data)
-    print('Assembling data...')
+    reader = pyfits.open(sim_catalog)
+    cat_data = reader[1].data
+    data = cat_data[np.in1d(cat_data, pix_nside_neighbors)]
     data = np.concatenate(data_array)
     reader.close()
+
+    return data
+
+def construct_modal_data(mode, pix_nside_neighbors)
+    print('Assembling data...')
+    if (mode == 0):
+        data = construct_real_data(pix_nside_neighbors)
+    elif (mode == 1):
+        data = construct_sim_data(pix_nside_neighbors)
+    elif (mode == 2):
+        data_real = construct_real_data(pix_nside_neighbors)
+        data_sim  = construct_sim_data(pix_nside_neighbors)
+        data = np.concatenate(data_real, data_sim)
+    else:
+        data = construct_real_data(pix_nside_neighbors)
 
     return data
 
