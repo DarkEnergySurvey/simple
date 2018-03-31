@@ -30,16 +30,21 @@ from matplotlib import mlab
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 import filters
+import search_utils
 
 ################################################################################
 
 with open('config.yaml', 'r') as ymlfile:
     cfg = yaml.load(ymlfile)
 
-    survey = cfg['data']
+    survey = cfg['survey']
     nside   = cfg[survey]['nside']
     datadir = cfg[survey]['datadir']
     mag_max = cfg[survey]['mag_max']
+
+    mode = cfg[survey]['mode']
+    sim_catalog = cfg[survey]['sim_catalog']
+    sim_population = cfg[survey]['sim_population']
     
     mag_g = cfg[survey]['mag_g']
     mag_r = cfg[survey]['mag_r']
@@ -54,18 +59,9 @@ def analysis(targ_ra, targ_dec, mod):
     pix_nside_select = ugali.utils.healpix.angToPix(nside, targ_ra, targ_dec)
     ra_select, dec_select = ugali.utils.healpix.pixToAng(nside, pix_nside_select)
     pix_nside_neighbors = np.concatenate([[pix_nside_select], healpy.get_all_neighbours(nside, pix_nside_select)])
+
     print('Loading data...')
-    data_array = []
-    for pix_nside in pix_nside_neighbors:
-        inlist = glob.glob('{}/*_{:05d}.fits'.format(datadir, pix_nside))
-        for infile in inlist:
-            if not os.path.exists(infile):
-                continue
-            reader = pyfits.open(infile)
-            data_array.append(reader[1].data)
-            reader.close()
-    print('Assembling data...')
-    data = np.concatenate(data_array)
+    data = search_utils.construct_modal_data(mode, pix_nside_neighbors)
     quality_cut = filters.quality_filter(survey, data)
     data = data[quality_cut]
     print('Found {} objects...').format(len(data))
