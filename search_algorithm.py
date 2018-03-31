@@ -20,7 +20,7 @@ import ugali.utils.projector
 
 # Simple binner modules
 import filters
-import search_utils
+import simple_utils
 
 ###########################################################
 
