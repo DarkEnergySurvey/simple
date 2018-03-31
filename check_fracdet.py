@@ -15,7 +15,7 @@ import healpy as hp
 with open('config.yaml', 'r') as ymlfile:
     cfg = yaml.load(ymlfile)
 
-    survey = cfg['data']
+    survey = cfg['survey']
     nside   = cfg[survey]['nside']
     candidate_list = cfg[survey]['candidate_list']
     fracdet = cfg[survey]['fracdet']

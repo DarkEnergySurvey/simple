@@ -9,7 +9,7 @@ output:
 batch:
     jobs: 20 # <= 20 for DES cluster computers!
 
-data: 'des' # parameter to change for runs across different data
+survey: 'des' # parameter to change for runs across different data
 
 des: #y3a2:
     mode : 1 # 0: real, 1: sim, 2: real+sim

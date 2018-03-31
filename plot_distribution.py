@@ -19,7 +19,7 @@ import ugali.candidate.associate
 with open('config.yaml', 'r') as ymlfile:
     cfg = yaml.load(ymlfile)
 
-    survey = cfg['data']
+    survey = cfg['survey']
     nside   = cfg[survey]['nside']
     datadir = cfg[survey]['datadir']
     candidate_list = cfg[survey]['candidate_list']

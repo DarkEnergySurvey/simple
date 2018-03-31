@@ -25,9 +25,9 @@ print(matplotlib.get_backend())
 with open('config.yaml', 'r') as ymlfile:
     cfg = yaml.load(ymlfile)
 
-survey = cfg['data']
-nside   = cfg[survey]['nside']
-datadir = cfg[survey]['datadir']
+    survey = cfg['survey']
+    nside   = cfg[survey]['nside']
+    datadir = cfg[survey]['datadir']
 
 save_dir = os.path.join(os.getcwd(), cfg['output']['save_dir'])
 if not os.path.exists(save_dir):

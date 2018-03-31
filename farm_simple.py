@@ -21,7 +21,7 @@ import yaml
 with open('config.yaml', 'r') as ymlfile:
     cfg = yaml.load(ymlfile)
 
-    survey = cfg['data']
+    survey = cfg['survey']
     simple_dir = cfg['setup']['simple_dir']
     jobs = cfg['batch']['jobs']
     nside = cfg[survey]['nside']
