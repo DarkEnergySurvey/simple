@@ -77,17 +77,17 @@ def construct_sim_data(pix_nside_neighbors):
 
     return data
 
-def construct_modal_data(mode, pix_nside_neighbors)
+def construct_modal_data(mode, pix_nside_neighbors):
     print('Assembling data...')
-    if (mode == 0):
+    if (mode == 0): # real data
         data = construct_real_data(pix_nside_neighbors)
-    elif (mode == 1):
+    elif (mode == 1): # simulated data
         data = construct_sim_data(pix_nside_neighbors)
-    elif (mode == 2):
+    elif (mode == 2): # real and simulated data
         data_real = construct_real_data(pix_nside_neighbors)
         data_sim  = construct_sim_data(pix_nside_neighbors)
         data = np.concatenate(data_real, data_sim)
-    else:
+    else: # assume mode = 0
         data = construct_real_data(pix_nside_neighbors)
 
     return data
