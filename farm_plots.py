@@ -41,6 +41,8 @@ try:
 except:
     sig_cut = 5.5
 
+print('Plotting hotspots with sig > {}'.format(sig_cut))
+
 candidate_list = fits.read(candidate_list)
 try: # simple
     candidate_list = candidate_list[candidate_list['SIG'] > sig_cut]

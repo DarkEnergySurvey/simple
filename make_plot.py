@@ -15,7 +15,6 @@ import numpy as np
 import numpy
 import pylab as plt
 from matplotlib import gridspec
-from multiprocessing import Pool
 
 import ugali.utils.projector
 import ugali.candidate.associate

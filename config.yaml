@@ -4,7 +4,7 @@ setup:
 output:
     results_dir : 'results_dir'
     log_dir     : 'log_dir'
-    save_dir    : 'save_dir_test'
+    save_dir    : 'save_dir'
 
 batch:
     jobs: 20 # <= 20 for DES cluster computers!
