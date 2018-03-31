@@ -27,7 +27,7 @@ import search_utils
 with open('config.yaml', 'r') as ymlfile:
     cfg = yaml.load(ymlfile)
 
-    survey = cfg['data']
+    survey = cfg['survey']
     nside = cfg[survey]['nside']
     datadir = cfg[survey]['datadir']
     mag_max = cfg[survey]['mag_max']
@@ -70,20 +70,16 @@ pix_nside_select = ugali.utils.healpix.angToPix(nside, ra_select, dec_select)
 ra_select, dec_select = ugali.utils.healpix.pixToAng(nside, pix_nside_select)
 pix_nside_neighbors = np.concatenate([[pix_nside_select], hp.get_all_neighbours(nside, pix_nside_select)])
 
+# Construct data
+data = search_utils.construct_modal_data(mode, pix_nside_neighbors)
 if (mode == 0):
     print('mode = 0: running only on real data')
-    data = search_utils.construct_real_data(pix_nside_neighbors)
-if (mode == 1):
+elif (mode == 1):
     print('mode = 1: running only on simulated data')
-    data = search_utils.construct_sim_data(pix_nside_neighbors)
-if (mode == 2):
+elif (mode == 2):
     print('mode = 2: running on real data and simulated data')
-    data_real = search_utils.construct_real_data(pix_nside_neighbors)
-    data_sim  = search_utils.construct_sim_data(pix_nside_neighbors)
-    data = np.concatenate(data_real, data_sim)
 else:
     print('No mode specified; running only on real data')
-    data = search_utils.construct_real_data(pix_nside_neighbors)
 
 # Quality cut
 quality = filters.quality_filter(survey, data)
