@@ -78,13 +78,10 @@ def construct_sim_data(pix_nside_neighbors):
 
     data_array = []
     cat_data = fits.read(sim_catalog)
-    #import pdb;pdb.set_trace()
-    pix_data = cat_data[np.in1d(range(len(cat_data)), pix_nside_neighbors)]
+    pix = hp.ang2pix(nside,cat_data['RA'],cat_data['DEC'],lonlat=True)
+    pix_data = cat_data[np.in1d(pix, pix_nside_neighbors)]
     data_array.append(pix_data)
     data = np.concatenate(data_array)
-
-    #cat_data = fits.read(sim_catalog)
-    #data = cat_data[np.in1d(cat_data, pix_nside_neighbors)]
 
     return data
 
