@@ -61,7 +61,7 @@ def analysis(targ_ra, targ_dec, mod):
     pix_nside_neighbors = np.concatenate([[pix_nside_select], healpy.get_all_neighbours(nside, pix_nside_select)])
 
     print('Loading data...')
-    data = search_utils.construct_modal_data(mode, pix_nside_neighbors)
+    data = simple_utils.construct_modal_data(mode, pix_nside_neighbors)
     quality_cut = filters.quality_filter(survey, data)
     data = data[quality_cut]
     print('Found {} objects...').format(len(data))
@@ -71,7 +71,7 @@ def analysis(targ_ra, targ_dec, mod):
     iso = isochrone_factory('Bressan2012', age=12, z=0.0001, distance_modulus=mod)
 
     # g_radius estimate
-    filter = filters.star_filter(cfg['data'], data)
+    filter = filters.star_filter(survey, data)
 
     iso_filter = (iso.separation(data[mag_g], data[mag_r]) < 0.1)
 
@@ -137,14 +137,14 @@ def densityPlot(targ_ra, targ_dec, data, iso, g_radius, nbhd, type):
     """Stellar density plot"""
 
     if type == 'stars':
-        filter = filters.star_filter(cfg['data'], data)
+        filter = filters.star_filter(survey, data)
         plt.title('Stellar Density')
     elif type == 'galaxies':
-        filter = filters.galaxy_filter(cfg['data'], data)
+        filter = filters.galaxy_filter(survey, data)
         plt.title('Galactic Density')
     elif type == 'blue_stars':
-        filter = filters.color_filter(cfg['data'], data) \
-               & filters.star_filter(cfg['data'], data)
+        filter = filters.color_filter(survey, data) \
+               & filters.star_filter(survey, data)
         plt.title('Blue Stellar Density')
 
     iso_filter = (iso.separation(data[mag_g], data[mag_r]) < 0.1)
@@ -178,7 +178,7 @@ def densityPlot(targ_ra, targ_dec, data, iso, g_radius, nbhd, type):
 def starPlot(targ_ra, targ_dec, data, iso, g_radius, nbhd):
     """Star bin plot"""
 
-    filter = filters.star_filter(cfg['data'], data)
+    filter = filters.star_filter(survey, data)
 
     iso_filter = (iso.separation(data[mag_g], data[mag_r]) < 0.1)
 
@@ -202,10 +202,10 @@ def cmPlot(targ_ra, targ_dec, data, iso, g_radius, nbhd, type):
     annulus = (angsep > g_radius) & (angsep < 1.)
 
     if type == 'stars':
-        filter = filters.star_filter(cfg['data'], data)
+        filter = filters.star_filter(survey, data)
         plt.title('Stellar Color-Magnitude')
     elif type == 'galaxies':
-        filter = filters.galaxy_filter(cfg['data'], data)
+        filter = filters.galaxy_filter(survey, data)
         plt.title('Galactic Color-Magnitude')
 
     iso_filter = (iso.separation(data[mag_g], data[mag_r]) < 0.1)
@@ -232,7 +232,7 @@ def cmPlot(targ_ra, targ_dec, data, iso, g_radius, nbhd, type):
 def hessPlot(targ_ra, targ_dec, data, iso, g_radius, nbhd):
     """Hess plot"""
 
-    filter = filters.star_filter(cfg['data'], data)
+    filter = filters.star_filter(survey, data)
 
     plt.title('Hess')
 
@@ -280,8 +280,8 @@ def radialPlot(targ_ra, targ_dec, data, iso, g_radius, nbhd):
     """Radial distribution plot"""
 
     ## Deprecated?
-    #filter_s = filters.star_filter(cfg['data'], data)
-    #filter_g = filters.galaxy_filter(cfg['data'], data)
+    #filter_s = filters.star_filter(survey, data)
+    #filter_g = filters.galaxy_filter(survey, data)
 
     plt.title('Radial Distribution')
 
@@ -297,9 +297,9 @@ def radialPlot(targ_ra, targ_dec, data, iso, g_radius, nbhd):
 
     def interp_values(type, seln):
         if type == 'stars':
-            filter = filters.star_filter(cfg['data'], data)
+            filter = filters.star_filter(survey, data)
         elif type == 'galaxies':
-            filter = filters.galaxy_filter(cfg['data'], data)
+            filter = filters.galaxy_filter(survey, data)
 
         if seln == 'f':
             iso_filter = iso_seln_f
@@ -316,9 +316,9 @@ def radialPlot(targ_ra, targ_dec, data, iso, g_radius, nbhd):
 
     def value_errors(type, seln):
         if type == 'stars':
-            filter = filters.star_filter(cfg['data'], data)
+            filter = filters.star_filter(survey, data)
         elif type == 'galaxies':
-            filter = filters.galaxy_filter(cfg['data'], data)
+            filter = filters.galaxy_filter(survey, data)
         if seln == 'f':
             iso_filter = iso_seln_f
         elif seln == 'u':

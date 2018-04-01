@@ -15,7 +15,7 @@ import fitsio
 with open('config.yaml', 'r') as ymlfile:
     cfg = yaml.load(ymlfile)
 
-candidate_list = cfg[cfg['data']]['candidate_list']
+candidate_list = cfg[cfg['survey']]['candidate_list']
 
 
 # Parse results from results_dir into a list of values

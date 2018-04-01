@@ -50,6 +50,7 @@ for infile in infiles:
 print('mode: {}...'.format(mode))
 
 for ii in range(0, len(pix_nside)):
+#for ii in range(5):
     ra, dec = ugali.utils.healpix.pixToAng(nside, pix_nside[ii])
 
     print('({}/{})').format(ii, len(pix_nside))

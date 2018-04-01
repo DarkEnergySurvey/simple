@@ -26,7 +26,7 @@ with open('config.yaml', 'r') as ymlfile:
 
     simple_dir = cfg['setup']['simple_dir']
     jobs = cfg['batch']['jobs']
-    candidate_list = cfg[cfg['data']]['candidate_list']
+    candidate_list = cfg[cfg['survey']]['candidate_list']
 
 save_dir = os.path.join(os.getcwd(), cfg['output']['save_dir'])
 if not os.path.exists(save_dir):

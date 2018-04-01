@@ -71,7 +71,7 @@ ra_select, dec_select = ugali.utils.healpix.pixToAng(nside, pix_nside_select)
 pix_nside_neighbors = np.concatenate([[pix_nside_select], hp.get_all_neighbours(nside, pix_nside_select)])
 
 # Construct data
-data = search_utils.construct_modal_data(mode, pix_nside_neighbors)
+data = simple_utils.construct_modal_data(mode, pix_nside_neighbors)
 if (mode == 0):
     print('mode = 0: running only on real data')
 elif (mode == 1):
@@ -108,7 +108,7 @@ r_peak_array = []
 sig_peak_array = []
 distance_modulus_array = []
 for distance_modulus in distance_modulus_search_array:
-    ra_peak, dec_peak, r_peak, sig_peak, distance_modulus = search_utils.searchByDistance(nside, data, distance_modulus, pix_nside_select, ra_select, dec_select, fracdet=fracdet)
+    ra_peak, dec_peak, r_peak, sig_peak, distance_modulus = simple_utils.searchByDistance(nside, data, distance_modulus, pix_nside_select, ra_select, dec_select, fracdet=fracdet)
     ra_peak_array.append(ra_peak)
     dec_peak_array.append(dec_peak)
     r_peak_array.append(r_peak)

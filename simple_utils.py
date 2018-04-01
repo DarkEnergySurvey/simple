@@ -12,6 +12,7 @@ import numpy as np
 from matplotlib import mlab
 import healpy as hp
 import astropy.io.fits as pyfits # migrate to fitsio for consistency with rest of suite
+import fitsio as fits
 import scipy.interpolate
 import scipy.ndimage
 
@@ -54,9 +55,10 @@ def construct_real_data(pix_nside_neighbors):
         for infile in inlist:
             if not os.path.exists(infile):
                 continue
-            reader = pyfits.open(infile)
-            data_array.append(reader[1].data)
-            reader.close()
+            #reader = pyfits.open(infile)
+            #data_array.append(reader[1].data)
+            #reader.close()
+            data_array.append(fits.read(infile)) # TODO: verify functionality
     data = np.concatenate(data_array)
 
     # Guarantee data has MC_SOURCE_ID
@@ -69,11 +71,20 @@ def construct_real_data(pix_nside_neighbors):
     return data
 
 def construct_sim_data(pix_nside_neighbors):
-    reader = pyfits.open(sim_catalog)
-    cat_data = reader[1].data
-    data = cat_data[np.in1d(cat_data, pix_nside_neighbors)]
+    #reader = pyfits.open(sim_catalog)
+    #cat_data = reader[1].data
+    #data = cat_data[np.in1d(cat_data, pix_nside_neighbors)]
+    #reader.close()
+
+    data_array = []
+    cat_data = fits.read(sim_catalog)
+    #import pdb;pdb.set_trace()
+    pix_data = cat_data[np.in1d(range(len(cat_data)), pix_nside_neighbors)]
+    data_array.append(pix_data)
     data = np.concatenate(data_array)
-    reader.close()
+
+    #cat_data = fits.read(sim_catalog)
+    #data = cat_data[np.in1d(cat_data, pix_nside_neighbors)]
 
     return data
 
