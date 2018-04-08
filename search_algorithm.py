@@ -47,13 +47,6 @@ with open('config.yaml', 'r') as ymlfile:
     if not os.path.exists(results_dir):
         os.mkdir(results_dir)
 
-if (fracdet_map is not None) and (fracdet_map.lower().strip() != 'none') and (fracdet_map != ''):
-    print('Reading fracdet map {} ...').format(fracdet_map)
-    fracdet = hp.read_map(fracdet_map)
-else:
-    print('No fracdet map specified ...')
-    fracdet = None
-
 ############################################################
 
 # main
@@ -100,6 +93,14 @@ data = data[cut]
 print('{} star-like objects in ROI...').format(len(data))
 print('{} galaxy-like objects in ROI...').format(len(data_gal))
 
+# Read in fracdet map
+if (fracdet_map is not None) and (fracdet_map.lower().strip() != 'none') and (fracdet_map != ''):
+    print('Reading fracdet map {} ...').format(fracdet_map)
+    fracdet = hp.read_map(fracdet_map)
+else:
+    print('No fracdet map specified ...')
+    fracdet = None
+
 distance_modulus_search_array = np.arange(16., mag_max, 0.5)
 
 ra_peak_array = []
@@ -108,12 +109,12 @@ r_peak_array = []
 sig_peak_array = []
 distance_modulus_array = []
 for distance_modulus in distance_modulus_search_array:
-    ra_peak, dec_peak, r_peak, sig_peak, distance_modulus = simple_utils.searchByDistance(nside, data, distance_modulus, pix_nside_select, ra_select, dec_select, fracdet=fracdet)
+    ra_peak, dec_peak, r_peak, sig_peak, dist_mod = simple_utils.searchByDistance(nside, data, distance_modulus, pix_nside_select, ra_select, dec_select, fracdet=fracdet)
     ra_peak_array.append(ra_peak)
     dec_peak_array.append(dec_peak)
     r_peak_array.append(r_peak)
     sig_peak_array.append(sig_peak)
-    distance_modulus_array.append(distance_modulus)
+    distance_modulus_array.append(dist_mod)
 
 ra_peak_array = np.concatenate(ra_peak_array)
 dec_peak_array = np.concatenate(dec_peak_array)
@@ -151,14 +152,5 @@ for ii in range(0, len(sig_peak_array)):
                  ugali.utils.projector.distanceModulusToDistance(distance_modulus_array[ii]),
                  distance_modulus_array[ii])
 
-outfile = '{}/results_nside_{}_{}.csv'.format(results_dir, nside, pix_nside_select)
-writer = open(outfile, 'w')
-for ii in range(0, len(sig_peak_array)):
-    # SIG, RA, DEC, MODULUS, r
-    writer.write('{:10.2f}, {:10.2f}, {:10.2f}, {:10.2f}, {:10.2f}\n'.format(sig_peak_array[ii], 
-                                                             ra_peak_array[ii], 
-                                                             dec_peak_array[ii], 
-                                                             distance_modulus_array[ii], 
-                                                             r_peak_array[ii]))
-writer.close()
-
+# Write output
+simple_utils.writeOutput(results_dir, nside, pix_nside_select, ra_peak_array, dec_peak_array, r_peak_array, distance_modulus_array, sig_peak_array)

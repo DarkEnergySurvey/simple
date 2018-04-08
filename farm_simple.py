@@ -44,7 +44,7 @@ if not os.path.exists(log_dir):
 def submitJob(ra, dec, pix):
     logfile = '{}/results_nside_{}_{}.log'.format(log_dir, nside, pix)
     batch = 'csub -n {} -o {} '.format(jobs, logfile)
-    command = 'python {}/search_algorithm.py {:0.2f} {:0.2f}'.format(simple_dir, ra, dec)
+    command = 'python {}/search_algorithm.py {:0.2f} {:0.2f}'.format(simple_dir, ra, dec) # TODO
     command_queue = batch + command
     print(command_queue)
     #os.system('./' + command) # Run locally
@@ -69,26 +69,12 @@ if (mode == 0): # real
         ra, dec = ugali.utils.healpix.pixToAng(nside, pix_nside[ii])
     
         submitJob(ra, dec, pix_nside[ii])
-        #print('({}/{})').format(ii, len(pix_nside))
+        print('({}/{})').format(ii, len(pix_nside))
     
-        #logfile = '{}/results_nside_{}_{}.log'.format(log_dir, nside, pix_nside[ii])
-        #batch = 'csub -n {} -o {} '.format(jobs, logfile)
-        #command = 'python {}/search_algorithm.py {:0.2f} {:0.2f}'.format(simple_dir, ra, dec)
-        #command_queue = batch + command
-        #print(command_queue)
-        ##os.system('./' + command) # Run locally
-        #os.system(command_queue) # Submit to queue
-elif (mode == 1): # sim
+else: # sim or real+sim
     sim_pop = fits.read(sim_population)
-    for sim in sim_pop:
+    for sim in [sim_pop[0]]: #
         ra, dec = sim['ra'], sim['dec']
         pix = hp.ang2pix(nside, ra, dec, lonlat=True)
 
         submitJob(ra, dec, pix)
-        #logfile = '{}/results_nside_{}_{}.log'.format(log_dir, nside, pix)
-        #batch = 'csub -n {} -o {} '.format(jobs, logfile)
-        #command = 'python {}/search_algorithm.py {:0.2f} {:0.2f}'.format(simple_dir, ra, dec)
-        #command_queue = batch + command
-        #print(command_queue)
-        ##os.system('./' + command) # Run locally
-        #os.system(command_queue) # Submit to queue
