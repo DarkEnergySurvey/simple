@@ -109,7 +109,22 @@ r_peak_array = []
 sig_peak_array = []
 distance_modulus_array = []
 for distance_modulus in distance_modulus_search_array:
-    ra_peak, dec_peak, r_peak, sig_peak, dist_mod = simple_utils.searchByDistance(nside, data, distance_modulus, pix_nside_select, ra_select, dec_select, fracdet=fracdet)
+    print('Distance = {:0.1f} kpc (m-M = {:0.1f})').format(ugali.utils.projector.distanceModulusToDistance(distance_modulus), distance_modulus)
+
+    dirname = '/home/s1/kadrlica/.ugali/isochrones/des/dotter2016/'
+    #dirname = '/Users/keithbechtol/Documents/DES/projects/mw_substructure/ugalidir/isochrones/des/dotter2016/'
+    iso = ugali.isochrone.factory('Dotter', hb_spread=0, dirname=dirname)
+    iso.age = 12.
+    iso.metallicity = 0.0001
+    iso.distance_modulus = distance_modulus
+
+    cut = simple_utils.cutIsochronePath(data[mag_g], data[mag_r], data[mag_g_err], data[mag_r_err], iso, radius=0.1)
+    data = data[cut]
+
+    print('{} objects left after isochrone cut...').format(len(data))
+
+    characteristic_density = simple_utils.computeCharDensity(nside, data, ra_select, dec_select, fracdet)
+    ra_peak, dec_peak, r_peak, sig_peak, dist_mod = simple_utils.searchByDistance(nside, data, characteristic_density, distance_modulus, pix_nside_select, ra_select, dec_select, mag_max, fracdet)
     ra_peak_array.append(ra_peak)
     dec_peak_array.append(dec_peak)
     r_peak_array.append(r_peak)

@@ -222,13 +222,13 @@ def computeCharDensity(nside, data, ra_select, dec_select, fracdet=None):
 
     return characteristic_density
 
-def computeLocalCharDensity(nside, data, ra_select, dec_select, x_peak, y_peak, angsep_peak, fracdet=None):
+def computeLocalCharDensity(nside, data, characteristic_density, ra_select, dec_select, x_peak, y_peak, angsep_peak, fracdet=None):
     """
     Compute the local characteristic density of a region
     """
 
     # TODO I believe this call is adding unnecessary computation time
-    characteristic_density = computeCharDensity(nside, data, ra_select, dec_select, fracdet)
+    #characteristic_density = computeCharDensity(nside, data, ra_select, dec_select, fracdet)
 
     # The following is all computed elsewhere but needed in here... should either
     # abstract into its own function or somehow else circumvent the need to copy
@@ -308,7 +308,7 @@ def computeLocalCharDensity(nside, data, ra_select, dec_select, x_peak, y_peak, 
 
 ########################################################################
 
-def findPeaks(nside, data, distance_modulus, pix_nside_select, ra_select, dec_select, magnitude_threshold=mag_max, fracdet=None):
+def findPeaks(nside, data, characteristic_density, distance_modulus, pix_nside_select, ra_select, dec_select, magnitude_threshold=mag_max, fracdet=None):
     """
     Convolve field to find characteristic density and peaks within the selected pixel
     """
@@ -330,7 +330,7 @@ def findPeaks(nside, data, distance_modulus, pix_nside_select, ra_select, dec_se
 
     h_g = scipy.ndimage.filters.gaussian_filter(h, smoothing / delta_x)
 
-    characteristic_density = computeCharDensity(nside, data, ra_select, dec_select, fracdet)
+    #characteristic_density = computeCharDensity(nside, data, ra_select, dec_select, fracdet)
 
     factor_array = np.arange(1., 5., 0.05)
     rara, decdec = proj.imageToSphere(xx.flatten(), yy.flatten())
@@ -366,10 +366,16 @@ def findPeaks(nside, data, distance_modulus, pix_nside_select, ra_select, dec_se
 
 ########################################################################
 
-def fitAperture(proj, distance_modulus, characteristic_density_local, x_peak, y_peak, angsep_peak, ra_peak_array, dec_peak_array, r_peak_array, sig_peak_array, distance_modulus_array):
+def fitAperture(proj, distance_modulus, characteristic_density_local, x_peak, y_peak, angsep_peak):
     """
     Fit aperture by varing radius and computing the significance
     """
+
+    ra_peak_array = []
+    dec_peak_array = []
+    r_peak_array = []
+    sig_peak_array = []
+    distance_modulus_array = []
 
     size_array = np.arange(0.01, 0.3, 0.01)
     sig_array = np.tile(0., len(size_array))
@@ -401,7 +407,7 @@ def fitAperture(proj, distance_modulus, characteristic_density_local, x_peak, y_
 
 ########################################################################
 
-def searchByDistance(nside, data, distance_modulus, pix_nside_select, ra_select, dec_select, magnitude_threshold=mag_max, fracdet=None):
+def searchByDistance(nside, data, characteristic_density, distance_modulus, pix_nside_select, ra_select, dec_select, magnitude_threshold=mag_max, fracdet=None):
     """
     Idea: 
     Send a data extension that goes to faint magnitudes, e.g., g < 24.
@@ -413,19 +419,19 @@ def searchByDistance(nside, data, distance_modulus, pix_nside_select, ra_select,
     fracdet corresponds to a fracdet map (numpy array, assumed to be EQUATORIAL and RING)
     """
 
-    print('Distance = {:0.1f} kpc (m-M = {:0.1f})').format(ugali.utils.projector.distanceModulusToDistance(distance_modulus), distance_modulus)
+    #print('Distance = {:0.1f} kpc (m-M = {:0.1f})').format(ugali.utils.projector.distanceModulusToDistance(distance_modulus), distance_modulus)
 
-    dirname = '/home/s1/kadrlica/.ugali/isochrones/des/dotter2016/'
-    #dirname = '/Users/keithbechtol/Documents/DES/projects/mw_substructure/ugalidir/isochrones/des/dotter2016/'
-    iso = ugali.isochrone.factory('Dotter', hb_spread=0, dirname=dirname)
-    iso.age = 12.
-    iso.metallicity = 0.0001
-    iso.distance_modulus = distance_modulus
+    #dirname = '/home/s1/kadrlica/.ugali/isochrones/des/dotter2016/'
+    ##dirname = '/Users/keithbechtol/Documents/DES/projects/mw_substructure/ugalidir/isochrones/des/dotter2016/'
+    #iso = ugali.isochrone.factory('Dotter', hb_spread=0, dirname=dirname)
+    #iso.age = 12.
+    #iso.metallicity = 0.0001
+    #iso.distance_modulus = distance_modulus
 
-    cut = cutIsochronePath(data[mag_g], data[mag_r], data[mag_g_err], data[mag_r_err], iso, radius=0.1)
-    data = data[cut]
+    #cut = cutIsochronePath(data[mag_g], data[mag_r], data[mag_g_err], data[mag_r_err], iso, radius=0.1)
+    #data = data[cut]
 
-    print('{} objects left after isochrone cut...').format(len(data))
+    #print('{} objects left after isochrone cut...').format(len(data))
     ra_peak_array = []
     dec_peak_array = []
     r_peak_array = []
@@ -434,13 +440,25 @@ def searchByDistance(nside, data, distance_modulus, pix_nside_select, ra_select,
 
     proj = ugali.utils.projector.Projector(ra_select, dec_select)
 
-    x_peak_array, y_peak_array, angsep_peak_array = findPeaks(nside, data, distance_modulus, pix_nside_select, ra_select, dec_select, magnitude_threshold, fracdet)
+    x_peak_array, y_peak_array, angsep_peak_array = findPeaks(nside, data, characteristic_density, distance_modulus, pix_nside_select, ra_select, dec_select, magnitude_threshold, fracdet)
 
     for x_peak, y_peak, angsep_peak in itertools.izip(x_peak_array, y_peak_array, angsep_peak_array):
-        characteristic_density_local = computeLocalCharDensity(nside, data, ra_select, dec_select, x_peak, y_peak, angsep_peak, fracdet)
+        characteristic_density_local = computeLocalCharDensity(nside, data, characteristic_density, ra_select, dec_select, x_peak, y_peak, angsep_peak, fracdet)
         # Aperture fitting
         print('Fitting aperture to hotspot...')
-        ra_peak_array, dec_peak_array, r_peak_array, sig_peak_array, distance_modulus_array = fitAperture(proj, distance_modulus, characteristic_density_local, x_peak, y_peak, angsep_peak, ra_peak_array, dec_peak_array, r_peak_array, sig_peak_array, distance_modulus_array)
+        ra_peaks, dec_peaks, r_peaks, sig_peaks, distance_moduli = fitAperture(proj, distance_modulus, characteristic_density_local, x_peak, y_peak, angsep_peak)
+        
+        ra_peak_array.append(ra_peaks)
+        dec_peak_array.append(dec_peaks)
+        r_peak_array.append(r_peaks)
+        sig_peak_array.append(sig_peaks)
+        distance_modulus_array.append(distance_moduli)
+
+    ra_peak_array = np.concatenate(ra_peak_array)
+    dec_peak_array = np.concatenate(dec_peak_array)
+    r_peak_array = np.concatenate(r_peak_array)
+    sig_peak_array = np.concatenate(sig_peak_array)
+    distance_modulus_array = np.concatenate(distance_modulus_array)
 
     return ra_peak_array, dec_peak_array, r_peak_array, sig_peak_array, distance_modulus_array
 
@@ -485,5 +503,3 @@ def writeOutput(results_dir, nside, pix_nside_select, ra_peak_array, dec_peak_ar
                                                                  dec_peak_array[ii], 
                                                                  distance_modulus_array[ii], 
                                                                  r_peak_array[ii]))
-    writer.close()
-
