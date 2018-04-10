@@ -146,11 +146,6 @@ def cutIsochronePath(g, r, g_err, r_err, isochrone, radius=0.1, return_all=False
 
 ########################################################################
 
-# smau: would it be better to have one density computation function that has a
-#       global/local argument such that the code can be more easily shared?
-#       Currently, the global version is called in the local, but this can still
-#       be addressed, I think.
-
 def computeCharDensity(nside, data, ra_select, dec_select, fracdet=None):
     """
     Compute the characteristic density of a region
@@ -226,9 +221,6 @@ def computeLocalCharDensity(nside, data, characteristic_density, ra_select, dec_
     """
     Compute the local characteristic density of a region
     """
-
-    # TODO I believe this call is adding unnecessary computation time
-    #characteristic_density = computeCharDensity(nside, data, ra_select, dec_select, fracdet)
 
     # The following is all computed elsewhere but needed in here... should either
     # abstract into its own function or somehow else circumvent the need to copy
@@ -401,13 +393,11 @@ def fitAperture(proj, distance_modulus, characteristic_density_local, x_peak, y_
         sig_peak_array.append(np.max(sig_array))
         distance_modulus_array.append(distance_modulus)
 
-    # is it better to modify input arrays or to make new arrays and append those to
-    # external arrays?
     return ra_peak_array, dec_peak_array, r_peak_array, sig_peak_array, distance_modulus_array
 
 ########################################################################
 
-def searchByDistance(nside, data, characteristic_density, distance_modulus, pix_nside_select, ra_select, dec_select, magnitude_threshold=mag_max, fracdet=None):
+def searchByDistance(nside, data, distance_modulus, pix_nside_select, ra_select, dec_select, magnitude_threshold=mag_max, fracdet=None):
     """
     Idea: 
     Send a data extension that goes to faint magnitudes, e.g., g < 24.
@@ -419,19 +409,23 @@ def searchByDistance(nside, data, characteristic_density, distance_modulus, pix_
     fracdet corresponds to a fracdet map (numpy array, assumed to be EQUATORIAL and RING)
     """
 
-    #print('Distance = {:0.1f} kpc (m-M = {:0.1f})').format(ugali.utils.projector.distanceModulusToDistance(distance_modulus), distance_modulus)
+    print('Distance = {:0.1f} kpc (m-M = {:0.1f})').format(ugali.utils.projector.distanceModulusToDistance(distance_modulus), distance_modulus)
 
-    #dirname = '/home/s1/kadrlica/.ugali/isochrones/des/dotter2016/'
-    ##dirname = '/Users/keithbechtol/Documents/DES/projects/mw_substructure/ugalidir/isochrones/des/dotter2016/'
-    #iso = ugali.isochrone.factory('Dotter', hb_spread=0, dirname=dirname)
-    #iso.age = 12.
-    #iso.metallicity = 0.0001
-    #iso.distance_modulus = distance_modulus
+    dirname = '/home/s1/kadrlica/.ugali/isochrones/des/dotter2016/'
+    #dirname = '/Users/keithbechtol/Documents/DES/projects/mw_substructure/ugalidir/isochrones/des/dotter2016/'
+    iso = ugali.isochrone.factory('Dotter', hb_spread=0, dirname=dirname)
+    iso.age = 12.
+    iso.metallicity = 0.0001
+    iso.distance_modulus = distance_modulus
 
-    #cut = cutIsochronePath(data[mag_g], data[mag_r], data[mag_g_err], data[mag_r_err], iso, radius=0.1)
-    #data = data[cut]
+    cut = cutIsochronePath(data[mag_g], data[mag_r], data[mag_g_err], data[mag_r_err], iso, radius=0.1)
+    data = data[cut]
 
-    #print('{} objects left after isochrone cut...').format(len(data))
+    print('{} objects left after isochrone cut...').format(len(data))
+
+    # Compute characteristic density at this distance
+    characteristic_density = computeCharDensity(nside, data, ra_select, dec_select, fracdet)
+
     ra_peak_array = []
     dec_peak_array = []
     r_peak_array = []
