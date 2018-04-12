@@ -41,10 +41,10 @@ if not os.path.exists(log_dir):
 
 ############################################################
 
-def submitJob(ra, dec, pix):
+def submitJob(ra, dec, pix, mc_source_id):
     logfile = '{}/results_nside_{}_{}.log'.format(log_dir, nside, pix)
     batch = 'csub -n {} -o {} '.format(jobs, logfile)
-    command = 'python {}/search_algorithm.py {:0.2f} {:0.2f}'.format(simple_dir, ra, dec) # TODO
+    command = 'python {}/search_algorithm.py {:0.2f} {:0.2f} {:0.2f}'.format(simple_dir, ra, dec, mc_source_id)
     command_queue = batch + command
     print(command_queue)
     #os.system('./' + command) # Run locally
@@ -68,13 +68,13 @@ if (mode == 0): # real
     #for ii in range(5):
         ra, dec = ugali.utils.healpix.pixToAng(nside, pix_nside[ii])
     
-        submitJob(ra, dec, pix_nside[ii])
+        submitJob(ra, dec, pix_nside[ii], 0) # TODO: mc_source_id (0 for real)
         print('({}/{})').format(ii, len(pix_nside))
     
-else: # sim or real+sim
+elif (mode == 1): # real+sim
     sim_pop = fits.read(sim_population)
-    for sim in [sim_pop[0]]: #
-        ra, dec = sim['ra'], sim['dec']
+    for sim in sim_pop:
+        ra, dec, mc_source_id = sim['ra'], sim['dec'], sim['mc_source_id']
         pix = hp.ang2pix(nside, ra, dec, lonlat=True)
 
-        submitJob(ra, dec, pix)
+        submitJob(ra, dec, pix, mc_source_id)

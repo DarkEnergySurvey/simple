@@ -13,6 +13,7 @@ from matplotlib import mlab
 import numpy as np
 import healpy as hp
 import astropy.io.fits as pyfits
+import fitsio as fits
 
 # Ugali libraries
 import ugali.utils.healpix
@@ -64,15 +65,23 @@ ra_select, dec_select = ugali.utils.healpix.pixToAng(nside, pix_nside_select)
 pix_nside_neighbors = np.concatenate([[pix_nside_select], hp.get_all_neighbours(nside, pix_nside_select)])
 
 # Construct data
-data = simple_utils.construct_modal_data(mode, pix_nside_neighbors)
+#data = simple_utils.construct_modal_data(mode, pix_nside_neighbors)
+data = simple_utils.construct_real_data(pix_nside_neighbors)
 if (mode == 0):
     print('mode = 0: running only on real data')
 elif (mode == 1):
-    print('mode = 1: running only on simulated data')
-elif (mode == 2):
-    print('mode = 2: running on real data and simulated data')
+    print('mode = 1: running on real data and simulated data')
+    try:
+        mc_source_id = float(sys.argv[3])
+    except:
+        sys.exit('error: invalid mc_source_id')
+    
+    # inject objects for simulated object of mc_source_id
+    sim_data = simple_utils.construct_sim_data(pix_nside_neighbors)
+    data = simple_utils.inject_sim(data, sim_data, mc_source_id)
 else:
     print('No mode specified; running only on real data')
+
 
 # Quality cut
 quality = filters.quality_filter(survey, data)
@@ -108,13 +117,23 @@ dec_peak_array = []
 r_peak_array = []
 sig_peak_array = []
 distance_modulus_array = []
-for distance_modulus in distance_modulus_search_array:
-    ra_peak, dec_peak, r_peak, sig_peak, dist_mod = simple_utils.searchByDistance(nside, data, distance_modulus, pix_nside_select, ra_select, dec_select, mag_max, fracdet)
-    ra_peak_array.append(ra_peak)
-    dec_peak_array.append(dec_peak)
-    r_peak_array.append(r_peak)
-    sig_peak_array.append(sig_peak)
-    distance_modulus_array.append(dist_mod)
+
+if (mode == 0):
+    for distance_modulus in distance_modulus_search_array:
+        ra_peaks, dec_peaks, r_peaks, sig_peaks, dist_moduli = simple_utils.searchByDistance(nside, data, distance_modulus, pix_nside_select, ra_select, dec_select, mag_max, fracdet)
+        ra_peak_array.append(ra_peaks)
+        dec_peak_array.append(dec_peaks)
+        r_peak_array.append(r_peaks)
+        sig_peak_array.append(sig_peaks)
+        distance_modulus_array.append(dist_moduli)
+elif (mode == 1):
+    for distance_modulus in distance_modulus_search_array:
+        ra_peaks, dec_peaks, r_peaks, sig_peaks, dist_moduli = simple_utils.searchBySimulation(nside, data, distance_modulus, pix_nside_select, ra_select, dec_select, mag_max, fracdet)
+        ra_peak_array.append(ra_peaks)
+        dec_peak_array.append(dec_peaks)
+        r_peak_array.append(r_peaks)
+        sig_peak_array.append(sig_peaks)
+        distance_modulus_array.append(dist_moduli)
 
 ra_peak_array = np.concatenate(ra_peak_array)
 dec_peak_array = np.concatenate(dec_peak_array)
