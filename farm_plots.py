@@ -62,10 +62,11 @@ for candidate in candidate_list:
     ra      = round(candidate['RA'], 2)
     dec     = round(candidate['DEC'], 2)
     mod     = round(candidate['MODULUS'], 2)
+    mc_source_id = round(candidate['MC_SOURCE_ID'], 2)
 
     logfile = '{}/candidate_{}_{}.log'.format(log_dir, ra, dec)
     batch = 'csub -n {} -o {} '.format(jobs, logfile)
-    command = 'python {}/make_plot.py {:0.2f} {:0.2f} {:0.2f} {:0.2f}'.format(simple_dir, ra, dec, mod, sig)
+    command = 'python {}/make_plot.py {:0.2f} {:0.2f} {:0.2f} {:0.2f} {:0.2f}'.format(simple_dir, ra, dec, mod, sig, mc_source_id)
     command_queue = batch + command
     print(command_queue)
     #os.system('./' + command) # Run locally

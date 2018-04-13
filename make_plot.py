@@ -36,7 +36,7 @@ if not os.path.exists(save_dir):
 #################################################################
 
 try:
-    targ_ra, targ_dec, mod, sig = float(sys.argv[1]), float(sys.argv[2]), float(sys.argv[3]), float(sys.argv[4])
+    targ_ra, targ_dec, mod, sig, mc_source_id, = float(sys.argv[1]), float(sys.argv[2]), float(sys.argv[3]), float(sys.argv[4]), float(sys.argv[5])
 except:
     sys.exit('ERROR! Coordinates not given in correct format.')
 
@@ -44,7 +44,7 @@ fig = plt.figure(figsize=(20, 17))
 fig.subplots_adjust(wspace=0.3, hspace=0.3)
 gs = gridspec.GridSpec(3, 3)
 
-data, iso, g_radius, nbhd = diagnostic_plots.analysis(targ_ra, targ_dec, mod)
+data, iso, g_radius, nbhd = diagnostic_plots.analysis(targ_ra, targ_dec, mod, mc_source_id)
 
 print('Making diagnostic plots for (RA, Dec) = ({}, {})...').format(targ_ra, targ_dec)
 

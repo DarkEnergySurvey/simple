@@ -82,7 +82,6 @@ elif (mode == 1):
 else:
     print('No mode specified; running only on real data')
 
-
 # Quality cut
 quality = filters.quality_filter(survey, data)
 data = data[quality]
@@ -99,8 +98,10 @@ cut_gal = filters.galaxy_filter(survey, data)
 data_gal = data[cut_gal] # this isn't used at all other than for noting number of galaxy-like objects in ROI
 data = data[cut]
 
-print('{} star-like objects in ROI...').format(len(data))
-print('{} galaxy-like objects in ROI...').format(len(data_gal))
+print('{} star-like objects in ROI...'.format(len(data)))
+print('{} galaxy-like objects in ROI...'.format(len(data_gal)))
+if (mode == 1):
+    print('{} simulated objects in ROI...'.format(np.sum(data['MC_SOURCE_ID'] != 0)))
 
 # Read in fracdet map
 if (fracdet_map is not None) and (fracdet_map.lower().strip() != 'none') and (fracdet_map != ''):
@@ -117,8 +118,10 @@ dec_peak_array = []
 r_peak_array = []
 sig_peak_array = []
 distance_modulus_array = []
+mc_source_id_array = []
 
 if (mode == 0):
+    mc_source_id_array.append([0])
     for distance_modulus in distance_modulus_search_array:
         ra_peaks, dec_peaks, r_peaks, sig_peaks, dist_moduli = simple_utils.searchByDistance(nside, data, distance_modulus, pix_nside_select, ra_select, dec_select, mag_max, fracdet)
         ra_peak_array.append(ra_peaks)
@@ -127,19 +130,25 @@ if (mode == 0):
         sig_peak_array.append(sig_peaks)
         distance_modulus_array.append(dist_moduli)
 elif (mode == 1):
-    for distance_modulus in distance_modulus_search_array:
-        ra_peaks, dec_peaks, r_peaks, sig_peaks, dist_moduli = simple_utils.searchBySimulation(nside, data, distance_modulus, pix_nside_select, ra_select, dec_select, mag_max, fracdet)
-        ra_peak_array.append(ra_peaks)
-        dec_peak_array.append(dec_peaks)
-        r_peak_array.append(r_peaks)
-        sig_peak_array.append(sig_peaks)
-        distance_modulus_array.append(dist_moduli)
+    mc_source_id_array.append([mc_source_id])
+    # grab distance_modulus from population
+    sim_pop = fits.read(sim_population)
+    distance_modulus_select = sim_pop[sim_pop['mc_source_id'] == mc_source_id]['distance_modulus'][0]
+
+    distance_modulus = distance_modulus_search_array[np.argmin(np.fabs(distance_modulus_search_array - distance_modulus_select))]
+    ra_peaks, dec_peaks, r_peaks, sig_peaks, dist_moduli = simple_utils.searchBySimulation(nside, data, distance_modulus, pix_nside_select, ra_select, dec_select, mag_max, fracdet)
+    ra_peak_array.append(ra_peaks)
+    dec_peak_array.append(dec_peaks)
+    r_peak_array.append(r_peaks)
+    sig_peak_array.append(sig_peaks)
+    distance_modulus_array.append(dist_moduli)
 
 ra_peak_array = np.concatenate(ra_peak_array)
 dec_peak_array = np.concatenate(dec_peak_array)
 r_peak_array = np.concatenate(r_peak_array)
 sig_peak_array = np.concatenate(sig_peak_array)
 distance_modulus_array = np.concatenate(distance_modulus_array)
+mc_source_id_array = np.concatenate(mc_source_id_array)
 
 # Sort peaks according to significance
 index_sort = np.argsort(sig_peak_array)[::-1]
@@ -148,6 +157,7 @@ dec_peak_array = dec_peak_array[index_sort]
 r_peak_array = r_peak_array[index_sort]
 sig_peak_array = sig_peak_array[index_sort]
 distance_modulus_array = distance_modulus_array[index_sort]
+mc_source_id_array = mc_source_id_array[index_sort]
 
 # Collect overlapping peaks
 for ii in range(0, len(sig_peak_array)):
@@ -161,15 +171,17 @@ ra_peak_array = ra_peak_array[sig_peak_array > 0.]
 dec_peak_array = dec_peak_array[sig_peak_array > 0.]
 r_peak_array = r_peak_array[sig_peak_array > 0.]
 distance_modulus_array = distance_modulus_array[sig_peak_array > 0.]
+mc_source_id_array = mc_source_id_array[sig_peak_array > 0.]
 sig_peak_array = sig_peak_array[sig_peak_array > 0.] # Update the sig_peak_array last!
 
 for ii in range(0, len(sig_peak_array)):
-    print('{:0.2f} sigma; (RA, Dec, d) = ({:0.2f}, {:0.2f}); r = {:0.2f} deg; d = {:0.1f}, mu = {:0.2f} mag)').format(sig_peak_array[ii], 
+    print('{:0.2f} sigma; (RA, Dec, d) = ({:0.2f}, {:0.2f}); r = {:0.2f} deg; d = {:0.1f}, mu = {:0.2f} mag), mc_source_id: {:0.2f}'.format(sig_peak_array[ii], 
                  ra_peak_array[ii], 
                  dec_peak_array[ii], 
                  r_peak_array[ii],
                  ugali.utils.projector.distanceModulusToDistance(distance_modulus_array[ii]),
-                 distance_modulus_array[ii])
+                 distance_modulus_array[ii],
+                 mc_source_id_array[ii]))
 
 # Write output
-simple_utils.writeOutput(results_dir, nside, pix_nside_select, ra_peak_array, dec_peak_array, r_peak_array, distance_modulus_array, sig_peak_array)
+simple_utils.writeOutput(results_dir, nside, pix_nside_select, ra_peak_array, dec_peak_array, r_peak_array, distance_modulus_array, sig_peak_array, mc_source_id_array)

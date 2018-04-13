@@ -484,7 +484,8 @@ def searchBySimulation(nside, data, distance_modulus, pix_nside_select, ra_selec
     cut = cutIsochronePath(data[mag_g], data[mag_r], data[mag_g_err], data[mag_r_err], iso, radius=0.1)
     data = data[cut]
 
-    print('{} objects left after isochrone cut...').format(len(data))
+    print('{} objects left after isochrone cut...'.format(len(data)))
+    print('{} simulated objects left after isochrone cut...'.format(np.sum(data['MC_SOURCE_ID'] != 0)))
 
     # Compute characteristic density at this distance
     characteristic_density = computeCharDensity(nside, data, ra_select, dec_select, mag_max, fracdet)
@@ -497,11 +498,13 @@ def searchBySimulation(nside, data, distance_modulus, pix_nside_select, ra_selec
 
     proj = ugali.utils.projector.Projector(ra_select, dec_select)
 
-    # smau: is this right?
+    cut_magnitude_threshold = (data[mag_g] < magnitude_threshold)
     x_peak, y_peak = proj.sphereToImage(ra_select, dec_select) # = 0, 0
-    angsep_peak = 0
+    x, y = proj.sphereToImage(data['RA'][cut_magnitude_threshold], data['DEC'][cut_magnitude_threshold])
+    angsep_peak = np.sqrt((x - x_peak)**2 + (y - y_peak)**2)
 
     characteristic_density_local = computeLocalCharDensity(nside, data, characteristic_density, ra_select, dec_select, x_peak, y_peak, angsep_peak, mag_max, fracdet)
+
     # Aperture fitting
     print('Fitting aperture to hotspot...')
     ra_peaks, dec_peaks, r_peaks, sig_peaks, distance_moduli = fitAperture(proj, distance_modulus, characteristic_density_local, x_peak, y_peak, angsep_peak)
@@ -550,14 +553,14 @@ def searchBySimulation(nside, data, distance_modulus, pix_nside_select, ra_selec
 
 ########################################################################
 
-def writeOutput(results_dir, nside, pix_nside_select, ra_peak_array, dec_peak_array, r_peak_array, distance_modulus_array, sig_peak_array):
+def writeOutput(results_dir, nside, pix_nside_select, ra_peak_array, dec_peak_array, r_peak_array, distance_modulus_array, sig_peak_array, mc_source_id_array):
     outfile = '{}/results_nside_{}_{}.csv'.format(results_dir, nside, pix_nside_select)
     writer = open(outfile, 'w')
     for ii in range(0, len(sig_peak_array)):
-        # SIG, RA, DEC, MODULUS, r
-        # TODO column for MC_SOURCE_ID
-        writer.write('{:10.2f}, {:10.2f}, {:10.2f}, {:10.2f}, {:10.2f}\n'.format(sig_peak_array[ii], 
+        # SIG, RA, DEC, MODULUS, r, mc_source_id
+        writer.write('{:10.2f}, {:10.2f}, {:10.2f}, {:10.2f}, {:10.2f}, {:10.2f}\n'.format(sig_peak_array[ii], 
                                                                  ra_peak_array[ii], 
                                                                  dec_peak_array[ii], 
                                                                  distance_modulus_array[ii], 
-                                                                 r_peak_array[ii]))
+                                                                 r_peak_array[ii],
+                                                                 mc_source_id_array[ii]))

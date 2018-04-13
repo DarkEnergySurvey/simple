@@ -53,12 +53,26 @@ with open('config.yaml', 'r') as ymlfile:
     
 ################################################################################
 
-def analysis(targ_ra, targ_dec, mod):
+def analysis(targ_ra, targ_dec, mod, mc_source_id):
     """Analyze a candidate"""
 
     pix_nside_select = ugali.utils.healpix.angToPix(nside, targ_ra, targ_dec)
     ra_select, dec_select = ugali.utils.healpix.pixToAng(nside, pix_nside_select)
     pix_nside_neighbors = np.concatenate([[pix_nside_select], healpy.get_all_neighbours(nside, pix_nside_select)])
+
+    # Construct data
+    #data = simple_utils.construct_modal_data(mode, pix_nside_neighbors)
+    data = simple_utils.construct_real_data(pix_nside_neighbors)
+    if (mode == 0):
+        print('mode = 0: running only on real data')
+    elif (mode == 1):
+        print('mode = 1: running on real data and simulated data')
+        
+        # inject objects for simulated object of mc_source_id
+        sim_data = simple_utils.construct_sim_data(pix_nside_neighbors)
+        data = simple_utils.inject_sim(data, sim_data, mc_source_id)
+    else:
+        print('No mode specified; running only on real data')
 
     print('Loading data...')
     data = simple_utils.construct_modal_data(mode, pix_nside_neighbors)
