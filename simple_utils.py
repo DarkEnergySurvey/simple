@@ -31,10 +31,13 @@ with open('config.yaml', 'r') as ymlfile:
     nside   = cfg[survey]['nside']
     datadir = cfg[survey]['datadir']
     mag_max = cfg[survey]['mag_max']
+    basis_1 = cfg[survey]['basis_1']
+    basis_2 = cfg[survey]['basis_2']
     
     mode = cfg[survey]['mode']
     sim_catalog = cfg[survey]['sim_catalog']
     sim_population = cfg[survey]['sim_population']
+    sim_dir = cfg[survey]['sim_dir']
 
     fracdet_map = cfg[survey]['fracdet']
     
@@ -71,28 +74,36 @@ def construct_real_data(pix_nside_neighbors):
 
     return data
 
-def construct_sim_data(pix_nside_neighbors):
+def construct_sim_data(pix_nside_neighbors, mc_source_id):
     #reader = pyfits.open(sim_catalog)
     #cat_data = reader[1].data
     #data = cat_data[np.in1d(cat_data, pix_nside_neighbors)]
     #reader.close()
 
+    #data_array = []
+    #cat_data = fits.read(sim_catalog)
+    #pix = hp.ang2pix(nside,cat_data[basis_1],cat_data[basis_2],lonlat=True)
+    #pix_data = cat_data[np.in1d(pix, pix_nside_neighbors)]
+    #data_array.append(pix_data)
+    #data = np.concatenate(data_array)
+
     data_array = []
-    cat_data = fits.read(sim_catalog)
-    pix = hp.ang2pix(nside,cat_data['RA'],cat_data['DEC'],lonlat=True)
+    cat_file = getCatalogFile(sim_dir, mc_source_id)
+    cat_data = fits.read(cat_file)
+    pix = hp.ang2pix(nside,cat_data[basis_1],cat_data[basis_2],lonlat=True)
     pix_data = cat_data[np.in1d(pix, pix_nside_neighbors)]
     data_array.append(pix_data)
     data = np.concatenate(data_array)
 
     return data
 
-def construct_modal_data(mode, pix_nside_neighbors):
+def construct_modal_data(mode, pix_nside_neighbors, mc_source_id):
     print('Assembling data...')
     if (mode == 0): # real data
         data = construct_real_data(pix_nside_neighbors)
     elif (mode == 1): # real and simulated data
         data_real = construct_real_data(pix_nside_neighbors)
-        data_sim  = construct_sim_data(pix_nside_neighbors)
+        data_sim  = construct_sim_data(pix_nside_neighbors, mc_source_id)
         data = np.concatenate((data_real, data_sim), axis=0)
     else: # assume mode = 0
         data = construct_real_data(pix_nside_neighbors)
@@ -104,6 +115,32 @@ def inject_sim(real_data, sim_data, mc_source_id):
     data = np.concatenate((real_data, inject_data), axis=0)
 
     return data
+
+def getCatalogFile(catalog_dir, mc_source_id):
+    """
+    Inputs:
+        catalog_dir = string corresponding to directory containing the stellar catalog infiles
+        mc_source_id = integer corresponding the target MC_SOURCE_ID value
+    Outputs:
+        catalog_infile = string corresponding to filename of stellar catalog containing mc_source_id
+    """
+    catalog_infiles = sorted(glob.glob(catalog_dir + '/*catalog*.fits'))
+    mc_source_id_array = []
+    catalog_infile_index_array = []
+    for ii, catalog_infile in enumerate(catalog_infiles):
+        mc_source_id_min = int(os.path.basename(catalog_infile).split('.')[0].split('mc_source_id_')[-1].split('-')[0])
+        mc_source_id_max = int(os.path.basename(catalog_infile).split('.')[0].split('mc_source_id_')[-1].split('-')[1])
+        assert (mc_source_id_max > mc_source_id_min) & (mc_source_id_min >= 1), 'Found invalue MC_SOURCE_ID values in filenames'
+        mc_source_id_array.append(np.arange(mc_source_id_min, mc_source_id_max + 1))
+        catalog_infile_index_array.append(np.tile(ii, 1 + (mc_source_id_max - mc_source_id_min)))
+
+    mc_source_id_array = np.concatenate(mc_source_id_array)
+    catalog_infile_index_array = np.concatenate(catalog_infile_index_array)
+
+    assert len(mc_source_id_array) == len(np.unique(mc_source_id_array)), 'Found non-unique MC_SOURCE_ID values in filenames'
+    assert np.in1d(mc_source_id, mc_source_id_array), 'Requested MC_SOURCE_ID value not among files'
+    mc_source_id_index = np.nonzero(mc_source_id == mc_source_id_array)[0]
+    return catalog_infiles[catalog_infile_index_array[mc_source_id_index]]
 
 ########################################################################
 
@@ -159,8 +196,8 @@ def computeCharDensity(nside, data, ra_select, dec_select, magnitude_threshold=m
     cut_magnitude_threshold = (data[mag_g] < magnitude_threshold)
 
     proj = ugali.utils.projector.Projector(ra_select, dec_select)
-    x, y = proj.sphereToImage(data['RA'][cut_magnitude_threshold], data['DEC'][cut_magnitude_threshold]) # Trimmed magnitude range for hotspot finding
-    #x_full, y_full = proj.sphereToImage(data['RA'], data['DEC']) # If we want to use full magnitude range for significance evaluation
+    x, y = proj.sphereToImage(data[basis_1][cut_magnitude_threshold], data[basis_2][cut_magnitude_threshold]) # Trimmed magnitude range for hotspot finding
+    #x_full, y_full = proj.sphereToImage(data[basis_1], data[basis_2]) # If we want to use full magnitude range for significance evaluation
     delta_x = 0.01
     area = delta_x**2
     smoothing = 2. / 60. # Was 3 arcmin
@@ -197,7 +234,7 @@ def computeCharDensity(nside, data, ra_select, dec_select, magnitude_threshold=m
         nside_fracdet = hp.npix2nside(len(fracdet))
         
         subpix_region_array = []
-        for pix in np.unique(ugali.utils.healpix.angToPix(nside, data['RA'], data['DEC'])):
+        for pix in np.unique(ugali.utils.healpix.angToPix(nside, data[basis_1], data[basis_2])):
             subpix_region_array.append(ugali.utils.healpix.subpixel(pix, nside, nside_fracdet))
         subpix_region_array = np.concatenate(subpix_region_array)
 
@@ -208,8 +245,8 @@ def computeCharDensity(nside, data, ra_select, dec_select, magnitude_threshold=m
         # smau: this doesn't seem to be used in the non-local density estimation
         #subpix_region_array = subpix_region_array[fracdet[subpix_region_array] > 0.99]
         #subpix = ugali.utils.healpix.angToPix(nside_fracdet, 
-        #                                      data['RA'][cut_magnitude_threshold], 
-        #                                      data['DEC'][cut_magnitude_threshold]) # Remember to apply mag threshold to objects
+        #                                      data[basis_1][cut_magnitude_threshold], 
+        #                                      data[basis_2][cut_magnitude_threshold]) # Remember to apply mag threshold to objects
         #characteristic_density_fracdet = float(np.sum(np.in1d(subpix, subpix_region_array))) \
         #                                 / (hp.nside2pixarea(nside_fracdet, degrees=True) * len(subpix_region_array)) # deg^-2
         #print('Characteristic density fracdet = {:0.1f} deg^-2').format(characteristic_density_fracdet)
@@ -232,8 +269,8 @@ def computeLocalCharDensity(nside, data, characteristic_density, ra_select, dec_
     cut_magnitude_threshold = (data[mag_g] < magnitude_threshold)
 
     proj = ugali.utils.projector.Projector(ra_select, dec_select)
-    #x, y = proj.sphereToImage(data['RA'][cut_magnitude_threshold], data['DEC'][cut_magnitude_threshold]) # Trimmed magnitude range for hotspot finding
-    ##x_full, y_full = proj.sphereToImage(data['RA'], data['DEC']) # If we want to use full magnitude range for significance evaluation
+    #x, y = proj.sphereToImage(data[basis_1][cut_magnitude_threshold], data[basis_2][cut_magnitude_threshold]) # Trimmed magnitude range for hotspot finding
+    ##x_full, y_full = proj.sphereToImage(data[basis_1], data[basis_2]) # If we want to use full magnitude range for significance evaluation
 
     ###angsep_peak = np.sqrt((x_full - x_peak)**2 + (y_full - y_peak)**2) # Use full magnitude range, NOT TESTED!!!
     ##angsep_peak = np.sqrt((x - x_peak)**2 + (y - y_peak)**2) # Impose magnitude threshold
@@ -249,7 +286,7 @@ def computeLocalCharDensity(nside, data, characteristic_density, ra_select, dec_
         nside_fracdet = hp.npix2nside(len(fracdet))
         
         subpix_region_array = []
-        for pix in np.unique(ugali.utils.healpix.angToPix(nside, data['RA'], data['DEC'])):
+        for pix in np.unique(ugali.utils.healpix.angToPix(nside, data[basis_1], data[basis_2])):
             subpix_region_array.append(ugali.utils.healpix.subpixel(pix, nside, nside_fracdet))
         subpix_region_array = np.concatenate(subpix_region_array)
 
@@ -259,8 +296,8 @@ def computeLocalCharDensity(nside, data, characteristic_density, ra_select, dec_
 
         subpix_region_array = subpix_region_array[fracdet[subpix_region_array] > 0.99]
         subpix = ugali.utils.healpix.angToPix(nside_fracdet, 
-                                              data['RA'][cut_magnitude_threshold], 
-                                              data['DEC'][cut_magnitude_threshold]) # Remember to apply mag threshold to objects
+                                              data[basis_1][cut_magnitude_threshold], 
+                                              data[basis_2][cut_magnitude_threshold]) # Remember to apply mag threshold to objects
 
         # This is where the local computation begins
         ra_peak, dec_peak = proj.imageToSphere(x_peak, y_peak)
@@ -313,8 +350,8 @@ def findPeaks(nside, data, characteristic_density, distance_modulus, pix_nside_s
     cut_magnitude_threshold = (data[mag_g] < magnitude_threshold)
 
     proj = ugali.utils.projector.Projector(ra_select, dec_select)
-    x, y = proj.sphereToImage(data['RA'][cut_magnitude_threshold], data['DEC'][cut_magnitude_threshold]) # Trimmed magnitude range for hotspot finding
-    #x_full, y_full = proj.sphereToImage(data['RA'], data['DEC']) # If we want to use full magnitude range for significance evaluation
+    x, y = proj.sphereToImage(data[basis_1][cut_magnitude_threshold], data[basis_2][cut_magnitude_threshold]) # Trimmed magnitude range for hotspot finding
+    #x_full, y_full = proj.sphereToImage(data[basis_1], data[basis_2]) # If we want to use full magnitude range for significance evaluation
     delta_x = 0.01
     area = delta_x**2
     smoothing = 2. / 60. # Was 3 arcmin
@@ -500,7 +537,7 @@ def searchBySimulation(nside, data, distance_modulus, pix_nside_select, ra_selec
 
     cut_magnitude_threshold = (data[mag_g] < magnitude_threshold)
     x_peak, y_peak = proj.sphereToImage(ra_select, dec_select) # = 0, 0
-    x, y = proj.sphereToImage(data['RA'][cut_magnitude_threshold], data['DEC'][cut_magnitude_threshold])
+    x, y = proj.sphereToImage(data[basis_1][cut_magnitude_threshold], data[basis_2][cut_magnitude_threshold])
     angsep_peak = np.sqrt((x - x_peak)**2 + (y - y_peak)**2)
 
     characteristic_density_local = computeLocalCharDensity(nside, data, characteristic_density, ra_select, dec_select, x_peak, y_peak, angsep_peak, mag_max, fracdet)
@@ -553,8 +590,11 @@ def searchBySimulation(nside, data, distance_modulus, pix_nside_select, ra_selec
 
 ########################################################################
 
-def writeOutput(results_dir, nside, pix_nside_select, ra_peak_array, dec_peak_array, r_peak_array, distance_modulus_array, sig_peak_array, mc_source_id_array):
-    outfile = '{}/results_nside_{}_{}.csv'.format(results_dir, nside, pix_nside_select)
+def writeOutput(results_dir, nside, pix_nside_select, ra_peak_array, dec_peak_array, r_peak_array, distance_modulus_array, sig_peak_array, mc_source_id_array, mode):
+    if (mode == 0):
+        outfile = '{}/results_nside_{}_{}.csv'.format(results_dir, nside, pix_nside_select)
+    elif (mode == 1):
+        outfile = '{}/results_mc_source_id_{}.csv'.format(results_dir, mc_source_id_array[0]) # all values in mc_source_id_array should be the same
     writer = open(outfile, 'w')
     for ii in range(0, len(sig_peak_array)):
         # SIG, RA, DEC, MODULUS, r, mc_source_id

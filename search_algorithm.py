@@ -32,10 +32,13 @@ with open('config.yaml', 'r') as ymlfile:
     nside = cfg[survey]['nside']
     datadir = cfg[survey]['datadir']
     mag_max = cfg[survey]['mag_max']
+    basis_1 = cfg[survey]['basis_1']
+    basis_2 = cfg[survey]['basis_2']
 
     mode = cfg[survey]['mode']
     sim_catalog = cfg[survey]['sim_catalog']
     sim_population = cfg[survey]['sim_population']
+    sim_dir = cfg[survey]['sim_dir']
 
     fracdet_map = cfg[survey]['fracdet']
 
@@ -61,11 +64,11 @@ print('Search coordinates: (RA, Dec) = ({:0.2f}, {:0.2f})').format(ra_select, de
 
 # Now cut for a single pixel
 pix_nside_select = ugali.utils.healpix.angToPix(nside, ra_select, dec_select)
-ra_select, dec_select = ugali.utils.healpix.pixToAng(nside, pix_nside_select)
+#ra_select, dec_select = ugali.utils.healpix.pixToAng(nside, pix_nside_select)
 pix_nside_neighbors = np.concatenate([[pix_nside_select], hp.get_all_neighbours(nside, pix_nside_select)])
 
 # Construct data
-#data = simple_utils.construct_modal_data(mode, pix_nside_neighbors)
+#data = simple_utils.construct_modal_data(mode, pix_nside_neighbors, mc_source_id)
 data = simple_utils.construct_real_data(pix_nside_neighbors)
 if (mode == 0):
     print('mode = 0: running only on real data')
@@ -77,7 +80,7 @@ elif (mode == 1):
         sys.exit('error: invalid mc_source_id')
     
     # inject objects for simulated object of mc_source_id
-    sim_data = simple_utils.construct_sim_data(pix_nside_neighbors)
+    sim_data = simple_utils.construct_sim_data(pix_nside_neighbors, mc_source_id)
     data = simple_utils.inject_sim(data, sim_data, mc_source_id)
 else:
     print('No mode specified; running only on real data')
@@ -121,7 +124,6 @@ distance_modulus_array = []
 mc_source_id_array = []
 
 if (mode == 0):
-    mc_source_id_array.append([0])
     for distance_modulus in distance_modulus_search_array:
         ra_peaks, dec_peaks, r_peaks, sig_peaks, dist_moduli = simple_utils.searchByDistance(nside, data, distance_modulus, pix_nside_select, ra_select, dec_select, mag_max, fracdet)
         ra_peak_array.append(ra_peaks)
@@ -129,8 +131,8 @@ if (mode == 0):
         r_peak_array.append(r_peaks)
         sig_peak_array.append(sig_peaks)
         distance_modulus_array.append(dist_moduli)
+        mc_source_id_array.append(np.tile(0, len(sig_peaks)))
 elif (mode == 1):
-    mc_source_id_array.append([mc_source_id])
     # grab distance_modulus from population
     sim_pop = fits.read(sim_population)
     distance_modulus_select = sim_pop[sim_pop['mc_source_id'] == mc_source_id]['distance_modulus'][0]
@@ -142,6 +144,7 @@ elif (mode == 1):
     r_peak_array.append(r_peaks)
     sig_peak_array.append(sig_peaks)
     distance_modulus_array.append(dist_moduli)
+    mc_source_id_array.append(np.tile(mc_source_id, len(sig_peaks)))
 
 ra_peak_array = np.concatenate(ra_peak_array)
 dec_peak_array = np.concatenate(dec_peak_array)
@@ -184,4 +187,4 @@ for ii in range(0, len(sig_peak_array)):
                  mc_source_id_array[ii]))
 
 # Write output
-simple_utils.writeOutput(results_dir, nside, pix_nside_select, ra_peak_array, dec_peak_array, r_peak_array, distance_modulus_array, sig_peak_array, mc_source_id_array)
+simple_utils.writeOutput(results_dir, nside, pix_nside_select, ra_peak_array, dec_peak_array, r_peak_array, distance_modulus_array, sig_peak_array, mc_source_id_array, mode)

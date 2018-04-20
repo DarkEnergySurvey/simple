@@ -15,7 +15,11 @@ import fitsio
 with open('config.yaml', 'r') as ymlfile:
     cfg = yaml.load(ymlfile)
 
-candidate_list = cfg[cfg['survey']]['candidate_list']
+    survey = cfg['survey']
+
+    basis_1 = cfg[survey]['basis_1']
+    basis_2 = cfg[survey]['basis_2']
+    candidate_list = cfg[survey]['candidate_list']
 
 
 # Parse results from results_dir into a list of values
@@ -28,13 +32,13 @@ for file in glob.glob('{}/*.csv'.format(cfg['output']['results_dir'])):
     csvfile.close()
 
 data = np.asarray(results)
-dt = np.dtype([('SIG', '>f4'), ('RA', '>f4'), ('DEC', '>f4'), ('MODULUS', '>f4'), ('r', '>f4'), ('MC_SOURCE_ID', '>f4')])
+dt = np.dtype([('SIG', '>f4'), (basis_1, '>f4'), (basis_2, '>f4'), ('MODULUS', '>f4'), ('r', '>f4'), ('MC_SOURCE_ID', '>f4')])
 data = data.astype(dt)
 
 # Create fits columns
 c0 = fits.Column(name='SIG',     format='E', array=data[:,0])
-c1 = fits.Column(name='RA',      format='E', array=data[:,1])
-c2 = fits.Column(name='DEC',     format='E', array=data[:,2])
+c1 = fits.Column(name=basis_1,      format='E', array=data[:,1])
+c2 = fits.Column(name=basis_2,     format='E', array=data[:,2])
 c3 = fits.Column(name='MODULUS', format='E', array=data[:,3])
 c4 = fits.Column(name='r',       format='E', array=data[:,4])
 c5 = fits.Column(name='MC_SOURCE_ID', format='E', array=data[:,5])
@@ -48,7 +52,7 @@ t.writeto(candidate_list, overwrite=True)
 #from fitsio import FITS
 #
 #fits = FITS(candidate_list, 'rw')
-##names = ['SIG', 'RA', 'DEC', 'MODULUS', 'r']
+##names = ['SIG', basis_1, basis_2, 'MODULUS', 'r']
 ##fits.write(data, names=names)
 #fits.write(data)
 #fits.close()

@@ -48,6 +48,8 @@ with open('config.yaml', 'r') as ymlfile:
     survey = cfg['survey']
     nside   = cfg[survey]['nside']
     datadir = cfg[survey]['datadir']
+    basis_1 = cfg[survey]['basis_1']
+    basis_2 = cfg[survey]['basis_2']
     
     #maglim_g = cfg[survey]['maglim_g']
     #maglim_r = cfg[survey]['maglim_r']
@@ -208,8 +210,8 @@ def searchByDistance(nside, data, distance_modulus, ra_select, dec_select, magni
     ###
 
     proj = ugali.utils.projector.Projector(ra_select, dec_select)
-    x, y = proj.sphereToImage(data['RA'][cut_magnitude_threshold], data['DEC'][cut_magnitude_threshold]) # Trimmed magnitude range for hotspot finding
-    x_full, y_full = proj.sphereToImage(data['RA'], data['DEC']) # In we want to use full magnitude range for significance evaluation
+    x, y = proj.sphereToImage(data[basis_1][cut_magnitude_threshold], data[basis_2][cut_magnitude_threshold]) # Trimmed magnitude range for hotspot finding
+    x_full, y_full = proj.sphereToImage(data[basis_1], data[basis_2]) # In we want to use full magnitude range for significance evaluation
     delta_x = 0.01
     area = delta_x**2
     smoothing = 2. / 60. # Was 3 arcmin
@@ -242,7 +244,7 @@ def searchByDistance(nside, data, distance_modulus, ra_select, dec_select, magni
         pylab.clf()
         hp.gnomview(fracdet, fig='gnom', rot=(ra_select, dec_select, 0.), reso=reso, xsize=(2. * SCALE * 60. / reso), 
                         cmap='Greens', title='Fracdet') #binary
-        hp.projscatter(data['RA'], data['DEC'], edgecolor='none', c='red', lonlat=True, s=2)
+        hp.projscatter(data[basis_1], data[basis_2], edgecolor='none', c='red', lonlat=True, s=2)
 
     h_g = scipy.ndimage.filters.gaussian_filter(h, smoothing / delta_x)
 
@@ -271,7 +273,7 @@ def searchByDistance(nside, data, distance_modulus, ra_select, dec_select, magni
         nside_fracdet = hp.npix2nside(len(fracdet))
         
         subpix_region_array = []
-        for pix in np.unique(ugali.utils.healpix.angToPix(nside, data['RA'], data['DEC'])):
+        for pix in np.unique(ugali.utils.healpix.angToPix(nside, data[basis_1], data[basis_2])):
             subpix_region_array.append(ugali.utils.healpix.subpixel(pix, nside, nside_fracdet))
         subpix_region_array = np.concatenate(subpix_region_array)
 
@@ -281,8 +283,8 @@ def searchByDistance(nside, data, distance_modulus, ra_select, dec_select, magni
 
         subpix_region_array = subpix_region_array[fracdet[subpix_region_array] > 0.99]
         subpix = ugali.utils.healpix.angToPix(nside_fracdet, 
-                                              data['RA'][cut_magnitude_threshold], 
-                                              data['DEC'][cut_magnitude_threshold]) # Remember to apply mag threshold to objects
+                                              data[basis_1][cut_magnitude_threshold], 
+                                              data[basis_2][cut_magnitude_threshold]) # Remember to apply mag threshold to objects
         characteristic_density_fracdet = float(np.sum(np.in1d(subpix, subpix_region_array))) \
                                          / (hp.nside2pixarea(nside_fracdet, degrees=True) * len(subpix_region_array)) # deg^-2
         print('Characteristic density fracdet = {:0.1f} deg^-2').format(characteristic_density_fracdet)
@@ -480,16 +482,16 @@ def diagnostic(data, data_gal, ra_peak, dec_peak, r_peak, sig_peak, distance_mod
                                    return_all=False)
     
     proj = ugali.utils.projector.Projector(ra_peak, dec_peak)
-    x, y = proj.sphereToImage(data['RA'][cut_iso], data['DEC'][cut_iso])
-    x_gal, y_gal = proj.sphereToImage(data_gal['RA'][cut_iso_gal], data_gal['DEC'][cut_iso_gal])
+    x, y = proj.sphereToImage(data[basis_1][cut_iso], data[basis_2][cut_iso])
+    x_gal, y_gal = proj.sphereToImage(data_gal[basis_1][cut_iso_gal], data_gal[basis_2][cut_iso_gal])
 
 ###########################################################
 
-    angsep = ugali.utils.projector.angsep(ra_peak, dec_peak, data['RA'], data['DEC'])
+    angsep = ugali.utils.projector.angsep(ra_peak, dec_peak, data[basis_1], data[basis_2])
     cut_inner = (angsep < r_peak)
     cut_annulus = (angsep > 0.5) & (angsep < 1.)
 
-    angsep_gal = ugali.utils.projector.angsep(ra_peak, dec_peak, data_gal['RA'], data_gal['DEC'])
+    angsep_gal = ugali.utils.projector.angsep(ra_peak, dec_peak, data_gal[basis_1], data_gal[basis_2])
     cut_inner_gal = (angsep_gal < r_peak)
     cut_annulus_gal = (angsep_gal > 0.5) & (angsep_gal < 1.)
 

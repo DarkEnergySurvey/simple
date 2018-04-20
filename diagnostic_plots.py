@@ -41,6 +41,8 @@ with open('config.yaml', 'r') as ymlfile:
     nside   = cfg[survey]['nside']
     datadir = cfg[survey]['datadir']
     mag_max = cfg[survey]['mag_max']
+    basis_1 = cfg[survey]['basis_1']
+    basis_2 = cfg[survey]['basis_2']
 
     mode = cfg[survey]['mode']
     sim_catalog = cfg[survey]['sim_catalog']
@@ -69,13 +71,13 @@ def analysis(targ_ra, targ_dec, mod, mc_source_id):
         print('mode = 1: running on real data and simulated data')
         
         # inject objects for simulated object of mc_source_id
-        sim_data = simple_utils.construct_sim_data(pix_nside_neighbors)
+        sim_data = simple_utils.construct_sim_data(pix_nside_neighbors, mc_source_id)
         data = simple_utils.inject_sim(data, sim_data, mc_source_id)
     else:
         print('No mode specified; running only on real data')
 
     print('Loading data...')
-    data = simple_utils.construct_modal_data(mode, pix_nside_neighbors)
+    data = simple_utils.construct_modal_data(mode, pix_nside_neighbors, mc_source_id)
     quality_cut = filters.quality_filter(survey, data)
     data = data[quality_cut]
     print('Found {} objects...').format(len(data))
@@ -89,7 +91,7 @@ def analysis(targ_ra, targ_dec, mod, mc_source_id):
 
     iso_filter = (iso.separation(data[mag_g], data[mag_r]) < 0.1)
 
-    angsep = ugali.utils.projector.angsep(targ_ra, targ_dec, data['RA'], data['DEC'])
+    angsep = ugali.utils.projector.angsep(targ_ra, targ_dec, data[basis_1], data[basis_2])
 
     bins = np.linspace(0, 0.4, 21) # deg
     centers = 0.5*(bins[1:] + bins[0:-1])
@@ -141,8 +143,8 @@ def analysis(targ_ra, targ_dec, mod, mc_source_id):
         g_radius = half_point # deg
 
     #c1 = SkyCoord(targ_ra, targ_dec, unit='deg') # frame is ICRS
-    #nbhd = c1.separation(SkyCoord(data['RA'], data['DEC'], unit='deg')).deg < g_radius # selects objects inside the galactic radius
-    angsep = ugali.utils.projector.angsep(targ_ra, targ_dec, data['RA'], data['DEC'])
+    #nbhd = c1.separation(SkyCoord(data[basis_1], data[basis_2], unit='deg')).deg < g_radius # selects objects inside the galactic radius
+    angsep = ugali.utils.projector.angsep(targ_ra, targ_dec, data[basis_1], data[basis_2])
     nbhd = (angsep < g_radius)
 
     return(data, iso, g_radius, nbhd)
@@ -165,7 +167,7 @@ def densityPlot(targ_ra, targ_dec, data, iso, g_radius, nbhd, type):
 
     # projection of image
     proj = ugali.utils.projector.Projector(targ_ra, targ_dec)
-    x, y = proj.sphereToImage(data[filter & iso_filter]['RA'], data[filter & iso_filter]['DEC'])
+    x, y = proj.sphereToImage(data[filter & iso_filter][basis_1], data[filter & iso_filter][basis_2])
 
     bound = 0.5 #1.
     steps = 100.
@@ -198,7 +200,7 @@ def starPlot(targ_ra, targ_dec, data, iso, g_radius, nbhd):
 
     # projection of image
     proj = ugali.utils.projector.Projector(targ_ra, targ_dec)
-    x, y = proj.sphereToImage(data[filter & iso_filter]['RA'], data[filter & iso_filter]['DEC'])
+    x, y = proj.sphereToImage(data[filter & iso_filter][basis_1], data[filter & iso_filter][basis_2])
 
     plt.scatter(x, y, edgecolor='none', s=3, c='black')
     plt.xlim(0.2, -0.2)
@@ -212,7 +214,7 @@ def starPlot(targ_ra, targ_dec, data, iso, g_radius, nbhd):
 def cmPlot(targ_ra, targ_dec, data, iso, g_radius, nbhd, type):
     """Color-magnitude plot"""
 
-    angsep = ugali.utils.projector.angsep(targ_ra, targ_dec, data['RA'], data['DEC'])
+    angsep = ugali.utils.projector.angsep(targ_ra, targ_dec, data[basis_1], data[basis_2])
     annulus = (angsep > g_radius) & (angsep < 1.)
 
     if type == 'stars':
@@ -255,8 +257,8 @@ def hessPlot(targ_ra, targ_dec, data, iso, g_radius, nbhd):
     r_near = 2.*g_radius # annulus begins at 2*g_radius away from centroid
     r_far = np.sqrt(5.)*g_radius # annulus has same area as inner area
 
-    inner = (c1.separation(SkyCoord(data['RA'], data['DEC'], unit='deg')).deg < g_radius)
-    outer = (c1.separation(SkyCoord(data['RA'], data['DEC'], unit='deg')).deg > r_near) & (c1.separation(SkyCoord(data['RA'], data['DEC'], unit='deg')).deg < r_far)
+    inner = (c1.separation(SkyCoord(data[basis_1], data[basis_2], unit='deg')).deg < g_radius)
+    outer = (c1.separation(SkyCoord(data[basis_1], data[basis_2], unit='deg')).deg > r_near) & (c1.separation(SkyCoord(data[basis_1], data[basis_2], unit='deg')).deg < r_far)
 
     xbins = np.arange(-0.5, 1.1, 0.1)
     ybins = np.arange(16., mag_max + 0.5, 0.5)
@@ -299,7 +301,7 @@ def radialPlot(targ_ra, targ_dec, data, iso, g_radius, nbhd):
 
     plt.title('Radial Distribution')
 
-    angsep = ugali.utils.projector.angsep(targ_ra, targ_dec, data['RA'], data['DEC'])
+    angsep = ugali.utils.projector.angsep(targ_ra, targ_dec, data[basis_1], data[basis_2])
 
     # Isochrone filtered/unfiltered
     iso_seln_f = (iso.separation(data[mag_g], data[mag_r]) < 0.1)

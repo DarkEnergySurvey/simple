@@ -11,10 +11,12 @@ from matplotlib import mlab
 with open('config.yaml', 'r') as ymlfile:
     cfg = yaml.load(ymlfile)
 
-    #survey = cfg['survey']
+    survey = cfg['survey']
 
-    mag_g = cfg[cfg['survey']]['mag_g']
-    mag_r = cfg[cfg['survey']]['mag_r']
+    basis_1 = cfg[survey]['basis_1']
+    basis_2 = cfg[survey]['basis_2']
+    mag_g = cfg[survey]['mag_g']
+    mag_r = cfg[survey]['mag_r']
 
 def quality_filter(survey, data):
     """Return data above a quality threshold"""

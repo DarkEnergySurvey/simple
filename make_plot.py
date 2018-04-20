@@ -28,6 +28,8 @@ with open('config.yaml', 'r') as ymlfile:
     survey = cfg['survey']
     nside   = cfg[survey]['nside']
     datadir = cfg[survey]['datadir']
+    basis_1 = cfg[survey]['basis_1']
+    basis_2 = cfg[survey]['basis_2']
 
 save_dir = os.path.join(os.getcwd(), cfg['output']['save_dir'])
 if not os.path.exists(save_dir):
@@ -46,7 +48,7 @@ gs = gridspec.GridSpec(3, 3)
 
 data, iso, g_radius, nbhd = diagnostic_plots.analysis(targ_ra, targ_dec, mod, mc_source_id)
 
-print('Making diagnostic plots for (RA, Dec) = ({}, {})...').format(targ_ra, targ_dec)
+print('Making diagnostic plots for ({}, {}) = ({}, {})...'.format(basis_1, basis_2, targ_ra, targ_dec))
 
 fig.add_subplot(gs[0,0])
 diagnostic_plots.densityPlot(targ_ra, targ_dec, data, iso, g_radius, nbhd, 'stars')

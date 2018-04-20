@@ -23,6 +23,8 @@ with open('config.yaml', 'r') as ymlfile:
     cfg = yaml.load(ymlfile)
 
     survey = cfg['survey']
+    basis_1 = cfg[survey]['basis_1']
+    basis_2 = cfg[survey]['basis_2']
     simple_dir = cfg['setup']['simple_dir']
     jobs = cfg['batch']['jobs']
     nside = cfg[survey]['nside']
@@ -74,7 +76,7 @@ if (mode == 0): # real
 elif (mode == 1): # real+sim
     sim_pop = fits.read(sim_population)
     for sim in sim_pop:
-        ra, dec, mc_source_id = sim['ra'], sim['dec'], sim['mc_source_id']
+        ra, dec, mc_source_id = sim['ra'], sim['dec'], sim['mc_source_id'] # TODO: basis_1, basis_2
         pix = hp.ang2pix(nside, ra, dec, lonlat=True)
 
         submitJob(ra, dec, pix, mc_source_id)

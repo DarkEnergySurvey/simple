@@ -27,6 +27,8 @@ with open('config.yaml', 'r') as ymlfile:
     simple_dir = cfg['setup']['simple_dir']
     jobs = cfg['batch']['jobs']
     candidate_list = cfg[cfg['survey']]['candidate_list']
+    basis_1 = cfg[survey]['basis_1']
+    basis_2 = cfg[survey]['basis_2']
 
 save_dir = os.path.join(os.getcwd(), cfg['output']['save_dir'])
 if not os.path.exists(save_dir):
@@ -59,8 +61,8 @@ for candidate in candidate_list:
         sig = round(candidate['SIG'], 2)
     except: # ugali
         sig = round(candidate['TS'], 2)
-    ra      = round(candidate['RA'], 2)
-    dec     = round(candidate['DEC'], 2)
+    ra      = round(candidate[basis_1], 2)
+    dec     = round(candidate[basis_2], 2)
     mod     = round(candidate['MODULUS'], 2)
     mc_source_id = round(candidate['MC_SOURCE_ID'], 2)
 

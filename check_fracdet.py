@@ -19,6 +19,8 @@ with open('config.yaml', 'r') as ymlfile:
     nside   = cfg[survey]['nside']
     candidate_list = cfg[survey]['candidate_list']
     fracdet = cfg[survey]['fracdet']
+    basis_1 = cfg[survey]['basis_1']
+    basis_2 = cfg[survey]['basis_2']
 
 candidate_list = cfg[survey]['candidate_list']
 
@@ -41,9 +43,9 @@ latmax = latmin+20
 #latmax = max(data['DEC'])
 
 hp.cartview(fracdetrav, lonra=[lonmin, lonmax], latra=[latmin, latmax], return_projected_map=True, cmap='binary')
-hp.projscatter(data['RA'], data['DEC'], lonlat=True, edgecolor='none', s=0.5, c='red')
+hp.projscatter(data[basis_1], data[basis_2], lonlat=True, edgecolor='none', s=0.5, c='red')
 
-plt.xlabel('RA')
-plt.ylabel('DEC')
+plt.xlabel(basis_1)
+plt.ylabel(basis_2)
 plt.savefig("{}_fracdet_check.png".format(survey), bbox_inches='tight', dpi=1000)
 plt.close()

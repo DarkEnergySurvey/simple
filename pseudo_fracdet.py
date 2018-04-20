@@ -18,6 +18,8 @@ with open('config.yaml', 'r') as ymlfile:
     survey = cfg['survey']
     nside   = cfg[survey]['nside']
     datadir = cfg[survey]['datadir']
+    basis_1 = cfg[survey]['basis_1']
+    basis_2 = cfg[survey]['basis_2']
 
 
 ############################################################
@@ -28,8 +30,8 @@ nside = 2048
 pix = []
 for infile in infiles:
     print('loading {}'.format(infile))
-    data = fits.read(infile, columns=['RA','DEC'])
-    p = hp.ang2pix(nside, data['RA'], data['DEC'], lonlat=True)
+    data = fits.read(infile, columns=[basis_1,basis_2])
+    p = hp.ang2pix(nside, data[basis_1], data[basis_2], lonlat=True)
     #pix.append(p)
     pix.append(np.unique(p))
 

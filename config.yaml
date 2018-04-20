@@ -9,18 +9,51 @@ output:
 batch:
     jobs: 20 # <= 20 for DES cluster computers!
 
-survey: 'des' # parameter to change for runs across different data
+survey: 'y3a2' # parameter to change for runs across different data
 
-des: #y3a2:
+y3_gold:
+    mode : 0 # 0: real, 1: real+sim
+    sim_population : None
+    sim_dir: None
+    nside          : 32
+    datadir        : ''
+    candidate_list : 'candidate_list.fits'
+    mag_max : 24.5
+
+    basis_1: 'RA'
+    basis_2: 'DEC'
+    mag_g : 'MAG_G'
+    mag_r : 'MAG_R'
+    mag_g_err : 'PSF_MAG_ERR_G'
+    mag_r_err : 'PSF_MAG_ERR_R'
+
+    mag_g_dred_flag : 'PSF_MAG_SFD_G'
+    mag_r_dred_flag : 'PSF_MAG_SFD_R'
+    mag_err_g_flag : 'PSF_MAG_ERR_G'
+    mag_err_r_flag : 'PSF_MAG_ERR_R'
+    flags_g : 'SEXTRACTOR_FLAGS_G'
+    flags_r : 'SEXTRACTOR_FLAGS_R'
+
+    star_galaxy_classification : 'EXTENDED_CLASS_MASH'
+
+    maglim_g : None
+    maglim_r : None
+
+    fracdet : None
+
+y3a2:
     mode : 1 # 0: real, 1: real+sim
     sim_catalog : 'sim_catalog.fits'
-    sim_population : 'sim_population.fits'
+    sim_population : 'v3/sim_population_v3.fits'
+    sim_dir: 'v3'
     nside          : 32
     datadir        : '/home/s1/kadrlica/projects/y3a2/dsphs/v2/skim'
     candidate_list : 'candidate_list.fits'
     mag_max : 24.5
     #candidate_list : '/home/s1/kadrlica/projects/y3a2/dsphs/v2/v2.1/search/ugali_candidates.fits' # ugali
 
+    basis_1: 'RA'
+    basis_2: 'DEC'
     mag_g : 'MAG_G'
     mag_r : 'MAG_R'
     mag_g_err             : 'PSF_MAG_ERR_G'
@@ -46,6 +79,8 @@ bliss: # Need to update this
     candidate_list : 'candidate_list.fits'
     mag_max : 24.5
 
+    basis_1: 'RA'
+    basis_2: 'DEC'
     mag_g : 'MAG_G'
     mag_r : 'MAG_R'
     mag_g_err             : 'PSF_MAG_ERR_G'
@@ -74,6 +109,8 @@ maglites: # Update
     candidate_list : 'candidate_list.fits'
     mag_max : 24.5
 
+    basis_1: 'RA'
+    basis_2: 'DEC'
     mag_g : 'MAG_G'
     mag_r : 'MAG_R'
     #mag_g_dred_flag            : 'PSF_MAG_SFD_G'
@@ -99,6 +136,8 @@ panstarrs:
     candidate_list : 'candidate_list.fits'
     mag_max : 22
 
+    basis_1: 'RA'
+    basis_2: 'DEC'
     mag_g : 'MAG_G'
     mag_r : 'MAG_R'
     mag_g_err : 'GFPSFMAGERR'
