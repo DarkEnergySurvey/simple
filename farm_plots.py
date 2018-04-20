@@ -48,7 +48,7 @@ print('Plotting hotspots with sig > {}'.format(sig_cut))
 candidate_list = fits.read(candidate_list)
 try: # simple
     candidate_list = candidate_list[candidate_list['SIG'] > sig_cut]
-    #candidate_list = candidate_list[candidate_list['DEC'] > -25] # panstarrs test
+    #candidate_list = candidate_list[candidate_list[basis_2] > -25] # panstarrs test
 except: # ugali
     candidate_list = candidate_list[candidate_list['TS'] > 25]
 

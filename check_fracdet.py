@@ -38,9 +38,9 @@ lonmin = -180
 lonmax = 180
 #lonmin = 200-180
 #lonmax = 260-180
-latmin = min(data['DEC'])
+latmin = min(data[basis_2])
 latmax = latmin+20
-#latmax = max(data['DEC'])
+#latmax = max(data[basis_2])
 
 hp.cartview(fracdetrav, lonra=[lonmin, lonmax], latra=[latmin, latmax], return_projected_map=True, cmap='binary')
 hp.projscatter(data[basis_1], data[basis_2], lonlat=True, edgecolor='none', s=0.5, c='red')
