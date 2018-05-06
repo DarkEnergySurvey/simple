@@ -110,6 +110,7 @@ if (mode == 1):
 if (fracdet_map is not None) and (fracdet_map.lower().strip() != 'none') and (fracdet_map != ''):
     print('Reading fracdet map {} ...').format(fracdet_map)
     fracdet = hp.read_map(fracdet_map)
+    #fracdet = fits.read(fracdet_map) # want to move to this but breaks as is
 else:
     print('No fracdet map specified ...')
     fracdet = None
@@ -135,7 +136,7 @@ if (mode == 0):
 elif (mode == 1):
     # grab distance_modulus from population
     sim_pop = fits.read(sim_population)
-    distance_modulus_select = sim_pop[sim_pop['mc_source_id'] == mc_source_id]['distance_modulus'][0]
+    distance_modulus_select = sim_pop[sim_pop['MC_SOURCE_ID'] == mc_source_id]['DISTANCE_MODULUS'][0]
 
     distance_modulus = distance_modulus_search_array[np.argmin(np.fabs(distance_modulus_search_array - distance_modulus_select))]
     ra_peaks, dec_peaks, r_peaks, sig_peaks, dist_moduli = simple_utils.searchBySimulation(nside, data, distance_modulus, pix_nside_select, ra_select, dec_select, mag_max, fracdet)
@@ -187,4 +188,7 @@ for ii in range(0, len(sig_peak_array)):
                  mc_source_id_array[ii]))
 
 # Write output
-simple_utils.writeOutput(results_dir, nside, pix_nside_select, ra_peak_array, dec_peak_array, r_peak_array, distance_modulus_array, sig_peak_array, mc_source_id_array, mode)
+if (len(sig_peak_array) > 0):
+    simple_utils.writeOutput(results_dir, nside, pix_nside_select, ra_peak_array, dec_peak_array, r_peak_array, distance_modulus_array, sig_peak_array, mc_source_id_array, mode)
+else:
+    print('No significant hotspots found.')

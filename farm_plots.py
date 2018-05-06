@@ -24,9 +24,10 @@ import yaml
 with open('config.yaml', 'r') as ymlfile:
     cfg = yaml.load(ymlfile)
 
+    survey = cfg['survey']
     simple_dir = cfg['setup']['simple_dir']
     jobs = cfg['batch']['jobs']
-    candidate_list = cfg[cfg['survey']]['candidate_list']
+    candidate_list = cfg[survey]['candidate_list']
     basis_1 = cfg[survey]['basis_1']
     basis_2 = cfg[survey]['basis_2']
 

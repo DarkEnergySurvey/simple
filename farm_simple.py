@@ -43,8 +43,11 @@ if not os.path.exists(log_dir):
 
 ############################################################
 
-def submitJob(ra, dec, pix, mc_source_id):
-    logfile = '{}/results_nside_{}_{}.log'.format(log_dir, nside, pix)
+def submitJob(ra, dec, pix, mc_source_id, mode):
+    if (mode == 0):
+        logfile = '{}/results_nside_{}_{}.log'.format(log_dir, nside, pix)
+    elif (mode == 1):
+        logfile = '{}/results_mc_source_id_{}.log'.format(log_dir, mc_source_id) # all values in mc_source_id_array should be the same
     batch = 'csub -n {} -o {} '.format(jobs, logfile)
     command = 'python {}/search_algorithm.py {:0.2f} {:0.2f} {:0.2f}'.format(simple_dir, ra, dec, mc_source_id)
     command_queue = batch + command
@@ -66,8 +69,8 @@ if (mode == 0): # real
     for infile in infiles:
         pix_nside.append(int(infile.split('.fits')[0].split('_')[-1]))
 
+    submitJobs(ra, dec, pix_nside[ii], 0, mode) # TODO: mc_source_id (0 for real)
     for ii in range(0, len(pix_nside)):
-    #for ii in range(5):
         ra, dec = ugali.utils.healpix.pixToAng(nside, pix_nside[ii])
     
         submitJob(ra, dec, pix_nside[ii], 0) # TODO: mc_source_id (0 for real)
@@ -75,8 +78,9 @@ if (mode == 0): # real
     
 elif (mode == 1): # real+sim
     sim_pop = fits.read(sim_population)
-    for sim in sim_pop:
-        ra, dec, mc_source_id = sim['ra'], sim['dec'], sim['mc_source_id'] # TODO: basis_1, basis_2
+    #for sim in sim_pop:
+    for sim in sim_pop[0:10]:
+        ra, dec, mc_source_id = sim[basis_1], sim[basis_2], sim['MC_SOURCE_ID']
         pix = hp.ang2pix(nside, ra, dec, lonlat=True)
 
-        submitJob(ra, dec, pix, mc_source_id)
+        submitJob(ra, dec, pix, mc_source_id, mode)

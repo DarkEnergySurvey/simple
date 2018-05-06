@@ -562,34 +562,6 @@ def searchBySimulation(nside, data, distance_modulus, pix_nside_select, ra_selec
 
 ########################################################################
 
-# These should ideally just depend on RA, Dec and find all the local hotspots
-# i.e. within the healpix pixel containing the search position
-
-#def find_real_hotspots(nside, data, distance_modulus, pix_nside_select, ra_select, dec_select, magnitude_threshold=mag_max, fracdet=None):
-##def find_real_hotspots():
-#    #estimate background
-#    #find hotspots
-#
-#    x_peak_array, y_peak_array, angsep_peak_array = findPeaks(nside, data, distance_modulus, pix_nside_select, ra_select, dec_select, magnitude_threshold=mag_max, fracdet=None)
-#
-#    ra_peak_array = []
-#    dec_peak_array = []
-#    r_peak_array = []
-#    sig_peak_array = []
-#    distance_modulus_array = []
-#
-#    #for x_peak, y_peak, angsep_peak in x_peak_array, y_peak_array, angsep_peak_array:
-#    #    characteristic_density_local = computeLocalCharDensity(nside, data, ra_select, dec_select, x_peak, y_peak, angsep_peak, fracdet)
-#
-#    return data
-#
-#def find_sim_hotspots():
-#    hotspots = fits.read(sim_population) # sim_catalog?
-#
-#    return hotspots
-
-########################################################################
-
 def writeOutput(results_dir, nside, pix_nside_select, ra_peak_array, dec_peak_array, r_peak_array, distance_modulus_array, sig_peak_array, mc_source_id_array, mode):
     if (mode == 0):
         outfile = '{}/results_nside_{}_{}.csv'.format(results_dir, nside, pix_nside_select)

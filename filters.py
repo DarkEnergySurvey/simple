@@ -20,7 +20,9 @@ with open('config.yaml', 'r') as ymlfile:
 
 def quality_filter(survey, data):
     """Return data above a quality threshold"""
-    if survey == 'des':
+    if survey == 'y3_gold_2_0':
+        cut = (data['SOF_PSF_MAG_CORRECTED_G'] < 25) # TODO mag_max?
+    elif survey == 'y3a2':
         cut = (data['PSF_MAG_SFD_G'] < 25)
     elif survey == 'bliss':
         cut = (data['PSF_MAG_SFD_G'] < 25) \
@@ -52,7 +54,10 @@ def quality_filter(survey, data):
 
 def star_filter(survey, data):
     """Return stellar-like objects"""
-    if survey == 'des':
+    if survey == 'y3_gold_2_0':
+        cut = (data['EXTENDED_CLASS_MASH_SOF'] >= 0) \
+            & (data['EXTENDED_CLASS_MASH_SOF'] <= 2)
+    elif survey == 'y3a2':
         cut = (data['EXTENDED_CLASS_MASH'] >= 0) \
             & (data['EXTENDED_CLASS_MASH'] <= 2)
     elif survey == 'bliss':
@@ -65,7 +70,9 @@ def star_filter(survey, data):
 
 def galaxy_filter(survey, data):
     """Return stellar-like objects"""
-    if survey == 'des':
+    if survey == 'y3_gold_2_0':
+        cut = (data['EXTENDED_CLASS_MASH_SOF'] > 2)
+    elif survey == 'y3a2':
         cut = (data['EXTENDED_CLASS_MASH'] > 2)
     elif survey == 'bliss':
         cut = (data['CM_T'] > 0.003 + data['CM_T_ERR']) # 0.005?
@@ -77,7 +84,9 @@ def galaxy_filter(survey, data):
 
 def color_filter(survey, data):
     """Return blue objects"""
-    if survey == 'des':
+    if survey == 'y3_gold_2_0':
+        cut = ((data['SOF_PSF_MAG_CORRECTED_G'] - data['SOF_PSF_MAG_CORRECTED_R']) < 0.4) # 0.2
+    elif survey == 'y3a2':
         cut = ((data['PSF_MAG_SFD_G'] - data['PSF_MAG_SFD_R']) < 0.4) # 0.2
     elif survey == 'bliss':
         cut = ((data[mag_g] - data[mag_r]) < 0.4) # 0.2
@@ -92,7 +101,9 @@ def color_filter(survey, data):
 def dered_mag(survey, data):
     """Return the data with an added flag for dereddened (extinction
        corrected) magnitude"""
-    if survey == 'des':
+    if survey == 'y3_gold_2_0':
+        data = mlab.rec_append_fields(data, [mag_g, mag_r], [data['SOF_PSF_MAG_CORRECTED_G'], data['SOF_PSF_MAG_CORRECTED_R']])
+    elif survey == 'y3a2':
         data = mlab.rec_append_fields(data, [mag_g, mag_r], [data['PSF_MAG_SFD_G'], data['PSF_MAG_SFD_R']])
     elif survey == 'bliss':
         #data = mlab.rec_append_fields(data, [mag_g, mag_r], [data['CM_MAG_G'] - data['EXINCTION_G'], data['CM_MAG_R'] - data['EXTINCTION_R']])
