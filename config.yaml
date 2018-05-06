@@ -9,37 +9,40 @@ output:
 batch:
     jobs: 20 # <= 20 for DES cluster computers!
 
-survey: 'y3a2' # parameter to change for runs across different data
+survey: 'y3_gold_2_0' # parameter to change for runs across different data
 
-y3_gold:
-    mode : 0 # 0: real, 1: real+sim
-    sim_population : None
-    sim_dir: None
+y3_gold_2_0:
+    mode : 1 # 0: real, 1: real+sim
+    sim_catalog : None
+    sim_population : '/data/des60.b/data/bechtol/projects/mw_substructure/y3a2/sim_population/v6/sim_population_v6_mc_source_id_000001-100000.fits'
+    sim_dir: '/data/des60.b/data/bechtol/projects/mw_substructure/y3a2/sim_population/v6'
     nside          : 32
-    datadir        : ''
+    datadir        : '/home/s1/kadrlica/projects/y3a2/data/gold/v2.0/skim_ext_0_3'
     candidate_list : 'candidate_list.fits'
     mag_max : 24.5
 
     basis_1: 'RA'
     basis_2: 'DEC'
+
     mag_g : 'MAG_G'
     mag_r : 'MAG_R'
-    mag_g_err : 'PSF_MAG_ERR_G'
-    mag_r_err : 'PSF_MAG_ERR_R'
+    mag_g_err : 'SOF_PSF_MAG_ERR_G'
+    mag_r_err : 'SOF_PSF_MAG_ERR_R'
 
-    mag_g_dred_flag : 'PSF_MAG_SFD_G'
-    mag_r_dred_flag : 'PSF_MAG_SFD_R'
-    mag_err_g_flag : 'PSF_MAG_ERR_G'
-    mag_err_r_flag : 'PSF_MAG_ERR_R'
-    flags_g : 'SEXTRACTOR_FLAGS_G'
-    flags_r : 'SEXTRACTOR_FLAGS_R'
+    mag_g_dred_flag : 'SOF_PSF_MAG_CORRECTED_G'
+    mag_r_dred_flag : 'SOF_PSF_MAG_CORRECTED_G'
+    mag_err_g_flag :  'SOF_PSF_MAG_ERR_G'
+    mag_err_r_flag :  'SOF_PSF_MAG_ERR_R'
+    flags_g : 'FLAGS_GOLD'
+    flags_r : 'FLAGS_GOLD'
 
-    star_galaxy_classification : 'EXTENDED_CLASS_MASH'
+    star_galaxy_classification : 'EXTENDED_CLASS_MASH_SOF'
 
-    maglim_g : None
-    maglim_r : None
+    maglim_g : '/home/s1/kadrlica/projects/y3q2/v6/release/depth/y2q1_maglim_g_n1024_ring.fits.gz'
+    maglim_r : '/home/s1/kadrlica/projects/y2q/v6/release/depth/y2q1_maglim_r_n1024_ring.fits.gz'
 
-    fracdet : None
+    fracdet_gz : 'y3a2_griz_o.4096_t.32768_coverfoot_EQU.fits.gz'
+    fracdet : 'y3a2_griz_o.4096_t.32768_coverfoot_EQU_decompressed.fits'
 
 y3a2:
     mode : 1 # 0: real, 1: real+sim
