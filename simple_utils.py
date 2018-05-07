@@ -414,23 +414,22 @@ def fitAperture(proj, distance_modulus, characteristic_density_local, x_peak, y_
         n_peak = np.sum(angsep_peak < size_array[ii])
         n_model = characteristic_density_local * (np.pi * size_array[ii]**2)
         sig_array[ii] = scipy.stats.norm.isf(scipy.stats.poisson.sf(n_peak, n_model))
-        if sig_array[ii] > 25:
-            sig_array[ii] = 25. # Set a maximum significance value
+        #if sig_array[ii] > 25:
+        #    sig_array[ii] = 25. # Set a maximum significance value
 
     ra_peak, dec_peak = proj.imageToSphere(x_peak, y_peak)
 
     r_peak = size_array[np.argmax(sig_array)]
-    if np.max(sig_array) == 25.:
+    if np.max(sig_array) >= 25.:
         r_peak = 0.5
 
     # Compile resilts
     print('Candidate: x_peak: {:12.3f}, y_peak: {:12.3f}, r_peak: {:12.3f}, sig: {:12.3f}, ra_peak: {:12.3f}, dec_peak: {:12.3f}'.format(x_peak, y_peak, r_peak, np.max(sig_array), ra_peak, dec_peak))
-    if np.max(sig_array) > 5.:
-        ra_peak_array.append(ra_peak)
-        dec_peak_array.append(dec_peak)
-        r_peak_array.append(r_peak)
-        sig_peak_array.append(np.max(sig_array))
-        distance_modulus_array.append(distance_modulus)
+    ra_peak_array.append(ra_peak)
+    dec_peak_array.append(dec_peak)
+    r_peak_array.append(r_peak)
+    sig_peak_array.append(np.max(sig_array))
+    distance_modulus_array.append(distance_modulus)
 
     return ra_peak_array, dec_peak_array, r_peak_array, sig_peak_array, distance_modulus_array
 
@@ -567,6 +566,7 @@ def writeOutput(results_dir, nside, pix_nside_select, ra_peak_array, dec_peak_ar
         outfile = '{}/results_nside_{}_{}.csv'.format(results_dir, nside, pix_nside_select)
     elif (mode == 1):
         outfile = '{}/results_mc_source_id_{}.csv'.format(results_dir, mc_source_id_array[0]) # all values in mc_source_id_array should be the same
+
     writer = open(outfile, 'w')
     for ii in range(0, len(sig_peak_array)):
         # SIG, RA, DEC, MODULUS, r, mc_source_id
