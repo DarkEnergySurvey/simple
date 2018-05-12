@@ -70,7 +70,9 @@ for candidate in candidate_list:
     logfile = '{}/candidate_{}_{}.log'.format(log_dir, ra, dec)
     batch = 'csub -n {} -o {} '.format(jobs, logfile)
     command = 'python {}/make_plot.py {:0.2f} {:0.2f} {:0.2f} {:0.2f} {:0.2f}'.format(simple_dir, ra, dec, mod, sig, mc_source_id)
-    command_queue = batch + command
-    print(command_queue)
+    #command_queue = batch + command
+    #print(command_queue)
+    print(command)
     #os.system('./' + command) # Run locally
-    os.system(command_queue) # Submit to queue
+    os.system(command)
+    #os.system(command_queue) # Submit to queue

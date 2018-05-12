@@ -135,7 +135,7 @@ maglites: # Update
 
 panstarrs:
     nside          : 32
-    datadir        : '/data/des40.b/data/pan-starrs/dr1/healpix'
+    datadir        : '/Users/keithbechtol/Documents/DES/external_data/pan-starrs/data/healpix/'
     candidate_list : 'candidate_list.fits'
     mag_max : 22
 
@@ -148,4 +148,4 @@ panstarrs:
     flags_g : 'GFLAGS'
     flags_r : 'RFLAGS'
 
-    fracdet : 'panstarrs_pseudo_fracdet.fits.gz'
+    fracdet : '/Users/keithbechtol/Documents/DES/external_data/pan-starrs/simple/sid/simple_v2/panstarrs_pseudo_fracdet.fits.gz'
