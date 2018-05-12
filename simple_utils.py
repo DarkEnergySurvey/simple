@@ -414,8 +414,8 @@ def fitAperture(proj, distance_modulus, characteristic_density_local, x_peak, y_
         n_peak = np.sum(angsep_peak < size_array[ii])
         n_model = characteristic_density_local * (np.pi * size_array[ii]**2)
         sig_array[ii] = scipy.stats.norm.isf(scipy.stats.poisson.sf(n_peak, n_model))
-        #if sig_array[ii] > 25:
-        #    sig_array[ii] = 25. # Set a maximum significance value
+        if sig_array[ii] > 37.5: # 25
+            sig_array[ii] = 37.5 # Set a maximum significance value
 
     ra_peak, dec_peak = proj.imageToSphere(x_peak, y_peak)
 

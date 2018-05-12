@@ -14,8 +14,8 @@ survey: 'y3_gold_2_0' # parameter to change for runs across different data
 y3_gold_2_0:
     mode : 1 # 0: real, 1: real+sim
     sim_catalog : None
-    sim_population : '/data/des60.b/data/bechtol/projects/mw_substructure/y3a2/sim_population/v6/sim_population_v6_mc_source_id_000001-100000.fits'
-    sim_dir: '/data/des60.b/data/bechtol/projects/mw_substructure/y3a2/sim_population/v6'
+    sim_population : '/home/s1/kadrlica/projects/mw_substructure/y3a2/sim_population/v7/sim_population_v7_mc_source_id_000001-100000.fits'
+    sim_dir: '/home/s1/kadrlica/projects/mw_substructure/y3a2/sim_population/v7'
     nside          : 32
     datadir        : '/home/s1/kadrlica/projects/y3a2/data/gold/v2.0/skim_ext_0_3'
     candidate_list : 'candidate_list.fits'
