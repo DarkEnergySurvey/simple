@@ -144,7 +144,7 @@ panstarrs:
     #datadir        : '/data/des40.b/data/pan-starrs/dr1/healpix'
     datadir        : '/Users/keithbechtol/Documents/DES/external_data/pan-starrs/data/healpix'
     #isodir         : '/Users/keithbechtol/Documents/DES/projects/mw_substructure/ugalidir/isochrones/ps1/dotter2016/'
-    isoname        : 'Dotter2016'
+    isoname        : 'Bressan2012' #'Dotter2016'
     isosurvey      : 'ps1'
     candidate_list : 'candidate_list.fits'
     mag_max : 22.5
