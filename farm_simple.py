@@ -57,6 +57,17 @@ def submitJob(ra, dec, pix, mc_source_id, mode):
 
     return
 
+def executeJob(ra, dec, pix, mc_source_id, mode):
+    if (mode == 0):
+        logfile = 'results_nside_{}_{}.log'.format(nside, pix)
+    elif (mode == 1):
+        logfile = 'results_mc_source_id_{}.log'.format(mc_source_id) # all values in mc_source_id_array should be the same
+    command = 'python {}/search_algorithm.py {:0.2f} {:0.2f} {:0.2f} >> {}/{}'.format(simple_dir, ra, dec, mc_source_id, log_dir, logfile)
+    print(command)
+    os.system(command) # Submit to queue # TODO use subprocess instead
+
+    return
+
 ############################################################
 
 print('mode: {}...'.format(mode))
@@ -69,7 +80,6 @@ if (mode == 0): # real
     for infile in infiles:
         pix_nside.append(int(infile.split('.fits')[0].split('_')[-1]))
 
-    submitJobs(ra, dec, pix_nside[ii], 0, mode) # TODO: mc_source_id (0 for real)
     for ii in range(0, len(pix_nside)):
         ra, dec = ugali.utils.healpix.pixToAng(nside, pix_nside[ii])
     
@@ -78,9 +88,10 @@ if (mode == 0): # real
     
 elif (mode == 1): # real+sim
     sim_pop = fits.read(sim_population)
-    #for sim in sim_pop:
-    for sim in sim_pop[0:10]:
+    for sim in sim_pop:
         ra, dec, mc_source_id = sim[basis_1], sim[basis_2], sim['MC_SOURCE_ID']
         pix = hp.ang2pix(nside, ra, dec, lonlat=True)
 
         submitJob(ra, dec, pix, mc_source_id, mode)
+
+        #batch = 'csub -n {} -o {} '.format(jobs, logfile)

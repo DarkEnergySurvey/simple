@@ -17,6 +17,7 @@ import fitsio as fits
 
 # Ugali libraries
 import ugali.utils.healpix
+import ugali.utils.healpix
 import ugali.utils.projector
 
 # Simple binner modules
@@ -109,8 +110,7 @@ if (mode == 1):
 # Read in fracdet map
 if (fracdet_map is not None) and (fracdet_map.lower().strip() != 'none') and (fracdet_map != ''):
     print('Reading fracdet map {} ...').format(fracdet_map)
-    fracdet = hp.read_map(fracdet_map)
-    #fracdet = fits.read(fracdet_map) # want to move to this but breaks as is
+    fracdet = ugali.utils.healpix.read_map(fracdet_map)
 else:
     print('No fracdet map specified ...')
     fracdet = None
@@ -186,16 +186,17 @@ for ii in range(0, len(sig_peak_array)):
     sig_peak_array[(angsep < r_peak_array[ii]) & (np.arange(len(sig_peak_array)) > ii)] = -1.
     #sig_peak_array[(angsep < 0.5) & (np.arange(len(sig_peak_array)) > ii)] = -1. # 0.5 deg radius
 
-# Prune the list of peaks
-ra_peak_array = ra_peak_array[sig_peak_array > 0.]
-dec_peak_array = dec_peak_array[sig_peak_array > 0.]
-r_peak_array = r_peak_array[sig_peak_array > 0.]
-distance_modulus_array = distance_modulus_array[sig_peak_array > 0.]
-n_obs_peak_array = n_obs_peak_array[sig_peak_array > 0.]
-n_obs_half_peak_array = n_obs_half_peak_array[sig_peak_array > 0.]
-n_model_peak_array = n_model_peak_array[sig_peak_array > 0.]
-mc_source_id_array = mc_source_id_array[sig_peak_array > 0.]
-sig_peak_array = sig_peak_array[sig_peak_array > 0.] # Update the sig_peak_array last!
+if (mode == 0):
+    # Prune the list of peaks
+    ra_peak_array = ra_peak_array[sig_peak_array > 0.]
+    dec_peak_array = dec_peak_array[sig_peak_array > 0.]
+    r_peak_array = r_peak_array[sig_peak_array > 0.]
+    distance_modulus_array = distance_modulus_array[sig_peak_array > 0.]
+    n_obs_peak_array = n_obs_peak_array[sig_peak_array > 0.]
+    n_obs_half_peak_array = n_obs_half_peak_array[sig_peak_array > 0.]
+    n_model_peak_array = n_model_peak_array[sig_peak_array > 0.]
+   mc_source_id_array = mc_source_id_array[sig_peak_array > 0.]
+    sig_peak_array = sig_peak_array[sig_peak_array > 0.] # Update the sig_peak_array last!
 
 for ii in range(0, len(sig_peak_array)):
     print('{:0.2f} sigma; (RA, Dec, d) = ({:0.2f}, {:0.2f}); r = {:0.2f} deg; d = {:0.1f}, mu = {:0.2f} mag), mc_source_id: {:0.2f}'.format(sig_peak_array[ii], 

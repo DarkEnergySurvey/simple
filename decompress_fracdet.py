@@ -18,6 +18,7 @@ with open('config.yaml', 'r') as ymlfile:
 if (fracdet_gz is not None) and (fracdet_gz.lower().strip() != 'none') and (fracdet_gz != ''):
     print('Reading fracdet map {} ...').format(fracdet_gz)
     fracdet_map = hp.read_map(fracdet_gz)
-    hp.write_map(fracdet, fracdet_map, nest=False)
+    hp.write_map(fracdet, fracdet_map, nest=False) # TODO
+    #fits.write(fracdet_map) # TODO
 else:
     print('No fracdet map specified ...')
