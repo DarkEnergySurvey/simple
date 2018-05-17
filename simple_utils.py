@@ -561,13 +561,8 @@ def searchBySimulation(nside, data, distance_modulus, pix_nside_select, ra_selec
 
 ########################################################################
 
-def writeOutput(results_dir, nside, pix_nside_select, ra_peak_array, dec_peak_array, r_peak_array, distance_modulus_array, sig_peak_array, mc_source_id_array, mode):
-    if (mode == 0):
-        outfile = '{}/results_nside_{}_{}.csv'.format(results_dir, nside, pix_nside_select)
-    elif (mode == 1):
-        outfile = '{}/results_mc_source_id_{}.csv'.format(results_dir, mc_source_id_array[0]) # all values in mc_source_id_array should be the same
-
-    writer = open(outfile, 'w')
+def writeOutput(results_dir, nside, pix_nside_select, ra_peak_array, dec_peak_array, r_peak_array, distance_modulus_array, sig_peak_array, mc_source_id_array, mode, outfile):
+    writer = open(outfile, 'a') # Will not overwrite
     for ii in range(0, len(sig_peak_array)):
         # SIG, RA, DEC, MODULUS, r, mc_source_id
         writer.write('{:10.2f}, {:10.2f}, {:10.2f}, {:10.2f}, {:10.2f}, {:10.2f}\n'.format(sig_peak_array[ii], 

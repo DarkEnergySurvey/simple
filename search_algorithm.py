@@ -61,6 +61,20 @@ try:
 except:
     sys.exit('ERROR! Coordinates not given in correct format.')
 
+try:
+    mc_source_id = float(sys.argv[3])
+except:
+    mc_source_id = 0
+
+try:
+    outfile = sys.argv[4]
+except:
+    if (mode == 0):
+        outfile = '{}/results_nside_{}_{}.csv'.format(results_dir, nside, pix_nside_select)
+    elif (mode == 1):
+        outfile = '{}/results_mc_source_id_{}.csv'.format(results_dir, mc_source_id_array[0]) # all values in mc_source_id_array should be the same
+    
+
 print('Search coordinates: (RA, Dec) = ({:0.2f}, {:0.2f})').format(ra_select, dec_select)
 
 # Now cut for a single pixel
@@ -75,10 +89,6 @@ if (mode == 0):
     print('mode = 0: running only on real data')
 elif (mode == 1):
     print('mode = 1: running on real data and simulated data')
-    try:
-        mc_source_id = float(sys.argv[3])
-    except:
-        sys.exit('error: invalid mc_source_id')
     
     # inject objects for simulated object of mc_source_id
     sim_data = simple_utils.construct_sim_data(pix_nside_neighbors, mc_source_id)
@@ -190,6 +200,6 @@ for ii in range(0, len(sig_peak_array)):
 
 # Write output
 if (len(sig_peak_array) > 0):
-    simple_utils.writeOutput(results_dir, nside, pix_nside_select, ra_peak_array, dec_peak_array, r_peak_array, distance_modulus_array, sig_peak_array, mc_source_id_array, mode)
+    simple_utils.writeOutput(results_dir, nside, pix_nside_select, ra_peak_array, dec_peak_array, r_peak_array, distance_modulus_array, sig_peak_array, mc_source_id_array, mode, outfile)
 else:
     print('No significant hotspots found.')
