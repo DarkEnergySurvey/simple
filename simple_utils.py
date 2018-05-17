@@ -345,7 +345,8 @@ def computeLocalCharDensity(nside, data, characteristic_density, ra_select, dec_
             #angsep_peak = np.sqrt((x - x_peak)**2 + (y - y_peak)**2)
             characteristic_density_local = characteristic_density
 
-    print('Characteristic density local = {:0.1f} deg^-2'.format(characteristic_density_local))
+    print('Characteristic density local = {:0.1f} deg^-2 = {:0.3f} arcmin^-2'.format(characteristic_density_local, characteristic_density_local / 60.**2))
+    #print('Characteristic density local = {:0.3f} arcmin^-2'.format(characteristic_density_local / 60.**2))
 
     return characteristic_density_local
 
@@ -370,13 +371,7 @@ def findPeaks(nside, data, characteristic_density, distance_modulus, pix_nside_s
     yy, xx = np.meshgrid(centers, centers)
 
     h = np.histogram2d(x, y, bins=[bins, bins])[0]
-    """
-    import pylab
-    pylab.ion()
-    pylab.imshow(h, cmap='binary_r')
-    pylab.colorbar()
-    raw_input('wait')
-    """
+    
     h_g = scipy.ndimage.filters.gaussian_filter(h, smoothing / delta_x)
 
     factor_array = np.arange(1., 5., 0.05)
@@ -409,6 +404,30 @@ def findPeaks(nside, data, characteristic_density, distance_modulus, pix_nside_s
         y_peak_array.append(y_peak)
         angsep_peak_array.append(angsep_peak)
 
+    """
+    import pylab
+    from matplotlib.colors import LogNorm
+    pylab.ion()
+
+    pylab.figure()
+    pylab.imshow(h_g, cmap='binary', norm=LogNorm(vmin=0.01, vmax=1))
+    pylab.colorbar()
+    pylab.imshow(h_region, cmap='jet', alpha=0.25)
+    #pylab.colorbar()
+    #pylab.figure()
+    raw_input('wait')
+    """
+    """
+    x_special, y_special = proj.sphereToImage(151.77, 16.08)
+    #x_peak_array.append(x_special)
+    #y_peak_array.append(y_special)
+    #angsep_peak_array.append(np.sqrt((x - x_special)**2 + (y - y_special)**2))
+    x_peak_array = [x_special]
+    y_peak_array = [y_special]
+    angsep_peak_array = [np.sqrt((x - x_special)**2 + (y - y_special)**2)]
+    """
+    #import pdb; pdb.set_trace()
+    
     return x_peak_array, y_peak_array, angsep_peak_array
 
 ########################################################################
@@ -478,7 +497,8 @@ def fitAperture(proj, distance_modulus, characteristic_density_local, x_peak, y_
     ra_peak_array.append(ra_peak)
     dec_peak_array.append(dec_peak)
     r_peak_array.append(r_peak)
-    sig_peak_array.append(np.max(sig_array))
+    #sig_peak_array.append(np.max(sig_array))
+    sig_peak_array.append(sig_array[index_peak])
     distance_modulus_array.append(distance_modulus)
     n_obs_peak_array.append(n_obs_peak)
     n_obs_half_peak_array.append(n_obs_half_peak)
@@ -627,7 +647,7 @@ def searchBySimulation(nside, data, distance_modulus, pix_nside_select, ra_selec
     sig_peak_array.append(sig_peaks)
     distance_modulus_array.append(distance_moduli)
     n_obs_peak_array.append(n_obs_peaks)
-    n_obs_half_peak_array.append(n_obs_peaks)
+    n_obs_half_peak_array.append(n_obs_half_peaks)
     n_model_peak_array.append(n_model_peaks)
 
     ra_peak_array = np.concatenate(ra_peak_array)

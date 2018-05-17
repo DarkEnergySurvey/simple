@@ -359,7 +359,7 @@ def hessPlot(targ_ra, targ_dec, data, iso, g_radius, nbhd):
     plt.xlabel('g-r (mag)')
     plt.ylabel('g (mag)')
 
-def radialPlot(targ_ra, targ_dec, data, iso, g_radius, nbhd):
+def radialPlot(targ_ra, targ_dec, data, iso, g_radius, nbhd, field_density=None):
     """Radial distribution plot"""
 
     ## Deprecated?
@@ -440,6 +440,9 @@ def radialPlot(targ_ra, targ_dec, data, iso, g_radius, nbhd):
 
     f_range, f_val = interp_values('stars', 'f')
     plt.plot(f_range, f_val, '-b', label='Filtered Stars')
+
+    if field_density:
+        plt.axhline(y=field_density, color='blue', ls='--', label='Model Field')
 
     ymax = plt.ylim()[1]
     plt.annotate(r'$\approx %0.1f$' + str(round(g_radius, 3)) + '$^\circ$', (g_radius*1.1, ymax/50.), color='red', bbox=dict(boxstyle='round,pad=0.0', fc='white', alpha=0.75, ec='white', lw=0))

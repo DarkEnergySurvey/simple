@@ -38,6 +38,7 @@ def quality_filter(survey, data):
     elif survey == 'panstarrs':
         cut = (np.bitwise_and(data['QUALITYFLAG'], 16) > 0) \
             & (data['NSTACKDETECTIONS'] > 1) \
+            & (data['NDETECTIONS'] > 0) \
             & (np.bitwise_and(data['GINFOFLAG'], 8) == 0) \
             & (np.bitwise_and(data['RINFOFLAG'], 8) == 0) \
             & (np.bitwise_and(data['IINFOFLAG'], 8) == 0) \
@@ -50,7 +51,7 @@ def quality_filter(survey, data):
             & (np.bitwise_and(data['GINFOFLAG2'], 8192) == 0) \
             & (np.bitwise_and(data['RINFOFLAG2'], 8192) == 0) \
             & (np.bitwise_and(data['IINFOFLAG2'], 8192) == 0) \
-            & (data['GFPSFMAG'] < 22.) # observed magnitude - not extinction corrected
+            & (data['GFPSFMAG'] < 22.5) # observed magnitude - not extinction corrected
     return cut
 
 def star_filter(survey, data):

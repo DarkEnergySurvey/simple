@@ -66,10 +66,15 @@ for candidate in candidate_list:
     dec     = round(candidate[basis_2], 2)
     mod     = round(candidate['MODULUS'], 2)
     mc_source_id = round(candidate['MC_SOURCE_ID'], 2)
-
+    if 'N_MODEL' in candidate_list.dtype.names:
+        field_density = round(candidate['N_MODEL'] / (np.pi * (candidate['r'] * 60.)**2), 4) # field density (arcmin^-2)
+    
     logfile = '{}/candidate_{}_{}.log'.format(log_dir, ra, dec)
     batch = 'csub -n {} -o {} '.format(jobs, logfile)
-    command = 'python {}/make_plot.py {:0.2f} {:0.2f} {:0.2f} {:0.2f} {:0.2f}'.format(simple_dir, ra, dec, mod, sig, mc_source_id)
+    if 'N_MODEL' in candidate_list.dtype.names:
+        command = 'python {}/make_plot.py {:0.2f} {:0.2f} {:0.2f} {:0.2f} {:0.2f} {:0.4f}'.format(simple_dir, ra, dec, mod, sig, mc_source_id, field_density)
+    else:
+        command = 'python {}/make_plot.py {:0.2f} {:0.2f} {:0.2f} {:0.2f} {:0.2f}'.format(simple_dir, ra, dec, mod, sig, mc_source_id)
     #command_queue = batch + command
     #print(command_queue)
     print(command)

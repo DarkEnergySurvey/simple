@@ -116,7 +116,7 @@ else:
     fracdet = None
 
 distance_modulus_search_array = np.arange(16., mag_max, 0.5)
-distance_modulus_search_array = [21.50] # ONLY FOR TESTING
+#distance_modulus_search_array = [17.0] # ONLY FOR TESTING
 
 ra_peak_array = []
 dec_peak_array = [] 
