@@ -214,69 +214,6 @@ def starPlot(targ_ra, targ_dec, data, iso, g_radius, nbhd):
 
     plt.title('Stars')
 
-    """
-    filter = filters.star_filter(survey, data)
-
-    #iso_filter = (iso.separation(data[mag_g], data[mag_r]) < 0.1)
-    iso_filter = (iso.separation(data[mag_g], data[mag_r]) < 1.0)
-
-    import pylab
-    pylab.ion()
-    pylab.figure('test')
-    #pylab.scatter(data[basis_1], data[basis_2], s=1)
-    pylab.hexbin(data[basis_1], data[basis_2])
-    pylab.colorbar()
-    pylab.scatter(targ_ra, targ_dec, c='red')
-    #raw_input('WAIT')
-
-    # projection of image
-    proj = ugali.utils.projector.Projector(targ_ra, targ_dec)
-    #x, y = proj.sphereToImage(data[filter & iso_filter][basis_1], data[filter & iso_filter][basis_2])
-    x, y = proj.sphereToImage(data[basis_1], data[basis_2])
-
-    cut_angsep = np.sqrt(x**2 + y**2) < 0.05
-
-    pylab.figure('test2')
-    #plt.scatter(x, y, edgecolor='none', s=3, c='black')
-    #plt.scatter(x[iso_filter], y[iso_filter], edgecolor='none', s=3, c='red')
-    #plt.scatter(x[iso_filter], y[iso_filter], marker='x', s=10, c='red')
-    #plt.scatter(x, y, edgecolor='none', s=3, c=data[mag_r], vmin=15., vmax=30.)
-    plt.scatter(x[cut_angsep], y[cut_angsep], edgecolor='none', s=3, c=iso.separation(data[mag_g], data[mag_r])[cut_angsep], vmax=1.0)
-    #plt.colorbar()
-    plt.xlim(0.2, -0.2)
-    plt.ylim(-0.2, 0.2)
-    plt.gca().set_aspect('equal')
-    plt.xlabel(r'$\Delta \alpha$ (deg)')
-    plt.ylabel(r'$\Delta \delta$ (deg)')
-    #raw_input('WAIT')
-
-    print data[mag_g][cut_angsep]
-    print data[mag_r][cut_angsep]
-
-    pylab.figure('test3')
-    pylab.scatter(data[mag_g][iso_filter] - data[mag_r][iso_filter], data[mag_g][iso_filter], c='black')
-    pylab.scatter(data[mag_g][cut_angsep] - data[mag_r][cut_angsep], data[mag_g][cut_angsep], c=iso.separation(data[mag_g], data[mag_r])[cut_angsep], vmax=1.0)
-    pylab.colorbar()
-    #raw_input('WAIT')
-
-    pylab.figure('test4')
-    pylab.scatter(np.clip(data['IFPSFMAG'][~cut_angsep], 11., 29.), 
-                  np.clip(data['IFPSFMAG'][~cut_angsep] - data['IFKRONMAG'][~cut_angsep], -14.5, 14.5), 
-                  c='black', s=1)
-    pylab.scatter(np.clip(data['IFPSFMAG'][cut_angsep], 11., 29.), 
-                  np.clip(data['IFPSFMAG'][cut_angsep] - data['IFKRONMAG'][cut_angsep], -14.5, 14.5), 
-                  c=data['IFKRONMAG'][cut_angsep], vmin=15., vmax=30., s=1)
-    pylab.colorbar()
-    pylab.xlim(10., 30.)
-    pylab.ylim(-15., 15.)
-
-    pylab.figure('test4')
-    pylab.scatter()
-
-    import pdb; pdb.set_trace()
-    plt.title('Stars')
-    """
-
 def cmPlot(targ_ra, targ_dec, data, iso, g_radius, nbhd, type):
     """Color-magnitude plot"""
 

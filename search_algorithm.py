@@ -116,7 +116,6 @@ else:
     fracdet = None
 
 distance_modulus_search_array = np.arange(16., mag_max, 0.5)
-#distance_modulus_search_array = [17.0] # ONLY FOR TESTING
 
 ra_peak_array = []
 dec_peak_array = [] 
@@ -205,8 +204,6 @@ for ii in range(0, len(sig_peak_array)):
                  r_peak_array[ii],
                  ugali.utils.projector.distanceModulusToDistance(distance_modulus_array[ii]),
                  distance_modulus_array[ii],
-                 #n_obs_peak_array[ii],
-                 #n_model_peak_array[ii],
                  mc_source_id_array[ii]))
 
 # Write output
