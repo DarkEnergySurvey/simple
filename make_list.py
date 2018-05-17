@@ -32,7 +32,7 @@ for file in glob.glob('{}/*.csv'.format(cfg['output']['results_dir'])):
     csvfile.close()
 
 data = np.asarray(results)
-dt = np.dtype([('SIG', '>f4'), (basis_1, '>f4'), (basis_2, '>f4'), ('MODULUS', '>f4'), ('r', '>f4'), ('MC_SOURCE_ID', '>f4')])
+dt = np.dtype([('SIG', '>f4'), (basis_1, '>f4'), (basis_2, '>f4'), ('MODULUS', '>f4'), ('r', '>f4'), ('N_OBS', '>f4'), ('N_OBS_HALF', '>f4'), ('N_MODEL', '>f4'), ('MC_SOURCE_ID', '>f4')])
 data = data.astype(dt)
 
 # Create fits columns
@@ -41,12 +41,15 @@ c1 = fits.Column(name=basis_1,      format='E', array=data[:,1])
 c2 = fits.Column(name=basis_2,     format='E', array=data[:,2])
 c3 = fits.Column(name='MODULUS', format='E', array=data[:,3])
 c4 = fits.Column(name='r',       format='E', array=data[:,4])
-c5 = fits.Column(name='MC_SOURCE_ID', format='E', array=data[:,5])
+c5 = fits.Column(name='N_OBS',       format='E', array=data[:,5])
+c6 = fits.Column(name='N_OBS_HALF',       format='E', array=data[:,6])
+c7 = fits.Column(name='N_MODEL',       format='E', array=data[:,7])
+c8 = fits.Column(name='MC_SOURCE_ID', format='E', array=data[:,8])
 #c5 = fits.Column(name='ASSOC',   format='E', array=data[:,5])
 #c6 = fits.Column(name='ANGSEP',  format='E', array=data[:,6])
 
 # Write fits output
-t = fits.BinTableHDU.from_columns([c0, c1, c2, c3, c4, c5])
+t = fits.BinTableHDU.from_columns([c0, c1, c2, c3, c4, c5, c6, c7, c8])
 t.writeto(candidate_list, overwrite=True)
 
 #from fitsio import FITS

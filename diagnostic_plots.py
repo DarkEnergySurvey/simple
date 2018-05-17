@@ -21,7 +21,6 @@ from operator import add
 from scipy import interpolate
 from scipy.signal import argrelextrema
 import scipy.ndimage
-import utils
 
 import pylab as plt
 import pyfits
@@ -40,6 +39,8 @@ with open('config.yaml', 'r') as ymlfile:
     survey = cfg['survey']
     nside   = cfg[survey]['nside']
     datadir = cfg[survey]['datadir']
+    isoname = cfg[survey]['isoname']
+    isosurvey = cfg[survey]['isosurvey']
     mag_max = cfg[survey]['mag_max']
     basis_1 = cfg[survey]['basis_1']
     basis_2 = cfg[survey]['basis_2']
@@ -84,12 +85,15 @@ def analysis(targ_ra, targ_dec, mod, mc_source_id):
 
     data = filters.dered_mag(survey, data)
 
-    iso = isochrone_factory('Bressan2012', age=12, z=0.0001, distance_modulus=mod)
+    # This should be generalized to also take the survey
+    #iso = isochrone_factory('Bressan2012', age=12, z=0.0001, distance_modulus=mod)
+    iso = isochrone_factory(name=isoname, survey=isosurvey, age=12, z=0.0001, distance_modulus=mod)
 
     # g_radius estimate
     filter = filters.star_filter(survey, data)
 
-    iso_filter = (iso.separation(data[mag_g], data[mag_r]) < 0.1)
+    #iso_filter = (iso.separation(data[mag_g], data[mag_r]) < 0.1)
+    iso_filter = simple_utils.cutIsochronePath(data[mag_g], data[mag_r], data[mag_g_err], data[mag_r_err], iso, radius=0.1, return_all=False)
 
     angsep = ugali.utils.projector.angsep(targ_ra, targ_dec, data[basis_1], data[basis_2])
 
@@ -162,8 +166,9 @@ def densityPlot(targ_ra, targ_dec, data, iso, g_radius, nbhd, type):
         filter = filters.color_filter(survey, data) \
                & filters.star_filter(survey, data)
         plt.title('Blue Stellar Density')
-
-    iso_filter = (iso.separation(data[mag_g], data[mag_r]) < 0.1)
+    
+    #iso_filter = (iso.separation(data[mag_g], data[mag_r]) < 0.1)
+    iso_filter = simple_utils.cutIsochronePath(data[mag_g], data[mag_r], data[mag_g_err], data[mag_r_err], iso, radius=0.1, return_all=False)
 
     # projection of image
     proj = ugali.utils.projector.Projector(targ_ra, targ_dec)
@@ -196,7 +201,8 @@ def starPlot(targ_ra, targ_dec, data, iso, g_radius, nbhd):
 
     filter = filters.star_filter(survey, data)
 
-    iso_filter = (iso.separation(data[mag_g], data[mag_r]) < 0.1)
+    #iso_filter = (iso.separation(data[mag_g], data[mag_r]) < 0.1) # Original
+    iso_filter = simple_utils.cutIsochronePath(data[mag_g], data[mag_r], data[mag_g_err], data[mag_r_err], iso, radius=0.1, return_all=False)
 
     # projection of image
     proj = ugali.utils.projector.Projector(targ_ra, targ_dec)
@@ -224,7 +230,8 @@ def cmPlot(targ_ra, targ_dec, data, iso, g_radius, nbhd, type):
         filter = filters.galaxy_filter(survey, data)
         plt.title('Galactic Color-Magnitude')
 
-    iso_filter = (iso.separation(data[mag_g], data[mag_r]) < 0.1)
+    #iso_filter = (iso.separation(data[mag_g], data[mag_r]) < 0.1)
+    iso_filter = simple_utils.cutIsochronePath(data[mag_g], data[mag_r], data[mag_g_err], data[mag_r_err], iso, radius=0.1, return_all=False)
 
     # Plot background objects
     plt.scatter(data[mag_g][filter & annulus] - data[mag_r][filter & annulus], data[mag_g][filter & annulus], c='k', alpha=0.1, edgecolor='none', s=1)
@@ -292,7 +299,7 @@ def hessPlot(targ_ra, targ_dec, data, iso, g_radius, nbhd):
     plt.xlabel('g-r (mag)')
     plt.ylabel('g (mag)')
 
-def radialPlot(targ_ra, targ_dec, data, iso, g_radius, nbhd):
+def radialPlot(targ_ra, targ_dec, data, iso, g_radius, nbhd, field_density=None):
     """Radial distribution plot"""
 
     ## Deprecated?
@@ -304,8 +311,10 @@ def radialPlot(targ_ra, targ_dec, data, iso, g_radius, nbhd):
     angsep = ugali.utils.projector.angsep(targ_ra, targ_dec, data[basis_1], data[basis_2])
 
     # Isochrone filtered/unfiltered
-    iso_seln_f = (iso.separation(data[mag_g], data[mag_r]) < 0.1)
-    iso_seln_u = (iso.separation(data[mag_g], data[mag_r]) >= 0.1)
+    #iso_seln_f = (iso.separation(data[mag_g], data[mag_r]) < 0.1)
+    #iso_seln_u = (iso.separation(data[mag_g], data[mag_r]) >= 0.1)
+    iso_seln_f = simple_utils.cutIsochronePath(data[mag_g], data[mag_r], data[mag_g_err], data[mag_r_err], iso, radius=0.1, return_all=False)
+    iso_seln_u = ~iso_seln_f
 
     bins = np.linspace(0, 0.4, 21) # deg
     centers = 0.5*(bins[1:] + bins[0:-1])
@@ -371,6 +380,9 @@ def radialPlot(targ_ra, targ_dec, data, iso, g_radius, nbhd):
 
     f_range, f_val = interp_values('stars', 'f')
     plt.plot(f_range, f_val, '-b', label='Filtered Stars')
+
+    if field_density:
+        plt.axhline(y=field_density, color='blue', ls='--', label='Model Field')
 
     ymax = plt.ylim()[1]
     plt.annotate(r'$\approx %0.1f$' + str(round(g_radius, 3)) + '$^\circ$', (g_radius*1.1, ymax/50.), color='red', bbox=dict(boxstyle='round,pad=0.0', fc='white', alpha=0.75, ec='white', lw=0))

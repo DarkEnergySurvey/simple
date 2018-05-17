@@ -9,7 +9,7 @@ import sys
 import os
 import glob
 import yaml
-from matplotlib import mlab
+#from matplotlib import mlab
 import numpy as np
 import healpy as hp
 import astropy.io.fits as pyfits
@@ -123,15 +123,21 @@ r_peak_array = []
 sig_peak_array = []
 distance_modulus_array = []
 mc_source_id_array = []
+n_obs_peak_array = []
+n_obs_half_peak_array = []
+n_model_peak_array = []
 
 if (mode == 0):
     for distance_modulus in distance_modulus_search_array:
-        ra_peaks, dec_peaks, r_peaks, sig_peaks, dist_moduli = simple_utils.searchByDistance(nside, data, distance_modulus, pix_nside_select, ra_select, dec_select, mag_max, fracdet)
+        ra_peaks, dec_peaks, r_peaks, sig_peaks, dist_moduli, n_obs_peaks, n_obs_half_peaks, n_model_peaks = simple_utils.searchByDistance(nside, data, distance_modulus, pix_nside_select, ra_select, dec_select, mag_max, fracdet)
         ra_peak_array.append(ra_peaks)
         dec_peak_array.append(dec_peaks)
         r_peak_array.append(r_peaks)
         sig_peak_array.append(sig_peaks)
         distance_modulus_array.append(dist_moduli)
+        n_obs_peak_array.append(n_obs_peaks)
+        n_obs_half_peak_array.append(n_obs_half_peaks)
+        n_model_peak_array.append(n_model_peaks)
         mc_source_id_array.append(np.tile(0, len(sig_peaks)))
 elif (mode == 1):
     # grab distance_modulus from population
@@ -139,12 +145,15 @@ elif (mode == 1):
     distance_modulus_select = sim_pop[sim_pop['MC_SOURCE_ID'] == mc_source_id]['DISTANCE_MODULUS'][0]
 
     distance_modulus = distance_modulus_search_array[np.argmin(np.fabs(distance_modulus_search_array - distance_modulus_select))]
-    ra_peaks, dec_peaks, r_peaks, sig_peaks, dist_moduli = simple_utils.searchBySimulation(nside, data, distance_modulus, pix_nside_select, ra_select, dec_select, mag_max, fracdet)
+    ra_peaks, dec_peaks, r_peaks, sig_peaks, dist_moduli, n_obs_peaks, n_obs_half_peaks, n_model_peaks = simple_utils.searchBySimulation(nside, data, distance_modulus, pix_nside_select, ra_select, dec_select, mag_max, fracdet)
     ra_peak_array.append(ra_peaks)
     dec_peak_array.append(dec_peaks)
     r_peak_array.append(r_peaks)
     sig_peak_array.append(sig_peaks)
     distance_modulus_array.append(dist_moduli)
+    n_obs_peak_array.append(n_obs_peaks)
+    n_obs_half_peak_array.append(n_obs_peaks)
+    n_model_peak_array.append(n_model_peaks)
     mc_source_id_array.append(np.tile(mc_source_id, len(sig_peaks)))
 
 ra_peak_array = np.concatenate(ra_peak_array)
@@ -153,6 +162,9 @@ r_peak_array = np.concatenate(r_peak_array)
 sig_peak_array = np.concatenate(sig_peak_array)
 distance_modulus_array = np.concatenate(distance_modulus_array)
 mc_source_id_array = np.concatenate(mc_source_id_array)
+n_obs_peak_array = np.concatenate(n_obs_peak_array)
+n_obs_half_peak_array = np.concatenate(n_obs_half_peak_array)
+n_model_peak_array = np.concatenate(n_model_peak_array)
 
 # Sort peaks according to significance
 index_sort = np.argsort(sig_peak_array)[::-1]
@@ -161,6 +173,9 @@ dec_peak_array = dec_peak_array[index_sort]
 r_peak_array = r_peak_array[index_sort]
 sig_peak_array = sig_peak_array[index_sort]
 distance_modulus_array = distance_modulus_array[index_sort]
+n_obs_peak_array = n_obs_peak_array[index_sort]
+n_obs_half_peak_array = n_obs_half_peak_array[index_sort]
+n_model_peak_array = n_model_peak_array[index_sort]
 mc_source_id_array = mc_source_id_array[index_sort]
 
 # Collect overlapping peaks
@@ -169,6 +184,7 @@ for ii in range(0, len(sig_peak_array)):
         continue
     angsep = ugali.utils.projector.angsep(ra_peak_array[ii], dec_peak_array[ii], ra_peak_array, dec_peak_array)
     sig_peak_array[(angsep < r_peak_array[ii]) & (np.arange(len(sig_peak_array)) > ii)] = -1.
+    #sig_peak_array[(angsep < 0.5) & (np.arange(len(sig_peak_array)) > ii)] = -1. # 0.5 deg radius
 
 if (mode == 0):
     # Prune the list of peaks
@@ -176,7 +192,10 @@ if (mode == 0):
     dec_peak_array = dec_peak_array[sig_peak_array > 0.]
     r_peak_array = r_peak_array[sig_peak_array > 0.]
     distance_modulus_array = distance_modulus_array[sig_peak_array > 0.]
-    mc_source_id_array = mc_source_id_array[sig_peak_array > 0.]
+    n_obs_peak_array = n_obs_peak_array[sig_peak_array > 0.]
+    n_obs_half_peak_array = n_obs_half_peak_array[sig_peak_array > 0.]
+    n_model_peak_array = n_model_peak_array[sig_peak_array > 0.]
+   mc_source_id_array = mc_source_id_array[sig_peak_array > 0.]
     sig_peak_array = sig_peak_array[sig_peak_array > 0.] # Update the sig_peak_array last!
 
 for ii in range(0, len(sig_peak_array)):
@@ -190,6 +209,8 @@ for ii in range(0, len(sig_peak_array)):
 
 # Write output
 if (len(sig_peak_array) > 0):
-    simple_utils.writeOutput(results_dir, nside, pix_nside_select, ra_peak_array, dec_peak_array, r_peak_array, distance_modulus_array, sig_peak_array, mc_source_id_array, mode)
+    simple_utils.writeOutput(results_dir, nside, pix_nside_select, ra_peak_array, dec_peak_array, r_peak_array, distance_modulus_array, 
+                             n_obs_peak_array, n_obs_half_peak_array, n_model_peak_array, 
+                             sig_peak_array, mc_source_id_array, mode)
 else:
     print('No significant hotspots found.')

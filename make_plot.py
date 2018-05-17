@@ -6,7 +6,7 @@ __author__ = "Sidney Mau"
 
 # Set the backend first!
 import matplotlib
-matplotlib.use('Agg')
+#matplotlib.use('Agg')
 
 import sys
 import os
@@ -38,9 +38,13 @@ if not os.path.exists(save_dir):
 #################################################################
 
 try:
-    targ_ra, targ_dec, mod, sig, mc_source_id, = float(sys.argv[1]), float(sys.argv[2]), float(sys.argv[3]), float(sys.argv[4]), float(sys.argv[5])
+    targ_ra, targ_dec, mod, sig, mc_source_id, field_density, = float(sys.argv[1]), float(sys.argv[2]), float(sys.argv[3]), float(sys.argv[4]), float(sys.argv[5]), float(sys.argv[6]) 
 except:
-    sys.exit('ERROR! Coordinates not given in correct format.')
+    try:
+        targ_ra, targ_dec, mod, sig, mc_source_id, = float(sys.argv[1]), float(sys.argv[2]), float(sys.argv[3]), float(sys.argv[4]), float(sys.argv[5])
+        field_density = None
+    except:
+        sys.exit('ERROR! Coordinates not given in correct format.')
 
 fig = plt.figure(figsize=(20, 17))
 fig.subplots_adjust(wspace=0.3, hspace=0.3)
@@ -72,7 +76,7 @@ fig.add_subplot(gs[1,2])
 diagnostic_plots.starPlot(targ_ra, targ_dec, data, iso, g_radius, nbhd)
 
 fig.add_subplot(gs[2,1:3])
-diagnostic_plots.radialPlot(targ_ra, targ_dec, data, iso, g_radius, nbhd)
+diagnostic_plots.radialPlot(targ_ra, targ_dec, data, iso, g_radius, nbhd, field_density)
 
 # Name
 try: # ugali
