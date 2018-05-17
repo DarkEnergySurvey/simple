@@ -8,7 +8,6 @@ import os
 import time
 import subprocess
 import glob
-import pyfits
 import healpy as hp
 import numpy as np
 import fitsio as fits
@@ -16,6 +15,8 @@ import fitsio as fits
 import ugali.utils.healpix
 
 import yaml
+
+from multiprocessing import Pool
 
 ############################################################
 
@@ -45,11 +46,13 @@ if not os.path.exists(log_dir):
 
 def submitJob(ra, dec, pix, mc_source_id, mode):
     if (mode == 0):
+        outfile = '{}/results_nside_{}_{}.csv'.format(results_dir, nside, pix_nside_select)
         logfile = '{}/results_nside_{}_{}.log'.format(log_dir, nside, pix)
     elif (mode == 1):
+        outfile = '{}/results_mc_source_id_{}.csv'.format(results_dir, mc_source) # all values in mc_source_id_array should be the same
         logfile = '{}/results_mc_source_id_{}.log'.format(log_dir, mc_source_id) # all values in mc_source_id_array should be the same
     batch = 'csub -n {} -o {} '.format(jobs, logfile)
-    command = 'python {}/search_algorithm.py {:0.2f} {:0.2f} {:0.2f}'.format(simple_dir, ra, dec, mc_source_id)
+    command = 'python {}/search_algorithm.py {:0.2f} {:0.2f} {:0.2f} {} {}'.format(simple_dir, ra, dec, mc_source_id, outfile, logfile)
     command_queue = batch + command
     print(command_queue)
     #os.system('./' + command) # Run locally
@@ -57,18 +60,7 @@ def submitJob(ra, dec, pix, mc_source_id, mode):
 
     return
 
-def executeJob(ra, dec, pix, mc_source_id, mode):
-    if (mode == 0):
-        logfile = 'results_nside_{}_{}.log'.format(nside, pix)
-    elif (mode == 1):
-        logfile = 'results_mc_source_id_{}.log'.format(mc_source_id) # all values in mc_source_id_array should be the same
-    command = 'python {}/search_algorithm.py {:0.2f} {:0.2f} {:0.2f} >> {}/{}'.format(simple_dir, ra, dec, mc_source_id, log_dir, logfile)
-    print(command)
-    os.system(command) # Submit to queue # TODO use subprocess instead
-
-    return
-
-############################################################
+#############################################################
 
 print('mode: {}...'.format(mode))
 
@@ -89,9 +81,9 @@ if (mode == 0): # real
 elif (mode == 1): # real+sim
     sim_pop = fits.read(sim_population)
     for sim in sim_pop:
-        ra, dec, mc_source_id = sim[basis_1], sim[basis_2], sim['MC_SOURCE_ID']
-        pix = hp.ang2pix(nside, ra, dec, lonlat=True)
+        if (sim['DIFFICULTY'] == 0): # check to make sure simulated object has stars
+            ra, dec, mc_source_id = sim[basis_1], sim[basis_2], sim['MC_SOURCE_ID']
+            pix = hp.ang2pix(nside, ra, dec, lonlat=True)
 
-        submitJob(ra, dec, pix, mc_source_id, mode)
+            submitJob(ra, dec, pix, mc_source_id, mode)
 
-        #batch = 'csub -n {} -o {} '.format(jobs, logfile)
