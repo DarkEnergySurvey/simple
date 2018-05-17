@@ -68,9 +68,6 @@ def construct_real_data(pix_nside_neighbors):
             data_array.append(fits.read(infile))
     data = np.concatenate(data_array)
 
-    #print len(data)
-    #import pdb; pdb.set_trace()
-
     # Guarantee data has MC_SOURCE_ID
     try:
         data['MC_SOURCE_ID']
@@ -156,7 +153,6 @@ def cutIsochronePath(g, r, g_err, r_err, isochrone, radius=0.1, return_all=False
     Cut to identify objects within isochrone cookie-cutter.
     """
     if np.all(isochrone.stage == 'Main'):
-    #if 'dotter' in isochrone.name.lower():
         # Dotter case
         index_transition = len(isochrone.stage)
     else:
@@ -168,8 +164,6 @@ def cutIsochronePath(g, r, g_err, r_err, isochrone, radius=0.1, return_all=False
     
     mag_1_rgb = mag_1_rgb[::-1]
     mag_2_rgb = mag_2_rgb[::-1]
-    
-    #import pdb; pdb.set_trace()
 
     # Cut one way...
     f_isochrone = scipy.interpolate.interp1d(mag_2_rgb, mag_1_rgb - mag_2_rgb, bounds_error=False, fill_value = 999.)
@@ -551,9 +545,10 @@ def searchBySimulation(nside, data, distance_modulus, pix_nside_select, ra_selec
 
     print('Distance = {:0.1f} kpc (m-M = {:0.1f})').format(ugali.utils.projector.distanceModulusToDistance(distance_modulus), distance_modulus)
 
-    dirname = '/home/s1/kadrlica/.ugali/isochrones/des/dotter2016/'
+    #dirname = '/home/s1/kadrlica/.ugali/isochrones/des/dotter2016/'
     #dirname = '/Users/keithbechtol/Documents/DES/projects/mw_substructure/ugalidir/isochrones/des/dotter2016/'
-    iso = ugali.isochrone.factory('Dotter', hb_spread=0, dirname=dirname)
+    #iso = ugali.isochrone.factory('Dotter', hb_spread=0, dirname=dirname)
+    iso = ugali.isochrone.factory(name=isoname, survey=isosurvey)
     iso.age = 12.
     iso.metallicity = 0.0001
     iso.distance_modulus = distance_modulus

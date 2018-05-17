@@ -21,7 +21,6 @@ from operator import add
 from scipy import interpolate
 from scipy.signal import argrelextrema
 import scipy.ndimage
-#import utils
 
 import pylab as plt
 import pyfits
@@ -40,6 +39,8 @@ with open('config.yaml', 'r') as ymlfile:
     survey = cfg['survey']
     nside   = cfg[survey]['nside']
     datadir = cfg[survey]['datadir']
+    isoname = cfg[survey]['isoname']
+    isosurvey = cfg[survey]['isosurvey']
     mag_max = cfg[survey]['mag_max']
     basis_1 = cfg[survey]['basis_1']
     basis_2 = cfg[survey]['basis_2']
@@ -84,7 +85,9 @@ def analysis(targ_ra, targ_dec, mod, mc_source_id):
 
     data = filters.dered_mag(survey, data)
 
-    iso = isochrone_factory('Bressan2012', age=12, z=0.0001, distance_modulus=mod)
+    # This should be generalized to also take the survey
+    #iso = isochrone_factory('Bressan2012', age=12, z=0.0001, distance_modulus=mod)
+    iso = isochrone_factory(name=isoname, survey=isosurvey, age=12, z=0.0001, distance_modulus=mod)
 
     # g_radius estimate
     filter = filters.star_filter(survey, data)
