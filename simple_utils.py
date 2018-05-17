@@ -9,7 +9,8 @@ import os
 import glob
 import yaml
 import numpy as np
-from matplotlib import mlab
+#from matplotlib import mlab
+import numpy.lib.recfunctions
 import healpy as hp
 import astropy.io.fits as pyfits # migrate to fitsio for consistency with rest of suite
 import fitsio as fits
@@ -30,10 +31,12 @@ with open('config.yaml', 'r') as ymlfile:
     survey = cfg['survey']
     nside   = cfg[survey]['nside']
     datadir = cfg[survey]['datadir']
+    isoname = cfg[survey]['isoname']
+    isosurvey = cfg[survey]['isosurvey']
     mag_max = cfg[survey]['mag_max']
     basis_1 = cfg[survey]['basis_1']
     basis_2 = cfg[survey]['basis_2']
-    
+
     mode = cfg[survey]['mode']
     sim_catalog = cfg[survey]['sim_catalog']
     sim_population = cfg[survey]['sim_population']
@@ -70,8 +73,9 @@ def construct_real_data(pix_nside_neighbors):
         data['MC_SOURCE_ID']
     except:
         # real data given MC_SOURCE_ID of 0
-        data = mlab.rec_append_fields(data, ['MC_SOURCE_ID'], [0])
-
+        data = numpy.lib.recfunctions.append_fields(data, 'MC_SOURCE_ID', np.tile(0, len(data)), usemask=False, asrecarray=True)
+        #data = mlab.rec_append_fields(data, ['MC_SOURCE_ID'], [0])
+    
     return data
 
 def construct_sim_data(pix_nside_neighbors, mc_source_id):
@@ -153,14 +157,14 @@ def cutIsochronePath(g, r, g_err, r_err, isochrone, radius=0.1, return_all=False
         index_transition = len(isochrone.stage)
     else:
         # Other cases
-        index_transition = np.nonzero(isochrone.stage > 3)[0][0] + 1    
+        index_transition = np.nonzero(isochrone.stage >= isochrone.hb_stage)[0][0] + 1    
 
     mag_1_rgb = isochrone.mag_1[0: index_transition] + isochrone.distance_modulus
     mag_2_rgb = isochrone.mag_2[0: index_transition] + isochrone.distance_modulus
     
     mag_1_rgb = mag_1_rgb[::-1]
     mag_2_rgb = mag_2_rgb[::-1]
-    
+
     # Cut one way...
     f_isochrone = scipy.interpolate.interp1d(mag_2_rgb, mag_1_rgb - mag_2_rgb, bounds_error=False, fill_value = 999.)
     color_diff = np.fabs((g - r) - f_isochrone(r))
@@ -335,7 +339,7 @@ def computeLocalCharDensity(nside, data, characteristic_density, ra_select, dec_
             #angsep_peak = np.sqrt((x - x_peak)**2 + (y - y_peak)**2)
             characteristic_density_local = characteristic_density
 
-    print('Characteristic density local = {:0.1f} deg^-2'.format(characteristic_density_local))
+    print('Characteristic density local = {:0.1f} deg^-2 = {:0.3f} arcmin^-2'.format(characteristic_density_local, characteristic_density_local / 60.**2))
 
     return characteristic_density_local
 
@@ -360,7 +364,7 @@ def findPeaks(nside, data, characteristic_density, distance_modulus, pix_nside_s
     yy, xx = np.meshgrid(centers, centers)
 
     h = np.histogram2d(x, y, bins=[bins, bins])[0]
-
+    
     h_g = scipy.ndimage.filters.gaussian_filter(h, smoothing / delta_x)
 
     factor_array = np.arange(1., 5., 0.05)
@@ -392,7 +396,7 @@ def findPeaks(nside, data, characteristic_density, distance_modulus, pix_nside_s
         x_peak_array.append(x_peak)
         y_peak_array.append(y_peak)
         angsep_peak_array.append(angsep_peak)
-
+    
     return x_peak_array, y_peak_array, angsep_peak_array
 
 ########################################################################
@@ -407,31 +411,50 @@ def fitAperture(proj, distance_modulus, characteristic_density_local, x_peak, y_
     r_peak_array = []
     sig_peak_array = []
     distance_modulus_array = []
+    n_obs_peak_array = []
+    n_obs_half_peak_array = []
+    n_model_peak_array = []
 
     size_array = np.arange(0.01, 0.3, 0.01)
     sig_array = np.tile(0., len(size_array))
+    
+    size_array_zero = np.concatenate([[0.], size_array])
+    area_array = np.pi * (size_array_zero[1:]**2 - size_array_zero[0:-1]**2)
+
+    n_obs_array = np.tile(0, len(size_array))
+    n_model_array = np.tile(0., len(size_array))
     for ii in range(0, len(size_array)):
-        n_peak = np.sum(angsep_peak < size_array[ii])
+        n_obs = np.sum(angsep_peak < size_array[ii])
         n_model = characteristic_density_local * (np.pi * size_array[ii]**2)
-        sig_array[ii] = scipy.stats.norm.isf(scipy.stats.poisson.sf(n_peak, n_model))
-        if sig_array[ii] > 37.5: # 25
-            sig_array[ii] = 37.5 # Set a maximum significance value
+        sig_array[ii] = np.clip(scipy.stats.norm.isf(scipy.stats.poisson.sf(n_obs, n_model)), 0., 37.5) # Clip at 37.5
+        #if sig_array[ii] > 25:
+        #    sig_array[ii] = 25. # Set a maximum significance value
+        n_obs_array[ii] = n_obs
+        n_model_array[ii] = n_model
 
     ra_peak, dec_peak = proj.imageToSphere(x_peak, y_peak)
 
-    r_peak = size_array[np.argmax(sig_array)]
-    if np.max(sig_array) >= 25.:
-        r_peak = 0.5
+    index_peak = np.argmax(sig_array)
+    r_peak = size_array[index_peak]
+    #if np.max(sig_array) >= 25.:
+    #    r_peak = 0.5
+    n_obs_peak = n_obs_array[index_peak]
+    n_model_peak = n_model_array[index_peak]
+    n_obs_half_peak = np.sum(angsep_peak < (0.5 * r_peak))
 
     # Compile resilts
     print('Candidate: x_peak: {:12.3f}, y_peak: {:12.3f}, r_peak: {:12.3f}, sig: {:12.3f}, ra_peak: {:12.3f}, dec_peak: {:12.3f}'.format(x_peak, y_peak, r_peak, np.max(sig_array), ra_peak, dec_peak))
     ra_peak_array.append(ra_peak)
     dec_peak_array.append(dec_peak)
     r_peak_array.append(r_peak)
-    sig_peak_array.append(np.max(sig_array))
+    #sig_peak_array.append(np.max(sig_array))
+    sig_peak_array.append(sig_array[index_peak])
     distance_modulus_array.append(distance_modulus)
+    n_obs_peak_array.append(n_obs_peak)
+    n_obs_half_peak_array.append(n_obs_half_peak)
+    n_model_peak_array.append(n_model_peak)
 
-    return ra_peak_array, dec_peak_array, r_peak_array, sig_peak_array, distance_modulus_array
+    return ra_peak_array, dec_peak_array, r_peak_array, sig_peak_array, distance_modulus_array, n_obs_peak_array, n_obs_half_peak_array, n_model_peak_array
 
 ########################################################################
 
@@ -449,9 +472,12 @@ def searchByDistance(nside, data, distance_modulus, pix_nside_select, ra_select,
 
     print('Distance = {:0.1f} kpc (m-M = {:0.1f})').format(ugali.utils.projector.distanceModulusToDistance(distance_modulus), distance_modulus)
 
-    dirname = '/home/s1/kadrlica/.ugali/isochrones/des/dotter2016/'
+    #dirname = '/home/s1/kadrlica/.ugali/isochrones/des/dotter2016/'
+    #dirname = '/Users/keithbechtol/Documents/DES/projects/mw_substructure/ugalidir/isochrones/ps1/dotter2016/'
     #dirname = '/Users/keithbechtol/Documents/DES/projects/mw_substructure/ugalidir/isochrones/des/dotter2016/'
-    iso = ugali.isochrone.factory('Dotter', hb_spread=0, dirname=dirname)
+    #iso = ugali.isochrone.factory('Dotter', hb_spread=0, dirname=isodir)
+    #iso = ugali.isochrone.factory(name='Dotter2016', survey='ps1')
+    iso = ugali.isochrone.factory(name=isoname, survey=isosurvey)
     iso.age = 12.
     iso.metallicity = 0.0001
     iso.distance_modulus = distance_modulus
@@ -469,6 +495,9 @@ def searchByDistance(nside, data, distance_modulus, pix_nside_select, ra_select,
     r_peak_array = []
     sig_peak_array = []
     distance_modulus_array = []
+    n_obs_peak_array = []
+    n_obs_half_peak_array = []
+    n_model_peak_array = []
 
     proj = ugali.utils.projector.Projector(ra_select, dec_select)
 
@@ -478,21 +507,27 @@ def searchByDistance(nside, data, distance_modulus, pix_nside_select, ra_select,
         characteristic_density_local = computeLocalCharDensity(nside, data, characteristic_density, ra_select, dec_select, x_peak, y_peak, angsep_peak, mag_max, fracdet)
         # Aperture fitting
         print('Fitting aperture to hotspot...')
-        ra_peaks, dec_peaks, r_peaks, sig_peaks, distance_moduli = fitAperture(proj, distance_modulus, characteristic_density_local, x_peak, y_peak, angsep_peak)
+        ra_peaks, dec_peaks, r_peaks, sig_peaks, distance_moduli, n_obs_peaks, n_obs_half_peaks, n_model_peaks = fitAperture(proj, distance_modulus, characteristic_density_local, x_peak, y_peak, angsep_peak)
         
         ra_peak_array.append(ra_peaks)
         dec_peak_array.append(dec_peaks)
         r_peak_array.append(r_peaks)
         sig_peak_array.append(sig_peaks)
         distance_modulus_array.append(distance_moduli)
+        n_obs_peak_array.append(n_obs_peaks)
+        n_obs_half_peak_array.append(n_obs_half_peaks)
+        n_model_peak_array.append(n_model_peaks)
 
     ra_peak_array = np.concatenate(ra_peak_array)
     dec_peak_array = np.concatenate(dec_peak_array)
     r_peak_array = np.concatenate(r_peak_array)
     sig_peak_array = np.concatenate(sig_peak_array)
     distance_modulus_array = np.concatenate(distance_modulus_array)
+    n_obs_peak_array = np.concatenate(n_obs_peak_array)
+    n_obs_half_peak_array = np.concatenate(n_obs_half_peak_array)
+    n_model_peak_array = np.concatenate(n_model_peak_array)
 
-    return ra_peak_array, dec_peak_array, r_peak_array, sig_peak_array, distance_modulus_array
+    return ra_peak_array, dec_peak_array, r_peak_array, sig_peak_array, distance_modulus_array, n_obs_peak_array, n_obs_half_peak_array, n_model_peak_array
 
 ########################################################################
 
@@ -510,9 +545,10 @@ def searchBySimulation(nside, data, distance_modulus, pix_nside_select, ra_selec
 
     print('Distance = {:0.1f} kpc (m-M = {:0.1f})').format(ugali.utils.projector.distanceModulusToDistance(distance_modulus), distance_modulus)
 
-    dirname = '/home/s1/kadrlica/.ugali/isochrones/des/dotter2016/'
+    #dirname = '/home/s1/kadrlica/.ugali/isochrones/des/dotter2016/'
     #dirname = '/Users/keithbechtol/Documents/DES/projects/mw_substructure/ugalidir/isochrones/des/dotter2016/'
-    iso = ugali.isochrone.factory('Dotter', hb_spread=0, dirname=dirname)
+    #iso = ugali.isochrone.factory('Dotter', hb_spread=0, dirname=dirname)
+    iso = ugali.isochrone.factory(name=isoname, survey=isosurvey)
     iso.age = 12.
     iso.metallicity = 0.0001
     iso.distance_modulus = distance_modulus
@@ -531,6 +567,9 @@ def searchBySimulation(nside, data, distance_modulus, pix_nside_select, ra_selec
     r_peak_array = []
     sig_peak_array = []
     distance_modulus_array = []
+    n_obs_peak_array = []
+    n_obs_half_peak_array = []
+    n_model_peak_array = []
 
     proj = ugali.utils.projector.Projector(ra_select, dec_select)
 
@@ -543,31 +582,45 @@ def searchBySimulation(nside, data, distance_modulus, pix_nside_select, ra_selec
 
     # Aperture fitting
     print('Fitting aperture to hotspot...')
-    ra_peaks, dec_peaks, r_peaks, sig_peaks, distance_moduli = fitAperture(proj, distance_modulus, characteristic_density_local, x_peak, y_peak, angsep_peak)
+    ra_peaks, dec_peaks, r_peaks, sig_peaks, distance_moduli, n_obs_peaks, n_obs_half_peaks, n_model_peaks = fitAperture(proj, distance_modulus, characteristic_density_local, x_peak, y_peak, angsep_peak)
     
     ra_peak_array.append(ra_peaks)
     dec_peak_array.append(dec_peaks)
     r_peak_array.append(r_peaks)
     sig_peak_array.append(sig_peaks)
     distance_modulus_array.append(distance_moduli)
+    n_obs_peak_array.append(n_obs_peaks)
+    n_obs_half_peak_array.append(n_obs_half_peaks)
+    n_model_peak_array.append(n_model_peaks)
 
     ra_peak_array = np.concatenate(ra_peak_array)
     dec_peak_array = np.concatenate(dec_peak_array)
     r_peak_array = np.concatenate(r_peak_array)
     sig_peak_array = np.concatenate(sig_peak_array)
     distance_modulus_array = np.concatenate(distance_modulus_array)
+    n_obs_peak_array = np.concatenate(n_obs_peak_array)
+    n_obs_half_peak_array = np.concatenate(n_obs_half_peak_array)
+    n_model_peak_array = np.concatenate(n_model_peak_array)
 
-    return ra_peak_array, dec_peak_array, r_peak_array, sig_peak_array, distance_modulus_array
+    return ra_peak_array, dec_peak_array, r_peak_array, sig_peak_array, distance_modulus_array, n_obs_peak_array, n_obs_half_peak_array, n_model_peak_array
 
 ########################################################################
 
-def writeOutput(results_dir, nside, pix_nside_select, ra_peak_array, dec_peak_array, r_peak_array, distance_modulus_array, sig_peak_array, mc_source_id_array, mode, outfile):
-    writer = open(outfile, 'a') # Will not overwrite
+def writeOutput(results_dir, nside, pix_nside_select, ra_peak_array, dec_peak_array, r_peak_array, distance_modulus_array, 
+                n_obs_peak_array, n_obs_half_peak_array, n_model_peak_array, 
+                sig_peak_array, mc_source_id_array, mode, outfile):
+    writer = open(outfile, 'a') # don't overwrite; append
     for ii in range(0, len(sig_peak_array)):
-        # SIG, RA, DEC, MODULUS, r, mc_source_id
-        writer.write('{:10.2f}, {:10.2f}, {:10.2f}, {:10.2f}, {:10.2f}, {:10.2f}\n'.format(sig_peak_array[ii], 
-                                                                 ra_peak_array[ii], 
-                                                                 dec_peak_array[ii], 
-                                                                 distance_modulus_array[ii], 
-                                                                 r_peak_array[ii],
-                                                                 mc_source_id_array[ii]))
+        # SIG, RA, DEC, MODULUS, r, n_obs, n_model, mc_source_id
+        writer.write('{:10.3f}, {:10.3f}, {:10.3f}, {:10.3f}, {:10.3f}, {:10.3f}, {:10.3f}, {:10.3f}, {:10.3f}\n'.format(sig_peak_array[ii], 
+                                                                                                                         ra_peak_array[ii], 
+                                                                                                                         dec_peak_array[ii], 
+                                                                                                                         distance_modulus_array[ii], 
+                                                                                                                         r_peak_array[ii],
+                                                                                                                         n_obs_peak_array[ii],
+                                                                                                                         n_obs_half_peak_array[ii],
+                                                                                                                         n_model_peak_array[ii],
+                                                                                                                         mc_source_id_array[ii]))
+
+########################################################################
+
