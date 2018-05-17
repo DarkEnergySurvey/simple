@@ -1,5 +1,6 @@
 setup:
-    simple_dir : '/home/s1/smau/software/simple'
+    #simple_dir : '/home/s1/smau/software/simple'
+    simple_dir : '/Users/keithbechtol/Documents/DES/code/simple'
 
 output:
     results_dir : 'results_dir'
@@ -9,7 +10,8 @@ output:
 batch:
     jobs: 20 # <= 20 for DES cluster computers!
 
-survey: 'y3_gold_2_0' # parameter to change for runs across different data
+#survey: 'y3_gold_2_0' # parameter to change for runs across different data
+survey: 'panstarrs'
 
 y3_gold_2_0:
     mode : 1 # 0: real, 1: real+sim
@@ -134,10 +136,18 @@ maglites: # Update
     fracdet : None
 
 panstarrs:
+    mode           : 0
+    sim_catalog    : None
+    sim_population : None
+    sim_dir        : None
     nside          : 32
-    datadir        : '/data/des40.b/data/pan-starrs/dr1/healpix'
+    #datadir        : '/data/des40.b/data/pan-starrs/dr1/healpix'
+    datadir        : '/Users/keithbechtol/Documents/DES/external_data/pan-starrs/data/healpix'
+    #isodir         : '/Users/keithbechtol/Documents/DES/projects/mw_substructure/ugalidir/isochrones/ps1/dotter2016/'
+    isoname        : 'Bressan2012' #'Dotter2016'
+    isosurvey      : 'ps1'
     candidate_list : 'candidate_list.fits'
-    mag_max : 22
+    mag_max : 22.5
 
     basis_1: 'RA'
     basis_2: 'DEC'
@@ -148,4 +158,5 @@ panstarrs:
     flags_g : 'GFLAGS'
     flags_r : 'RFLAGS'
 
-    fracdet : 'panstarrs_pseudo_fracdet.fits.gz'
+    #fracdet : 'panstarrs_pseudo_fracdet.fits.gz'
+    fracdet : '/Users/keithbechtol/Documents/DES/external_data/pan-starrs/simple/sid/simple_v2/panstarrs_pseudo_fracdet.fits.gz'

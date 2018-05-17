@@ -6,7 +6,8 @@ __author__ = "Sidney Mau"
 
 import yaml
 import numpy as np
-from matplotlib import mlab
+#from matplotlib import mlab
+import numpy.lib.recfunctions
 
 with open('config.yaml', 'r') as ymlfile:
     cfg = yaml.load(ymlfile)
@@ -37,6 +38,7 @@ def quality_filter(survey, data):
     elif survey == 'panstarrs':
         cut = (np.bitwise_and(data['QUALITYFLAG'], 16) > 0) \
             & (data['NSTACKDETECTIONS'] > 1) \
+            & (data['NDETECTIONS'] > 0) \
             & (np.bitwise_and(data['GINFOFLAG'], 8) == 0) \
             & (np.bitwise_and(data['RINFOFLAG'], 8) == 0) \
             & (np.bitwise_and(data['IINFOFLAG'], 8) == 0) \
@@ -49,7 +51,7 @@ def quality_filter(survey, data):
             & (np.bitwise_and(data['GINFOFLAG2'], 8192) == 0) \
             & (np.bitwise_and(data['RINFOFLAG2'], 8192) == 0) \
             & (np.bitwise_and(data['IINFOFLAG2'], 8192) == 0) \
-            & (data['GFPSFMAG'] < 22) # observed magnitude - not extinction corrected
+            & (data['GFPSFMAG'] < 22.5) # observed magnitude - not extinction corrected
     return cut
 
 def star_filter(survey, data):
@@ -65,7 +67,11 @@ def star_filter(survey, data):
     elif survey == 'maglites':
         cut = (data['CM_T'] < 0.003 + data['CM_T_ERR'])
     elif survey == 'panstarrs':
-        cut = ((data['IFPSFMAG'] - data['IFKRONMAG']) < 0.05) 
+        cut = ((data['IFPSFMAG'] - data['IFKRONMAG']) < 0.05)
+        # Label objects that fail fit stars (this happens in dense regions)
+        cut = cut | (data['IFPSFMAG'] == -999.) 
+        # Label objects that have exceptionally bright Kron magnitudes relative to PSF magnitudes stars (this happens in dense regions)
+        cut = cut | ((data['IFPSFMAG'] - data['IFKRONMAG']) > 4.0)
     return cut
 
 def galaxy_filter(survey, data):
@@ -102,14 +108,24 @@ def dered_mag(survey, data):
     """Return the data with an added flag for dereddened (extinction
        corrected) magnitude"""
     if survey == 'y3_gold_2_0':
-        data = mlab.rec_append_fields(data, [mag_g, mag_r], [data['SOF_PSF_MAG_CORRECTED_G'], data['SOF_PSF_MAG_CORRECTED_R']])
+        #data = mlab.rec_append_fields(data, [mag_g, mag_r], [data['SOF_PSF_MAG_CORRECTED_G'], data['SOF_PSF_MAG_CORRECTED_R']])
+        data = numpy.lib.recfunctions.append_fields(data, [mag_g, mag_r], [data['SOF_PSF_MAG_CORRECTED_G'], data['SOF_PSF_MAG_CORRECTED_R']], 
+                                                    usemask=False, asrecarray=True)
     elif survey == 'y3a2':
-        data = mlab.rec_append_fields(data, [mag_g, mag_r], [data['PSF_MAG_SFD_G'], data['PSF_MAG_SFD_R']])
+        #data = mlab.rec_append_fields(data, [mag_g, mag_r], [data['PSF_MAG_SFD_G'], data['PSF_MAG_SFD_R']])
+        data = numpy.lib.recfunctions.append_fields(data, [mag_g, mag_r], [data['PSF_MAG_SFD_G'], data['PSF_MAG_SFD_R']], 
+                                                    usemask=False, asrecarray=True)
     elif survey == 'bliss':
         #data = mlab.rec_append_fields(data, [mag_g, mag_r], [data['CM_MAG_G'] - data['EXINCTION_G'], data['CM_MAG_R'] - data['EXTINCTION_R']])
-        data = mlab.rec_append_fields(data, [mag_g, mag_r], [data['PSF_MAG_SFD_G'], data['PSF_MAG_SFD_R']])
+        #data = mlab.rec_append_fields(data, [mag_g, mag_r], [data['PSF_MAG_SFD_G'], data['PSF_MAG_SFD_R']])
+        data = numpy.lib.recfunctions.append_fields(data, [mag_g, mag_r], [data['PSF_MAG_SFD_G'], data['PSF_MAG_SFD_R']], 
+                                                    usemask=False, asrecarray=True)
     elif survey == 'maglites':
-        data = mlab.rec_append_fields(data, [mag_g, mag_r], [data['WAVG_MAG_PSF_G'] - data['EXINCTION_G'], data['WAVG_MAG_PSF_R'] - data['EXTINCTION_R']])
+        #data = mlab.rec_append_fields(data, [mag_g, mag_r], [data['WAVG_MAG_PSF_G'] - data['EXINCTION_G'], data['WAVG_MAG_PSF_R'] - data['EXTINCTION_R']])
+        data = numpy.lib.recfunctions.append_fields(data, [mag_g, mag_r], [data['WAVG_MAG_PSF_G'] - data['EXINCTION_G'], data['WAVG_MAG_PSF_R'] - data['EXTINCTION_R']], 
+                                                    usemask=False, asrecarray=True)
     elif survey == 'panstarrs':
-        data = mlab.rec_append_fields(data, [mag_g, mag_r], [data['GFPSFMAG'] - data['EXTSFD_G'], data['RFPSFMAG'] - data['EXTSFD_R']])
+        #data = mlab.rec_append_fields(data, [mag_g, mag_r], [data['GFPSFMAG'] - data['EXTSFD_G'], data['RFPSFMAG'] - data['EXTSFD_R']])
+        data = numpy.lib.recfunctions.append_fields(data, [mag_g, mag_r], [data['GFPSFMAG'] - data['EXTSFD_G'], data['RFPSFMAG'] - data['EXTSFD_R']], 
+                                                    usemask=False, asrecarray=True)
     return data
