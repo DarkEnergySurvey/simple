@@ -46,7 +46,7 @@ if not os.path.exists(log_dir):
 
 def submitJob(ra, dec, pix, mc_source_id, mode):
     if (mode == 0):
-        outfile = '{}/results_nside_{}_{}.csv'.format(results_dir, nside, pix_nside_select)
+        outfile = '{}/results_nside_{}_{}.csv'.format(results_dir, nside, pix)
         logfile = '{}/results_nside_{}_{}.log'.format(log_dir, nside, pix)
     elif (mode == 1):
         outfile = '{}/results_mc_source_id_{}.csv'.format(results_dir, mc_source) # all values in mc_source_id_array should be the same
@@ -75,7 +75,7 @@ if (mode == 0): # real
     for ii in range(0, len(pix_nside)):
         ra, dec = ugali.utils.healpix.pixToAng(nside, pix_nside[ii])
     
-        submitJob(ra, dec, pix_nside[ii], 0) # TODO: mc_source_id (0 for real)
+        submitJob(ra, dec, pix_nside[ii], 0, mode) # TODO: mc_source_id (0 for real)
         print('({}/{})').format(ii, len(pix_nside))
     
 elif (mode == 1): # real+sim

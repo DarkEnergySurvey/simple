@@ -6,7 +6,7 @@ __author__ = "Sidney Mau"
 
 # Set the backend first!
 import matplotlib
-#matplotlib.use('Agg')
+matplotlib.use('Agg')
 
 import sys
 import os

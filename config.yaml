@@ -1,6 +1,6 @@
 setup:
-    #simple_dir : '/home/s1/smau/software/simple'
-    simple_dir : '/Users/keithbechtol/Documents/DES/code/simple'
+    simple_dir : '/home/s1/smau/software/simple'
+    #simple_dir : '/Users/keithbechtol/Documents/DES/code/simple'
 
 output:
     results_dir : 'results_dir'
@@ -20,6 +20,8 @@ y3_gold_2_0:
     sim_dir: '/home/s1/kadrlica/projects/mw_substructure/y3a2/sim_population/v7'
     nside          : 32
     datadir        : '/home/s1/kadrlica/projects/y3a2/data/gold/v2.0/skim_ext_0_3'
+    isoname: 'Bressan2012'
+    isosurvey: 'des'
     candidate_list : 'candidate_list.fits'
     mag_max : 24.5
 
@@ -56,6 +58,8 @@ y3a2:
     candidate_list : 'candidate_list.fits'
     mag_max : 24.5
     #candidate_list : '/home/s1/kadrlica/projects/y3a2/dsphs/v2/v2.1/search/ugali_candidates.fits' # ugali
+    isoname: 'Bressan2012'
+    isosurvey: 'des'
 
     basis_1: 'RA'
     basis_2: 'DEC'
@@ -83,6 +87,8 @@ bliss: # Need to update this
     datadir        : '/home/s1/kadrlica/projects/bliss/cat/v2/cat'
     candidate_list : 'candidate_list.fits'
     mag_max : 24.5
+    isoname: 'Bressan2012'
+    isosurvey: 'des'
 
     basis_1: 'RA'
     basis_2: 'DEC'
@@ -113,6 +119,8 @@ maglites: # Update
     datadir        : '/home/s1/kadrlica/projects/maglites/r4/v1/cat'
     candidate_list : 'candidate_list.fits'
     mag_max : 24.5
+    isoname: 'Bressan2012'
+    isosurvey: 'des'
 
     basis_1: 'RA'
     basis_2: 'DEC'
@@ -141,8 +149,8 @@ panstarrs:
     sim_population : None
     sim_dir        : None
     nside          : 32
-    #datadir        : '/data/des40.b/data/pan-starrs/dr1/healpix'
-    datadir        : '/Users/keithbechtol/Documents/DES/external_data/pan-starrs/data/healpix'
+    datadir        : '/data/des40.b/data/pan-starrs/dr1/healpix'
+    #datadir        : '/Users/keithbechtol/Documents/DES/external_data/pan-starrs/data/healpix'
     #isodir         : '/Users/keithbechtol/Documents/DES/projects/mw_substructure/ugalidir/isochrones/ps1/dotter2016/'
     isoname        : 'Bressan2012' #'Dotter2016'
     isosurvey      : 'ps1'
@@ -158,5 +166,6 @@ panstarrs:
     flags_g : 'GFLAGS'
     flags_r : 'RFLAGS'
 
-    #fracdet : 'panstarrs_pseudo_fracdet.fits.gz'
-    fracdet : '/Users/keithbechtol/Documents/DES/external_data/pan-starrs/simple/sid/simple_v2/panstarrs_pseudo_fracdet.fits.gz'
+    fracdet_gz : 'panstarrs_pseudo_fracdet.fits.gz'
+    fracdet : 'panstarrs_pseudo_fracdet.fits'
+    #fracdet : '/Users/keithbechtol/Documents/DES/external_data/pan-starrs/simple/sid/simple_v2/panstarrs_pseudo_fracdet.fits.gz'

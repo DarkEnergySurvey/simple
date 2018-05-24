@@ -49,7 +49,7 @@ print('Plotting hotspots with sig > {}'.format(sig_cut))
 candidate_list = fits.read(candidate_list)
 try: # simple
     candidate_list = candidate_list[candidate_list['SIG'] > sig_cut]
-    #candidate_list = candidate_list[candidate_list[basis_2] > -25] # panstarrs test
+    candidate_list = candidate_list[candidate_list[basis_2] > -25] # panstarrs test
 except: # ugali
     candidate_list = candidate_list[candidate_list['TS'] > 25]
 
@@ -75,9 +75,9 @@ for candidate in candidate_list:
         command = 'python {}/make_plot.py {:0.2f} {:0.2f} {:0.2f} {:0.2f} {:0.2f} {:0.4f}'.format(simple_dir, ra, dec, mod, sig, mc_source_id, field_density)
     else:
         command = 'python {}/make_plot.py {:0.2f} {:0.2f} {:0.2f} {:0.2f} {:0.2f}'.format(simple_dir, ra, dec, mod, sig, mc_source_id)
-    #command_queue = batch + command
-    #print(command_queue)
-    print(command)
+    command_queue = batch + command
+    print(command_queue)
+    #print(command)
     #os.system('./' + command) # Run locally
-    os.system(command)
-    #os.system(command_queue) # Submit to queue
+    #os.system(command)
+    os.system(command_queue) # Submit to queue
