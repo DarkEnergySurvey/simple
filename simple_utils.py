@@ -10,15 +10,16 @@ import glob
 import yaml
 import numpy as np
 #from matplotlib import mlab
-import numpy.lib.recfunctions
+#import numpy.lib.recfunctions
 import healpy as hp
-import astropy.io.fits as pyfits # migrate to fitsio for consistency with rest of suite
+import astropy.io.fits as pyfits # migrate to fitsio
 import fitsio as fits
 import scipy.interpolate
 import scipy.ndimage
 import itertools
 
 # Ugali libraries
+import ugali.utils.mlab
 import ugali.utils.healpix
 import ugali.utils.projector
 import ugali.isochrone
@@ -73,8 +74,9 @@ def construct_real_data(pix_nside_neighbors):
         data['MC_SOURCE_ID']
     except:
         # real data given MC_SOURCE_ID of 0
-        data = numpy.lib.recfunctions.append_fields(data, 'MC_SOURCE_ID', np.tile(0, len(data)), usemask=False, asrecarray=True)
         #data = mlab.rec_append_fields(data, ['MC_SOURCE_ID'], [0])
+        #data = numpy.lib.recfunctions.append_fields(data, 'MC_SOURCE_ID', np.tile(0, len(data)), usemask=False, asrecarray=True)
+        data = ugali.utils.mlab.rec_append_field(data, ['MC_SOURCE_ID'], [0])
     
     return data
 
