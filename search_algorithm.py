@@ -161,7 +161,7 @@ elif (mode == 1):
     r_peak_array.append(r_peaks)
     sig_peak_array.append(sig_peaks)
     distance_modulus_array.append(dist_moduli)
-    n_obs_Peak_array.append(n_obs_peaks)
+    n_obs_peak_array.append(n_obs_peaks)
     n_obs_half_peak_array.append(n_obs_half_peaks)
     n_model_peak_array.append(n_model_peaks)
     mc_source_id_array.append(np.tile(mc_source_id, len(sig_peaks)))
