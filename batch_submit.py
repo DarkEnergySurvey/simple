@@ -4,9 +4,11 @@ Batch submit
 """
 __author__ = "Sidney Mau"
 
+import sys
 import os
 import subprocess
 import healpy as hp
+import fitsio as fits
 
 import yaml
 
@@ -36,6 +38,13 @@ if not os.path.exists(log_dir):
 
 ############################################################
 
+try:
+    mc_first, mc_last, outfile, logfile = float(sys.argv[1]), float(sys.argv[2]), sys.argv[3], sys.argv[4]
+except:
+    sys.exit('ERROR!')
+
+############################################################
+
 def execute_batch_jobs(sub_sim_list, outfile, logfile):
     for sim in sub_sim_list:
         if (sim['DIFFICULTY'] == 0):
@@ -48,3 +57,11 @@ def execute_batch_jobs(sub_sim_list, outfile, logfile):
 
     return
 
+############################################################
+
+# Main:
+
+sim_pop = fits.read(sim_population)
+sub_sim_list = sim_pop[(sim_pop['MC_SOURCE_ID'] >= mc_first) & (sim_pop['MC_SOURCE_ID'] <= mc_last)]
+
+execute_batch_jobs(sub_sim_list, outfile, logfile)

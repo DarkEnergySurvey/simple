@@ -13,8 +13,6 @@ import fitsio as fits
 
 import yaml
 
-import batch_submit
-
 ############################################################
 
 with open('config.yaml', 'r') as ymlfile:
@@ -41,32 +39,20 @@ if not os.path.exists(log_dir):
 
 ############################################################
 
-def execute_batch_jobs(sub_sim_list, outfile, logfile):
-    for sim in sub_sim_list:
-        if (sim['DIFFICULTY'] == 0):
-            ra, dec, mc_source_id = sim[basis_1], sim[basis_2], sim['MC_SOURCE_ID']
-            pix = hp.ang2pix(nside, ra, dec, lonlat=True)
-    
-            command = 'python {}/search_algorithm.py {:0.2f} {:0.2f} {:0.2f} {} >> {}'.format(simple_dir, ra, dec, mc_source_id, outfile, logfile)
-            print(command)
-            os.system(command) # Submit to queue
-
-    return
-
-############################################################
-
 # Main
 
 sim_pop = fits.read(sim_population)
 sub_sim_pop_list = [sim_pop[x:x+100] for x in range(0, len(sim_pop), 100)]
 
 for sub_sim_list in sub_sim_pop_list:
-    outfile = '{}/results_mc_source_id_{}-{}.csv'.format(results_dir, sub_sim_list[0]['MC_SOURCE_ID'], sub_sim_list[-1]['MC_SOURCE_ID'])
-    logfile = '{}/results_mc_source_id_{}-{}.log'.format(log_dir, sub_sim_list[0]['MC_SOURCE_ID'], sub_sim_list[-1]['MC_SOURCE_ID'])
+    mc_first = sub_sim_list[0]['MC_SOURCE_ID']
+    mc_last = sub_sim_list[-1]['MC_SOURCE_ID']
+    outfile = '{}/results_mc_source_id_{}-{}.csv'.format(results_dir, mc_first, mc_last)
+    logfile = '{}/results_mc_source_id_{}-{}.log'.format(log_dir, mc_first, mc_last)
 
     batch = 'csub -n {} -o {} '.format(jobs, logfile)
 
-    command = 'python {}/batch_submit.py {:0.2f} {:0.2f} {:0.2f}'.format(simple_dir, outfile, logfile)
+    command = 'python {}/batch_submit.py {:0.2f} {:0.2f} {:0.2f} {:0.2f}'.format(simple_dir, mc_first, mc_last, outfile, logfile)
     command_queue = batch + command
     print(command_queue)
     #os.system('./' + command) # Run locally
