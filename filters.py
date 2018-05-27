@@ -7,8 +7,8 @@ __author__ = "Sidney Mau"
 import yaml
 import numpy as np
 #from matplotlib import mlab
-#import numpy.lib.recfunctions
-import ugali.utils.mlab
+import numpy.lib.recfunctions
+#import ugali.utils.mlab
 
 with open('config.yaml', 'r') as ymlfile:
     cfg = yaml.load(ymlfile)
@@ -110,28 +110,28 @@ def dered_mag(survey, data):
        corrected) magnitude"""
     if survey == 'y3_gold_2_0':
         #data = mlab.rec_append_fields(data, [mag_g, mag_r], [data['SOF_PSF_MAG_CORRECTED_G'], data['SOF_PSF_MAG_CORRECTED_R']])
-        #data = numpy.lib.recfunctions.append_fields(data, [mag_g, mag_r], [data['SOF_PSF_MAG_CORRECTED_G'], data['SOF_PSF_MAG_CORRECTED_R']], 
-        data = ugali.utils.mlab.rec_append_fields(data, [mag_g, mag_r], [data['SOF_PSF_MAG_CORRECTED_G'], data['SOF_PSF_MAG_CORRECTED_R']])
+        data = numpy.lib.recfunctions.append_fields(data, [mag_g, mag_r], [data['SOF_PSF_MAG_CORRECTED_G'], data['SOF_PSF_MAG_CORRECTED_R']], 
                                                     usemask=False, asrecarray=True)
+        #data = ugali.utils.mlab.rec_append_fields(data, [mag_g, mag_r], [data['SOF_PSF_MAG_CORRECTED_G'], data['SOF_PSF_MAG_CORRECTED_R']])
     elif survey == 'y3a2':
         #data = mlab.rec_append_fields(data, [mag_g, mag_r], [data['PSF_MAG_SFD_G'], data['PSF_MAG_SFD_R']])
-        #data = numpy.lib.recfunctions.append_fields(data, [mag_g, mag_r], [data['PSF_MAG_SFD_G'], data['PSF_MAG_SFD_R']], 
-        data = ugali.utils.mlab.rec_append_fields(data, [mag_g, mag_r], [data['PSF_MAG_SFD_G'], data['PSF_MAG_SFD_R']])
+        data = numpy.lib.recfunctions.append_fields(data, [mag_g, mag_r], [data['PSF_MAG_SFD_G'], data['PSF_MAG_SFD_R']], 
                                                     usemask=False, asrecarray=True)
+        #data = ugali.utils.mlab.rec_append_fields(data, [mag_g, mag_r], [data['PSF_MAG_SFD_G'], data['PSF_MAG_SFD_R']])
     elif survey == 'bliss':
         #data = mlab.rec_append_fields(data, [mag_g, mag_r], [data['CM_MAG_G'] - data['EXINCTION_G'], data['CM_MAG_R'] - data['EXTINCTION_R']])
         #data = mlab.rec_append_fields(data, [mag_g, mag_r], [data['PSF_MAG_SFD_G'], data['PSF_MAG_SFD_R']])
-        #data = numpy.lib.recfunctions.append_fields(data, [mag_g, mag_r], [data['PSF_MAG_SFD_G'], data['PSF_MAG_SFD_R']], 
-        data = ugali.utils.mlab.rec_append_fields(data, [mag_g, mag_r], [data['PSF_MAG_SFD_G'], data['PSF_MAG_SFD_R']])
+        data = numpy.lib.recfunctions.append_fields(data, [mag_g, mag_r], [data['PSF_MAG_SFD_G'], data['PSF_MAG_SFD_R']], 
                                                     usemask=False, asrecarray=True)
+        #data = ugali.utils.mlab.rec_append_fields(data, [mag_g, mag_r], [data['PSF_MAG_SFD_G'], data['PSF_MAG_SFD_R']])
     elif survey == 'maglites':
         #data = mlab.rec_append_fields(data, [mag_g, mag_r], [data['WAVG_MAG_PSF_G'] - data['EXINCTION_G'], data['WAVG_MAG_PSF_R'] - data['EXTINCTION_R']])
-        #data = numpy.lib.recfunctions.append_fields(data, [mag_g, mag_r], [data['WAVG_MAG_PSF_G'] - data['EXINCTION_G'], data['WAVG_MAG_PSF_R'] - data['EXTINCTION_R']], 
-        data = ugali.uitls.mlab.rec_append_fields(data, [mag_g, mag_r], [data['WAVG_MAG_PSF_G'] - data['EXINCTION_G'], data['WAVG_MAG_PSF_R'] - data['EXTINCTION_R']])
+        data = numpy.lib.recfunctions.append_fields(data, [mag_g, mag_r], [data['WAVG_MAG_PSF_G'] - data['EXINCTION_G'], data['WAVG_MAG_PSF_R'] - data['EXTINCTION_R']], 
                                                     usemask=False, asrecarray=True)
+        #data = ugali.uitls.mlab.rec_append_fields(data, [mag_g, mag_r], [data['WAVG_MAG_PSF_G'] - data['EXINCTION_G'], data['WAVG_MAG_PSF_R'] - data['EXTINCTION_R']])
     elif survey == 'panstarrs':
         #data = mlab.rec_append_fields(data, [mag_g, mag_r], [data['GFPSFMAG'] - data['EXTSFD_G'], data['RFPSFMAG'] - data['EXTSFD_R']])
-        #data = numpy.lib.recfunctions.append_fields(data, [mag_g, mag_r], [data['GFPSFMAG'] - data['EXTSFD_G'], data['RFPSFMAG'] - data['EXTSFD_R']], 
-        data = ugali.utils.mlab.rec_append_fields(data, [mag_g, mag_r], [data['GFPSFMAG'] - data['EXTSFD_G'], data['RFPSFMAG'] - data['EXTSFD_R']])
+        data = numpy.lib.recfunctions.append_fields(data, [mag_g, mag_r], [data['GFPSFMAG'] - data['EXTSFD_G'], data['RFPSFMAG'] - data['EXTSFD_R']], 
                                                     usemask=False, asrecarray=True)
+        #data = ugali.utils.mlab.rec_append_fields(data, [mag_g, mag_r], [data['GFPSFMAG'] - data['EXTSFD_G'], data['RFPSFMAG'] - data['EXTSFD_R']])
     return data
