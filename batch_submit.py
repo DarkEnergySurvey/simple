@@ -52,6 +52,7 @@ def execute_batch_jobs(sub_sim_list, outfile, logfile):
             pix = hp.ang2pix(nside, ra, dec, lonlat=True)
     
             command = 'python {}/search_algorithm.py {:0.2f} {:0.2f} {:0.2f} {} >> {}'.format(simple_dir, ra, dec, mc_source_id, outfile, logfile)
+
             print(command)
             os.system(command) # Submit to queue
 

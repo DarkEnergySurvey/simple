@@ -54,8 +54,8 @@ def submitJob(ra, dec, pix, mc_source_id, mode):
     batch = 'csub -n {} -o {} '.format(jobs, logfile)
     command = 'python {}/search_algorithm.py {:0.2f} {:0.2f} {:0.2f} {} {}'.format(simple_dir, ra, dec, mc_source_id, outfile, logfile)
     command_queue = batch + command
+
     print(command_queue)
-    #os.system('./' + command) # Run locally
     os.system(command_queue) # Submit to queue
 
     return

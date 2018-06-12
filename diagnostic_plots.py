@@ -86,13 +86,11 @@ def analysis(targ_ra, targ_dec, mod, mc_source_id):
     data = filters.dered_mag(survey, data)
 
     # This should be generalized to also take the survey
-    #iso = isochrone_factory('Bressan2012', age=12, z=0.0001, distance_modulus=mod)
     iso = isochrone_factory(name=isoname, survey=isosurvey, age=12, z=0.0001, distance_modulus=mod)
 
     # g_radius estimate
     filter = filters.star_filter(survey, data)
 
-    #iso_filter = (iso.separation(data[mag_g], data[mag_r]) < 0.1)
     iso_filter = simple_utils.cutIsochronePath(data[mag_g], data[mag_r], data[mag_g_err], data[mag_r_err], iso, radius=0.1, return_all=False)
 
     angsep = ugali.utils.projector.angsep(targ_ra, targ_dec, data[basis_1], data[basis_2])
@@ -146,8 +144,6 @@ def analysis(targ_ra, targ_dec, mod, mc_source_id):
     else:
         g_radius = half_point # deg
 
-    #c1 = SkyCoord(targ_ra, targ_dec, unit='deg') # frame is ICRS
-    #nbhd = c1.separation(SkyCoord(data[basis_1], data[basis_2], unit='deg')).deg < g_radius # selects objects inside the galactic radius
     angsep = ugali.utils.projector.angsep(targ_ra, targ_dec, data[basis_1], data[basis_2])
     nbhd = (angsep < g_radius)
 
@@ -167,7 +163,6 @@ def densityPlot(targ_ra, targ_dec, data, iso, g_radius, nbhd, type):
                & filters.star_filter(survey, data)
         plt.title('Blue Stellar Density')
     
-    #iso_filter = (iso.separation(data[mag_g], data[mag_r]) < 0.1)
     iso_filter = simple_utils.cutIsochronePath(data[mag_g], data[mag_r], data[mag_g_err], data[mag_r_err], iso, radius=0.1, return_all=False)
 
     # projection of image
@@ -201,7 +196,6 @@ def starPlot(targ_ra, targ_dec, data, iso, g_radius, nbhd):
 
     filter = filters.star_filter(survey, data)
 
-    #iso_filter = (iso.separation(data[mag_g], data[mag_r]) < 0.1) # Original
     iso_filter = simple_utils.cutIsochronePath(data[mag_g], data[mag_r], data[mag_g_err], data[mag_r_err], iso, radius=0.1, return_all=False)
 
     # projection of image
@@ -230,7 +224,6 @@ def cmPlot(targ_ra, targ_dec, data, iso, g_radius, nbhd, type):
         filter = filters.galaxy_filter(survey, data)
         plt.title('Galactic Color-Magnitude')
 
-    #iso_filter = (iso.separation(data[mag_g], data[mag_r]) < 0.1)
     iso_filter = simple_utils.cutIsochronePath(data[mag_g], data[mag_r], data[mag_g_err], data[mag_r_err], iso, radius=0.1, return_all=False)
 
     # Plot background objects
@@ -311,8 +304,6 @@ def radialPlot(targ_ra, targ_dec, data, iso, g_radius, nbhd, field_density=None)
     angsep = ugali.utils.projector.angsep(targ_ra, targ_dec, data[basis_1], data[basis_2])
 
     # Isochrone filtered/unfiltered
-    #iso_seln_f = (iso.separation(data[mag_g], data[mag_r]) < 0.1)
-    #iso_seln_u = (iso.separation(data[mag_g], data[mag_r]) >= 0.1)
     iso_seln_f = simple_utils.cutIsochronePath(data[mag_g], data[mag_r], data[mag_g_err], data[mag_r_err], iso, radius=0.1, return_all=False)
     iso_seln_u = ~iso_seln_f
 

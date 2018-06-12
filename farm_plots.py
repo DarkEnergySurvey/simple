@@ -75,8 +75,8 @@ for candidate in candidate_list:
     else:
         command = 'python {}/make_plot.py {:0.2f} {:0.2f} {:0.2f} {:0.2f} {:0.2f}'.format(simple_dir, ra, dec, mod, sig, mc_source_id)
     command_queue = batch + command
-    print(command_queue)
+
     #print(command)
-    #os.system('./' + command) # Run locally
     #os.system(command)
+    print(command_queue)
     os.system(command_queue) # Submit to queue

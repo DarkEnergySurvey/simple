@@ -45,8 +45,6 @@ c5 = fits.Column(name='N_OBS',       format='E', array=data[:,5])
 c6 = fits.Column(name='N_OBS_HALF',       format='E', array=data[:,6])
 c7 = fits.Column(name='N_MODEL',       format='E', array=data[:,7])
 c8 = fits.Column(name='MC_SOURCE_ID', format='E', array=data[:,8])
-#c5 = fits.Column(name='ASSOC',   format='E', array=data[:,5])
-#c6 = fits.Column(name='ANGSEP',  format='E', array=data[:,6])
 
 # Write fits output
 t = fits.BinTableHDU.from_columns([c0, c1, c2, c3, c4, c5, c6, c7, c8])

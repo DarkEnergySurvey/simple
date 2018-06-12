@@ -52,6 +52,7 @@ def quality_filter(survey, data):
             & (np.bitwise_and(data['GINFOFLAG2'], 8192) == 0) \
             & (np.bitwise_and(data['RINFOFLAG2'], 8192) == 0) \
             & (np.bitwise_and(data['IINFOFLAG2'], 8192) == 0) \
+            #& (data['GINFOFLAG'] >= 0) \ # recommended by Alex; untested yet
             & (data['GFPSFMAG'] < 22.5) # observed magnitude - not extinction corrected
     return cut
 

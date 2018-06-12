@@ -54,6 +54,6 @@ for sub_sim_list in sub_sim_pop_list:
 
     command = 'python {}/batch_submit.py {:0.2f} {:0.2f} {:0.2f} {:0.2f}'.format(simple_dir, mc_first, mc_last, outfile, logfile)
     command_queue = batch + command
+
     print(command_queue)
-    #os.system('./' + command) # Run locally
     os.system(command_queue) # Submit to queue

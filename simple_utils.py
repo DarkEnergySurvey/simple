@@ -56,6 +56,32 @@ with open('config.yaml', 'r') as ymlfile:
 
 ########################################################################
 
+def getCatalogFile(catalog_dir, mc_source_id):
+    """
+    Inputs:
+        catalog_dir = string corresponding to directory containing the stellar catalog infiles
+        mc_source_id = integer corresponding the target MC_SOURCE_ID value
+    Outputs:
+        catalog_infile = string corresponding to filename of stellar catalog containing mc_source_id
+    """
+    catalog_infiles = sorted(glob.glob(catalog_dir + '/*catalog*.fits'))
+    mc_source_id_array = []
+    catalog_infile_index_array = []
+    for ii, catalog_infile in enumerate(catalog_infiles):
+        mc_source_id_min = int(os.path.basename(catalog_infile).split('.')[0].split('mc_source_id_')[-1].split('-')[0])
+        mc_source_id_max = int(os.path.basename(catalog_infile).split('.')[0].split('mc_source_id_')[-1].split('-')[1])
+        assert (mc_source_id_max > mc_source_id_min) & (mc_source_id_min >= 1), 'Found invalue MC_SOURCE_ID values in filenames'
+        mc_source_id_array.append(np.arange(mc_source_id_min, mc_source_id_max + 1))
+        catalog_infile_index_array.append(np.tile(ii, 1 + (mc_source_id_max - mc_source_id_min)))
+
+    mc_source_id_array = np.concatenate(mc_source_id_array)
+    catalog_infile_index_array = np.concatenate(catalog_infile_index_array)
+
+    assert len(mc_source_id_array) == len(np.unique(mc_source_id_array)), 'Found non-unique MC_SOURCE_ID values in filenames'
+    assert np.in1d(mc_source_id, mc_source_id_array), 'Requested MC_SOURCE_ID value not among files'
+    mc_source_id_index = np.nonzero(mc_source_id == mc_source_id_array)[0]
+    return catalog_infiles[catalog_infile_index_array[mc_source_id_index]]
+
 def construct_real_data(pix_nside_neighbors):
     data_array = []
     for pix_nside in pix_nside_neighbors:
@@ -81,18 +107,6 @@ def construct_real_data(pix_nside_neighbors):
     return data
 
 def construct_sim_data(pix_nside_neighbors, mc_source_id):
-    #reader = pyfits.open(sim_catalog)
-    #cat_data = reader[1].data
-    #data = cat_data[np.in1d(cat_data, pix_nside_neighbors)]
-    #reader.close()
-
-    #data_array = []
-    #cat_data = fits.read(sim_catalog)
-    #pix = hp.ang2pix(nside,cat_data[basis_1],cat_data[basis_2],lonlat=True)
-    #pix_data = cat_data[np.in1d(pix, pix_nside_neighbors)]
-    #data_array.append(pix_data)
-    #data = np.concatenate(data_array)
-
     data_array = []
     cat_file = getCatalogFile(sim_dir, mc_source_id)
     cat_data = fits.read(cat_file)
@@ -121,32 +135,6 @@ def inject_sim(real_data, sim_data, mc_source_id):
     data = np.concatenate((real_data, inject_data), axis=0)
 
     return data
-
-def getCatalogFile(catalog_dir, mc_source_id):
-    """
-    Inputs:
-        catalog_dir = string corresponding to directory containing the stellar catalog infiles
-        mc_source_id = integer corresponding the target MC_SOURCE_ID value
-    Outputs:
-        catalog_infile = string corresponding to filename of stellar catalog containing mc_source_id
-    """
-    catalog_infiles = sorted(glob.glob(catalog_dir + '/*catalog*.fits'))
-    mc_source_id_array = []
-    catalog_infile_index_array = []
-    for ii, catalog_infile in enumerate(catalog_infiles):
-        mc_source_id_min = int(os.path.basename(catalog_infile).split('.')[0].split('mc_source_id_')[-1].split('-')[0])
-        mc_source_id_max = int(os.path.basename(catalog_infile).split('.')[0].split('mc_source_id_')[-1].split('-')[1])
-        assert (mc_source_id_max > mc_source_id_min) & (mc_source_id_min >= 1), 'Found invalue MC_SOURCE_ID values in filenames'
-        mc_source_id_array.append(np.arange(mc_source_id_min, mc_source_id_max + 1))
-        catalog_infile_index_array.append(np.tile(ii, 1 + (mc_source_id_max - mc_source_id_min)))
-
-    mc_source_id_array = np.concatenate(mc_source_id_array)
-    catalog_infile_index_array = np.concatenate(catalog_infile_index_array)
-
-    assert len(mc_source_id_array) == len(np.unique(mc_source_id_array)), 'Found non-unique MC_SOURCE_ID values in filenames'
-    assert np.in1d(mc_source_id, mc_source_id_array), 'Requested MC_SOURCE_ID value not among files'
-    mc_source_id_index = np.nonzero(mc_source_id == mc_source_id_array)[0]
-    return catalog_infiles[catalog_infile_index_array[mc_source_id_index]]
 
 ########################################################################
 
@@ -249,13 +237,13 @@ def computeCharDensity(nside, data, ra_select, dec_select, magnitude_threshold=m
         mean_fracdet = np.mean(fracdet[subpix_region_array[cut]])
 
         # smau: this doesn't seem to be used in the non-local density estimation
-        #subpix_region_array = subpix_region_array[fracdet[subpix_region_array] > 0.99]
-        #subpix = ugali.utils.healpix.angToPix(nside_fracdet, 
-        #                                      data[basis_1][cut_magnitude_threshold], 
-        #                                      data[basis_2][cut_magnitude_threshold]) # Remember to apply mag threshold to objects
-        #characteristic_density_fracdet = float(np.sum(np.in1d(subpix, subpix_region_array))) \
-        #                                 / (hp.nside2pixarea(nside_fracdet, degrees=True) * len(subpix_region_array)) # deg^-2
-        #print('Characteristic density fracdet = {:0.1f} deg^-2').format(characteristic_density_fracdet)
+        subpix_region_array = subpix_region_array[fracdet[subpix_region_array] > 0.99]
+        subpix = ugali.utils.healpix.angToPix(nside_fracdet, 
+                                              data[basis_1][cut_magnitude_threshold], 
+                                              data[basis_2][cut_magnitude_threshold]) # Remember to apply mag threshold to objects
+        characteristic_density_fracdet = float(np.sum(np.in1d(subpix, subpix_region_array))) \
+                                         / (hp.nside2pixarea(nside_fracdet, degrees=True) * len(subpix_region_array)) # deg^-2
+        print('Characteristic density fracdet = {:0.1f} deg^-2').format(characteristic_density_fracdet)
         
         # Correct the characteristic density by the mean fracdet value
         characteristic_density_raw = 1. * characteristic_density
@@ -275,11 +263,6 @@ def computeLocalCharDensity(nside, data, characteristic_density, ra_select, dec_
     cut_magnitude_threshold = (data[mag_g] < magnitude_threshold)
 
     proj = ugali.utils.projector.Projector(ra_select, dec_select)
-    #x, y = proj.sphereToImage(data[basis_1][cut_magnitude_threshold], data[basis_2][cut_magnitude_threshold]) # Trimmed magnitude range for hotspot finding
-    ##x_full, y_full = proj.sphereToImage(data[basis_1], data[basis_2]) # If we want to use full magnitude range for significance evaluation
-
-    ###angsep_peak = np.sqrt((x_full - x_peak)**2 + (y_full - y_peak)**2) # Use full magnitude range, NOT TESTED!!!
-    ##angsep_peak = np.sqrt((x - x_peak)**2 + (y - y_peak)**2) # Impose magnitude threshold
 
     # If fracdet map is available, use that information to either compute local density,
     # or in regions of spotty coverage, use the typical density of the region
@@ -429,8 +412,6 @@ def fitAperture(proj, distance_modulus, characteristic_density_local, x_peak, y_
         n_obs = np.sum(angsep_peak < size_array[ii])
         n_model = characteristic_density_local * (np.pi * size_array[ii]**2)
         sig_array[ii] = np.clip(scipy.stats.norm.isf(scipy.stats.poisson.sf(n_obs, n_model)), 0., 37.5) # Clip at 37.5
-        #if sig_array[ii] > 25:
-        #    sig_array[ii] = 25. # Set a maximum significance value
         n_obs_array[ii] = n_obs
         n_model_array[ii] = n_model
 
@@ -438,7 +419,7 @@ def fitAperture(proj, distance_modulus, characteristic_density_local, x_peak, y_
 
     index_peak = np.argmax(sig_array)
     r_peak = size_array[index_peak]
-    #if np.max(sig_array) >= 25.:
+    #if np.max(sig_array) >= 37.5:
     #    r_peak = 0.5
     n_obs_peak = n_obs_array[index_peak]
     n_model_peak = n_model_array[index_peak]
@@ -474,11 +455,6 @@ def searchByDistance(nside, data, distance_modulus, pix_nside_select, ra_select,
 
     print('Distance = {:0.1f} kpc (m-M = {:0.1f})').format(ugali.utils.projector.distanceModulusToDistance(distance_modulus), distance_modulus)
 
-    #dirname = '/home/s1/kadrlica/.ugali/isochrones/des/dotter2016/'
-    #dirname = '/Users/keithbechtol/Documents/DES/projects/mw_substructure/ugalidir/isochrones/ps1/dotter2016/'
-    #dirname = '/Users/keithbechtol/Documents/DES/projects/mw_substructure/ugalidir/isochrones/des/dotter2016/'
-    #iso = ugali.isochrone.factory('Dotter', hb_spread=0, dirname=isodir)
-    #iso = ugali.isochrone.factory(name='Dotter2016', survey='ps1')
     iso = ugali.isochrone.factory(name=isoname, survey=isosurvey)
     iso.age = 12.
     iso.metallicity = 0.0001
@@ -547,9 +523,6 @@ def searchBySimulation(nside, data, distance_modulus, pix_nside_select, ra_selec
 
     print('Distance = {:0.1f} kpc (m-M = {:0.1f})').format(ugali.utils.projector.distanceModulusToDistance(distance_modulus), distance_modulus)
 
-    #dirname = '/home/s1/kadrlica/.ugali/isochrones/des/dotter2016/'
-    #dirname = '/Users/keithbechtol/Documents/DES/projects/mw_substructure/ugalidir/isochrones/des/dotter2016/'
-    #iso = ugali.isochrone.factory('Dotter', hb_spread=0, dirname=dirname)
     iso = ugali.isochrone.factory(name=isoname, survey=isosurvey)
     iso.age = 12.
     iso.metallicity = 0.0001
