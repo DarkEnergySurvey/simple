@@ -257,8 +257,11 @@ def hessPlot(targ_ra, targ_dec, data, iso, g_radius, nbhd):
     r_near = 2.*g_radius # annulus begins at 2*g_radius away from centroid
     r_far = np.sqrt(5.)*g_radius # annulus has same area as inner area
 
-    inner = (c1.separation(SkyCoord(data[basis_1], data[basis_2], unit='deg')).deg < g_radius)
-    outer = (c1.separation(SkyCoord(data[basis_1], data[basis_2], unit='deg')).deg > r_near) & (c1.separation(SkyCoord(data[basis_1], data[basis_2], unit='deg')).deg < r_far)
+    #inner = (c1.separation(SkyCoord(data[basis_1], data[basis_2], unit='deg')).deg < g_radius)
+    #outer = (c1.separation(SkyCoord(data[basis_1], data[basis_2], unit='deg')).deg > r_near) & (c1.separation(SkyCoord(data[basis_1], data[basis_2], unit='deg')).deg < r_far)
+    angsep = ugali.utils.projector.angsep(targ_ra, targ_dec, data[basis_1], data[basis_2])
+    inner = (angsep < g_radius)
+    outer = ((angsep > r_near) & (angsep < r_far))
 
     xbins = np.arange(-0.5, 1.1, 0.1)
     ybins = np.arange(16., mag_max + 0.5, 0.5)
