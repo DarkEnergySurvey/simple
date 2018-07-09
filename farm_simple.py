@@ -33,6 +33,7 @@ with open('config.yaml', 'r') as ymlfile:
     mode = cfg[survey]['mode']
     sim_catalog = cfg[survey]['sim_catalog']
     sim_population = cfg[survey]['sim_population']
+    sim_dir = cfg[survey]['sim_dir']
 
 results_dir = os.path.join(os.getcwd(), cfg['output']['results_dir'])
 if not os.path.exists(results_dir):
@@ -44,13 +45,15 @@ if not os.path.exists(log_dir):
 
 ############################################################
 
-def submitJob(ra, dec, pix, mc_source_id, mode):
+def submitJob(ra, dec, pix, mc_source_id, mode, **population_file):
     if (mode == 0):
         outfile = '{}/results_nside_{}_{}.csv'.format(results_dir, nside, pix)
         logfile = '{}/results_nside_{}_{}.log'.format(log_dir, nside, pix)
+        #command = 'python {}/search_algorithm.py {:0.2f} {:0.2f} {:0.2f} {} {}'.format(simple_dir, ra, dec, mc_source_id, outfile, logfile)
     elif (mode == 1):
-        outfile = '{}/results_mc_source_id_{}.csv'.format(results_dir, mc_source) # all values in mc_source_id_array should be the same
+        outfile = '{}/results_mc_source_id_{}.csv'.format(results_dir, mc_source_id) # all values in mc_source_id_array should be the same
         logfile = '{}/results_mc_source_id_{}.log'.format(log_dir, mc_source_id) # all values in mc_source_id_array should be the same
+        #command = 'python {}/search_algorithm.py {:0.2f} {:0.2f} {:0.2f} {} {} {}'.format(simple_dir, ra, dec, mc_source_id, outfile, logfile, population_file)
     batch = 'csub -n {} -o {} '.format(jobs, logfile)
     command = 'python {}/search_algorithm.py {:0.2f} {:0.2f} {:0.2f} {} {}'.format(simple_dir, ra, dec, mc_source_id, outfile, logfile)
     command_queue = batch + command
@@ -80,10 +83,21 @@ if (mode == 0): # real
     
 elif (mode == 1): # real+sim
     sim_pop = fits.read(sim_population)
-    for sim in sim_pop:
-        if (sim['DIFFICULTY'] == 0): # check to make sure simulated object has stars
-            ra, dec, mc_source_id = sim[basis_1], sim[basis_2], sim['MC_SOURCE_ID']
-            pix = hp.ang2pix(nside, ra, dec, lonlat=True)
+    for sim in sim_pop[:]:
+        #if (sim['DIFFICULTY'] == 0): # check to make sure simulated object has stars
+        ra, dec, mc_source_id = sim[basis_1], sim[basis_2], sim['MC_SOURCE_ID']
+        pix = hp.ang2pix(nside, ra, dec, lonlat=True)
 
-            submitJob(ra, dec, pix, mc_source_id, mode)
+        submitJob(ra, dec, pix, mc_source_id, mode)
+
+    #population_infiles = sorted(glob.glob(sim_dir + '/*population*.fits'))
+    #for population_infile in population_infiles:
+    #    sim_pop = fits.read(population_infile)
+
+    #    for sim in sim_pop:
+    #        #if (sim['DIFFICULTY'] == 0): # check to make sure simulated object has stars
+    #        ra, dec, mc_source_id = sim[basis_1], sim[basis_2], sim['MC_SOURCE_ID']
+    #        pix = hp.ang2pix(nside, ra, dec, lonlat=True)
+
+    #        submitJob(ra, dec, pix, mc_source_id, mode)
 

@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 """
-Simple binning search algorithm
+Simple binning search algorithm utilities
 """
-__author__ = "Keith Bechtol"
+__author__ = "Keith Bechtol, Sid Mau"
 
 # Python libraries
 import os
@@ -117,6 +117,18 @@ def construct_sim_data(pix_nside_neighbors, mc_source_id):
 
     return data
 
+def inject_sim(real_data, sim_data, mc_source_id):
+    inject_data = sim_data[sim_data['MC_SOURCE_ID'] == mc_source_id]
+    columns = inject_data.dtype
+    # inject_data has boolean extended class
+    # real_data has pseudo-boolean extended class
+    real_data = real_data.astype(columns)
+    #real_data_reshape = np.ndarray(real_data.shape, columns, real_data, 0, real_data.strides)
+    data = np.concatenate((real_data, inject_data), axis=0)
+    #data = np.concatenate((real_data_reshape, inject_data), axis=0)
+
+    return data
+
 def construct_modal_data(mode, pix_nside_neighbors, mc_source_id):
     print('Assembling data...')
     if (mode == 0): # real data
@@ -124,15 +136,13 @@ def construct_modal_data(mode, pix_nside_neighbors, mc_source_id):
     elif (mode == 1): # real and simulated data
         data_real = construct_real_data(pix_nside_neighbors)
         data_sim  = construct_sim_data(pix_nside_neighbors, mc_source_id)
-        data = np.concatenate((data_real, data_sim), axis=0)
+
+        #columns = data_sim.dtype
+        #data_real = np.ndarray(data_real.shape, columns, data_real, 0, data_real.strides)
+        #data = np.concatenate((data_real, data_sim), axis=0)
+        data = inject_sim(data_real, data_sim, mc_source_id)
     else: # assume mode = 0
         data = construct_real_data(pix_nside_neighbors)
-
-    return data
-
-def inject_sim(real_data, sim_data, mc_source_id):
-    inject_data = sim_data[sim_data['MC_SOURCE_ID'] == mc_source_id]
-    data = np.concatenate((real_data, inject_data), axis=0)
 
     return data
 
@@ -167,7 +177,8 @@ def cutIsochronePath(g, r, g_err, r_err, isochrone, radius=0.1, return_all=False
 
     cut = np.logical_or(cut_1, cut_2)
 
-    mag_bins = np.arange(17., 24.1, 0.1)
+    #mag_bins = np.arange(17., 24.1, 0.1)
+    mag_bins = np.arange(17., mag_max+0.1, 0.1)
     mag_centers = 0.5 * (mag_bins[1:] + mag_bins[0:-1])
     magerr = np.tile(0., len(mag_centers))
     for ii in range(0, len(mag_bins) - 1):
@@ -263,6 +274,8 @@ def computeLocalCharDensity(nside, data, characteristic_density, ra_select, dec_
     cut_magnitude_threshold = (data[mag_g] < magnitude_threshold)
 
     proj = ugali.utils.projector.Projector(ra_select, dec_select)
+    x, y = proj.sphereToImage(data[basis_1][cut_magnitude_threshold], data[basis_2][cut_magnitude_threshold]) # Trimmed magnitude range for hotspot finding
+    #x_full, y_full = proj.sphereToImage(data[basis_1], data[basis_2]) # If we want to use full magnitude range for significance evaluation
 
     # If fracdet map is available, use that information to either compute local density,
     # or in regions of spotty coverage, use the typical density of the region

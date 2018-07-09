@@ -3,21 +3,22 @@ setup:
     #simple_dir : '/Users/keithbechtol/Documents/DES/code/simple'
 
 output:
-    results_dir : 'results_dir_sim_v1'
+    results_dir : 'results_dir'
     log_dir     : 'log_dir'
-    save_dir    : 'save_dir_test'
+    save_dir    : 'save_dir'
 
 batch:
     jobs: 20 # <= 20 for DES cluster computers!
 
-#survey: 'y3_gold_2_0' # parameter to change for runs across different data
-survey: 'panstarrs'
+survey: 'y3_gold_2_0' # parameter to change for runs across different data
+#survey: 'panstarrs'
+#survey: 'bliss'
 
 y3_gold_2_0:
     mode : 1 # 0: real, 1: real+sim
     sim_catalog : None
-    sim_population : '/home/s1/kadrlica/projects/mw_substructure/y3a2/sim_population/v7/sim_population_v7_mc_source_id_000001-100000.fits'
-    sim_dir: '/home/s1/kadrlica/projects/mw_substructure/y3a2/sim_population/v7'
+    sim_population : '/home/s1/kadrlica/projects/mw_substructure/y3a2/sim_population/v10_des/sim_population_v10_des_mc_source_id_0000001-0010000.fits'
+    sim_dir: '/home/s1/kadrlica/projects/mw_substructure/y3a2/sim_population/v10_des'
     nside          : 32
     datadir        : '/home/s1/kadrlica/projects/y3a2/data/gold/v2.0/skim_ext_0_3'
     isoname: 'Bressan2012'
@@ -83,8 +84,15 @@ y3a2:
     fracdet : 'y3a2_griz_o.4096_t.32768_coverfoot_EQU.fits.gz'
 
 bliss: # Need to update this
+    mode: 0
+    sim_catalog: None
+    sim_population: None
+    sim_dir: None
     nside          : 32
-    datadir        : '/home/s1/kadrlica/projects/bliss/cat/v2/cat'
+    #datadir        : '/home/s1/kadrlica/projects/bliss/cat/v3/cat'
+    datadir        : '/home/s1/kadrlica/projects/bliss/cat/v4/cat'
+    #datadir        : '/home/s1/kadrlica/projects/bliss/cat/v4/hpx/i'
+    #datadir        : '/home/s1/kadrlica/projects/bliss/cat/v3/hpx/i'
     candidate_list : 'candidate_list.fits'
     mag_max : 24.5
     isoname: 'Bressan2012'
@@ -94,8 +102,10 @@ bliss: # Need to update this
     basis_2: 'DEC'
     mag_g : 'MAG_G'
     mag_r : 'MAG_R'
-    mag_g_err             : 'PSF_MAG_ERR_G'
-    mag_r_err             : 'PSF_MAG_ERR_R'
+    mag_g_err : 'WAVG_MAGERR_PSF_G'
+    mag_r_err : 'WAVG_MAGERR_PSF_R'
+    #mag_g_err             : 'PSF_MAG_ERR_G'
+    #mag_r_err             : 'PSF_MAG_ERR_R'
 
     #mag_g_dred_flag            : 'PSF_MAG_SFD_G'
     #mag_r_dred_flag            : 'PSF_MAG_SFD_R'
@@ -146,10 +156,13 @@ maglites: # Update
 panstarrs:
     mode           : 1
     sim_catalog    : None
-    sim_population : None
-    sim_dir        : None
+    #sim_population : '/home/s1/kadrlica/projects/mw_substructure/y3a2/sim_population/v9_ps1/sim_population_v9_ps1_mc_source_id_0000001-0010000.fits'
+    #sim_dir        : '/home/s1/kadrlica/projects/mw_substructure/y3a2/sim_population/v9_ps1'
+    sim_dir : '/home/s1/kadrlica/projects/mw_substructure/y3a2/sim_population/v10_ps1'
+    sim_population : '/home/s1/kadrlica/projects/mw_substructure/y3a2/sim_population/v10_ps1/sim_population_v10_ps1_mc_source_id_0000001-0010000.fits'
     nside          : 32
-    datadir        : '/data/des40.b/data/pan-starrs/dr1/healpix'
+    #datadir        : '/data/des40.b/data/pan-starrs/dr1/healpix'
+    datadir        : '/home/s1/kadrlica/projects/ps1/dr1/v0/skim_ext_0_1'
     #datadir        : '/Users/keithbechtol/Documents/DES/external_data/pan-starrs/data/healpix'
     #isodir         : '/Users/keithbechtol/Documents/DES/projects/mw_substructure/ugalidir/isochrones/ps1/dotter2016/'
     isoname        : 'Bressan2012' #'Dotter2016'

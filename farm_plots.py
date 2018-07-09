@@ -56,6 +56,7 @@ print('{} candidates found...').format(len(candidate_list))
 
 ############################################################
 
+#for candidate in [candidate_list[:10]]:
 for candidate in candidate_list:
     try: # simple
         sig = round(candidate['SIG'], 2)

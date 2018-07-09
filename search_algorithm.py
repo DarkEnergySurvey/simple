@@ -17,7 +17,6 @@ import fitsio as fits
 
 # Ugali libraries
 import ugali.utils.healpix
-import ugali.utils.healpix
 import ugali.utils.projector
 
 # Simple binner modules
@@ -69,10 +68,11 @@ except:
 try:
     outfile = sys.argv[4]
 except:
-    if (mode == 0):
-        outfile = '{}/results_nside_{}_{}.csv'.format(results_dir, nside, pix_nside_select)
-    elif (mode == 1):
-        outfile = '{}/results_mc_source_id_{}.csv'.format(results_dir, mc_source_id_array[0]) # all values in mc_source_id_array should be the same
+    sys.exit('ERROR: no outfile given.')
+#    if (mode == 0):
+#        outfile = '{}/results_nside_{}_{}.csv'.format(results_dir, nside, pix_nside_select)
+#    elif (mode == 1):
+#        outfile = '{}/results_mc_source_id_{}.csv'.format(results_dir, mc_source_id_array[0]) # all values in mc_source_id_array should be the same
     
 
 print('Search coordinates: (RA, Dec) = ({:0.2f}, {:0.2f})').format(ra_select, dec_select)
@@ -85,6 +85,7 @@ pix_nside_neighbors = np.concatenate([[pix_nside_select], hp.get_all_neighbours(
 # Construct data
 #data = simple_utils.construct_modal_data(mode, pix_nside_neighbors, mc_source_id)
 data = simple_utils.construct_real_data(pix_nside_neighbors)
+
 if (mode == 0):
     print('mode = 0: running only on real data')
 elif (mode == 1):
