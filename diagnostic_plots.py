@@ -46,7 +46,6 @@ with open('config.yaml', 'r') as ymlfile:
     basis_2 = cfg[survey]['basis_2']
 
     mode = cfg[survey]['mode']
-    sim_catalog = cfg[survey]['sim_catalog']
     sim_population = cfg[survey]['sim_population']
     
     mag_g = cfg[survey]['mag_g']

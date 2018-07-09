@@ -31,7 +31,6 @@ with open('config.yaml', 'r') as ymlfile:
     nside = cfg[survey]['nside']
     datadir = cfg[survey]['datadir']
     mode = cfg[survey]['mode']
-    sim_catalog = cfg[survey]['sim_catalog']
     sim_population = cfg[survey]['sim_population']
     sim_dir = cfg[survey]['sim_dir']
 
