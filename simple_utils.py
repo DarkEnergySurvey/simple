@@ -48,10 +48,25 @@ with open('config.yaml', 'r') as ymlfile:
     mag_r = cfg[survey]['mag_r']
     mag_g_err = cfg[survey]['mag_g_err']
     mag_r_err = cfg[survey]['mag_r_err']
-    
+
+    color_1 = cfg[survey]['color_1']
+    color_2 = cfg[survey]['color_2']
+    mag = cfg[survey]['mag']
+    mag_err = cfg[survey]['mag_err']
+    mag_dered = cfg[survey]['mag_dered']
+
     results_dir = os.path.join(os.getcwd(), cfg['output']['results_dir'])
     if not os.path.exists(results_dir):
         os.mkdir(results_dir)
+
+# construct mags
+mag_1 = mag + color_1
+mag_2 = mag + color_2
+mag_err_1 = mag_err + color_1
+mag_err_2 = mag_err + color_2
+mag_dered_1 = mag_dered + color_1
+mag_dered_2 = mag_dered + color_2
+    
 
 ########################################################################
 
@@ -197,7 +212,7 @@ def computeCharDensity(nside, data, ra_select, dec_select, magnitude_threshold=m
     Convlve the field and find overdensity peaks
     """
 
-    cut_magnitude_threshold = (data[mag_g] < magnitude_threshold)
+    cut_magnitude_threshold = (data[mag_1] < magnitude_threshold)
 
     proj = ugali.utils.projector.Projector(ra_select, dec_select)
     x, y = proj.sphereToImage(data[basis_1][cut_magnitude_threshold], data[basis_2][cut_magnitude_threshold]) # Trimmed magnitude range for hotspot finding
@@ -270,7 +285,7 @@ def computeLocalCharDensity(nside, data, characteristic_density, ra_select, dec_
     # The following is all computed elsewhere but needed in here... should either
     # abstract into its own function or somehow else circumvent the need to copy
     magnitude_threshold = mag_max # make this function argument?
-    cut_magnitude_threshold = (data[mag_g] < magnitude_threshold)
+    cut_magnitude_threshold = (data[mag_dered_1] < magnitude_threshold)
 
     proj = ugali.utils.projector.Projector(ra_select, dec_select)
     x, y = proj.sphereToImage(data[basis_1][cut_magnitude_threshold], data[basis_2][cut_magnitude_threshold]) # Trimmed magnitude range for hotspot finding
@@ -348,7 +363,7 @@ def findPeaks(nside, data, characteristic_density, distance_modulus, pix_nside_s
     """
 
     # convolve field and find peaks
-    cut_magnitude_threshold = (data[mag_g] < magnitude_threshold)
+    cut_magnitude_threshold = (data[mag_dered_1] < magnitude_threshold)
 
     proj = ugali.utils.projector.Projector(ra_select, dec_select)
     x, y = proj.sphereToImage(data[basis_1][cut_magnitude_threshold], data[basis_2][cut_magnitude_threshold]) # Trimmed magnitude range for hotspot finding
@@ -453,6 +468,7 @@ def fitAperture(proj, distance_modulus, characteristic_density_local, x_peak, y_
 
 ########################################################################
 
+# mode = 0
 def searchByDistance(nside, data, distance_modulus, pix_nside_select, ra_select, dec_select, magnitude_threshold=mag_max, fracdet=None):
     """
     Idea: 
@@ -467,12 +483,12 @@ def searchByDistance(nside, data, distance_modulus, pix_nside_select, ra_select,
 
     print('Distance = {:0.1f} kpc (m-M = {:0.1f})').format(ugali.utils.projector.distanceModulusToDistance(distance_modulus), distance_modulus)
 
-    iso = ugali.isochrone.factory(name=isoname, survey=isosurvey)
+    iso = ugali.isochrone.factory(name=isoname, survey=isosurvey, band_1=lower(color_1), band_2=lower(color_2))
     iso.age = 12.
     iso.metallicity = 0.0001
     iso.distance_modulus = distance_modulus
 
-    cut = cutIsochronePath(data[mag_g], data[mag_r], data[mag_g_err], data[mag_r_err], iso, radius=0.1)
+    cut = cutIsochronePath(data[mag_dered_1], data[mag_dered_2], data[mag_err_1], data[mag_err_2], iso, radius=0.1)
     data = data[cut]
 
     print('{} objects left after isochrone cut...').format(len(data))
@@ -521,6 +537,7 @@ def searchByDistance(nside, data, distance_modulus, pix_nside_select, ra_select,
 
 ########################################################################
 
+# mode = 1
 def searchBySimulation(nside, data, distance_modulus, pix_nside_select, ra_select, dec_select, magnitude_threshold=mag_max, fracdet=None):
     """
     Idea: 
@@ -535,12 +552,12 @@ def searchBySimulation(nside, data, distance_modulus, pix_nside_select, ra_selec
 
     print('Distance = {:0.1f} kpc (m-M = {:0.1f})').format(ugali.utils.projector.distanceModulusToDistance(distance_modulus), distance_modulus)
 
-    iso = ugali.isochrone.factory(name=isoname, survey=isosurvey)
+    iso = ugali.isochrone.factory(name=isoname, survey=isosurvey, band_1=lower(color_1), band_2=lower(color_2))
     iso.age = 12.
     iso.metallicity = 0.0001
     iso.distance_modulus = distance_modulus
 
-    cut = cutIsochronePath(data[mag_g], data[mag_r], data[mag_g_err], data[mag_r_err], iso, radius=0.1)
+    cut = cutIsochronePath(data[mag_dered_1], data[mag_dered_2], data[mag_err_1], data[mag_err_2], iso, radius=0.1)
     data = data[cut]
 
     print('{} objects left after isochrone cut...'.format(len(data)))
@@ -560,7 +577,80 @@ def searchBySimulation(nside, data, distance_modulus, pix_nside_select, ra_selec
 
     proj = ugali.utils.projector.Projector(ra_select, dec_select)
 
-    cut_magnitude_threshold = (data[mag_g] < magnitude_threshold)
+    cut_magnitude_threshold = (data[mag_dered_1] < magnitude_threshold)
+    x_peak, y_peak = proj.sphereToImage(ra_select, dec_select) # = 0, 0
+    x, y = proj.sphereToImage(data[basis_1][cut_magnitude_threshold], data[basis_2][cut_magnitude_threshold])
+    angsep_peak = np.sqrt((x - x_peak)**2 + (y - y_peak)**2)
+
+    characteristic_density_local = computeLocalCharDensity(nside, data, characteristic_density, ra_select, dec_select, x_peak, y_peak, angsep_peak, mag_max, fracdet)
+
+    # Aperture fitting
+    print('Fitting aperture to hotspot...')
+    ra_peaks, dec_peaks, r_peaks, sig_peaks, distance_moduli, n_obs_peaks, n_obs_half_peaks, n_model_peaks = fitAperture(proj, distance_modulus, characteristic_density_local, x_peak, y_peak, angsep_peak)
+    
+    ra_peak_array.append(ra_peaks)
+    dec_peak_array.append(dec_peaks)
+    r_peak_array.append(r_peaks)
+    sig_peak_array.append(sig_peaks)
+    distance_modulus_array.append(distance_moduli)
+    n_obs_peak_array.append(n_obs_peaks)
+    n_obs_half_peak_array.append(n_obs_half_peaks)
+    n_model_peak_array.append(n_model_peaks)
+
+    ra_peak_array = np.concatenate(ra_peak_array)
+    dec_peak_array = np.concatenate(dec_peak_array)
+    r_peak_array = np.concatenate(r_peak_array)
+    sig_peak_array = np.concatenate(sig_peak_array)
+    distance_modulus_array = np.concatenate(distance_modulus_array)
+    n_obs_peak_array = np.concatenate(n_obs_peak_array)
+    n_obs_half_peak_array = np.concatenate(n_obs_half_peak_array)
+    n_model_peak_array = np.concatenate(n_model_peak_array)
+
+    return ra_peak_array, dec_peak_array, r_peak_array, sig_peak_array, distance_modulus_array, n_obs_peak_array, n_obs_half_peak_array, n_model_peak_array
+
+########################################################################
+
+# mode = 2
+def searchByObject(nside, data, distance_modulus, pix_nside_select, ra_select, dec_select, magnitude_threshold=mag_max, fracdet=None):
+    """
+    Idea: 
+    Send a data extension that goes to faint magnitudes, e.g., g < 24.
+    Use the whole region to identify hotspots using a slightly brighter 
+    magnitude threshold, e.g., g < 23, so not susceptible to variations 
+    in depth. Then compute the local field density using a small annulus 
+    around each individual hotspot, e.g., radius 0.3 to 0.5 deg.
+
+    fracdet corresponds to a fracdet map (numpy array, assumed to be EQUATORIAL and RING)
+    """
+
+    print('Distance = {:0.1f} kpc (m-M = {:0.1f})').format(ugali.utils.projector.distanceModulusToDistance(distance_modulus), distance_modulus)
+
+    iso = ugali.isochrone.factory(name=isoname, survey=isosurvey, band_1=lower(color_1), band_2=lower(color_2))
+    iso.age = 12.
+    iso.metallicity = 0.0001
+    iso.distance_modulus = distance_modulus
+
+    cut = cutIsochronePath(data[mag_dered_1], data[mag_dered_2], data[mag_err_1], data[mag_err_2], iso, radius=0.1)
+    data = data[cut]
+
+    print('{} objects left after isochrone cut...'.format(len(data)))
+    print('{} simulated objects left after isochrone cut...'.format(np.sum(data['MC_SOURCE_ID'] != 0)))
+
+    # Compute characteristic density at this distance
+    characteristic_density = computeCharDensity(nside, data, ra_select, dec_select, mag_max, fracdet)
+
+    ra_peak_array = []
+    dec_peak_array = []
+    r_peak_array = []
+    sig_peak_array = []
+    distance_modulus_array = []
+    n_obs_peak_array = []
+    n_obs_half_peak_array = []
+    n_model_peak_array = []
+
+    proj = ugali.utils.projector.Projector(ra_select, dec_select)
+
+    cut_magnitude_threshold = (data[mag_dered_1] < magnitude_threshold)
     x_peak, y_peak = proj.sphereToImage(ra_select, dec_select) # = 0, 0
     x, y = proj.sphereToImage(data[basis_1][cut_magnitude_threshold], data[basis_2][cut_magnitude_threshold])
     angsep_peak = np.sqrt((x - x_peak)**2 + (y - y_peak)**2)

@@ -15,43 +15,49 @@ survey: 'y3_gold_2_0' # parameter to change for runs across different data
 #survey: 'bliss'
 
 y3_gold_2_0:
-    mode : 1 # 0: real, 1: real+sim
-    sim_catalog : None
+    mode : 0 # 0: real, 1: real+sim
     sim_population : '/home/s1/kadrlica/projects/mw_substructure/y3a2/sim_population/v10_des/sim_population_v10_des_mc_source_id_0000001-0010000.fits'
     sim_dir: '/home/s1/kadrlica/projects/mw_substructure/y3a2/sim_population/v10_des'
     nside          : 32
-    datadir        : '/home/s1/kadrlica/projects/y3a2/data/gold/v2.0/skim_ext_0_3'
+    #datadir        : '/home/s1/kadrlica/projects/y3a2/data/gold/v2.0/skim_ext_0_3'
+    datadir        : '/home/s1/kadrlica/projects/y3a2/data/gold/v2.0/healpix'
     isoname: 'Bressan2012'
     isosurvey: 'des'
-    candidate_list : 'candidate_list.fits'
+    object_list: 'object_list.fits'
+    candidate_list : 'candidate_list_r-i.fits'
     mag_max : 24.5
 
     basis_1: 'RA'
     basis_2: 'DEC'
+
+    # Dev #############################################################
+    # # change to band_1, band_2
+    color_1: 'R'
+    color_2: 'I'
+    #mag: 'SOF_PSF_MAG_CORRECTED_'
+    mag: 'SOF_PSF_MAG_'
+    mag_err: 'SOF_PSF_MAG_ERR_'
+    mag_dered: 'MAG_DERED_'
+
+    #mag_1_err: '' #'SOF_PSF_MAG_ERR_G'
+    #mag_2_err: '' #'SOF_PSF_MAG_ERR_R'
+    ###################################################################
 
     mag_g : 'MAG_G'
     mag_r : 'MAG_R'
     mag_g_err : 'SOF_PSF_MAG_ERR_G'
     mag_r_err : 'SOF_PSF_MAG_ERR_R'
 
-    mag_g_dred_flag : 'SOF_PSF_MAG_CORRECTED_G'
-    mag_r_dred_flag : 'SOF_PSF_MAG_CORRECTED_G'
-    mag_err_g_flag :  'SOF_PSF_MAG_ERR_G'
-    mag_err_r_flag :  'SOF_PSF_MAG_ERR_R'
-    flags_g : 'FLAGS_GOLD'
-    flags_r : 'FLAGS_GOLD'
-
     star_galaxy_classification : 'EXTENDED_CLASS_MASH_SOF'
 
-    maglim_g : '/home/s1/kadrlica/projects/y3q2/v6/release/depth/y2q1_maglim_g_n1024_ring.fits.gz'
-    maglim_r : '/home/s1/kadrlica/projects/y2q/v6/release/depth/y2q1_maglim_r_n1024_ring.fits.gz'
+    #maglim_g : '/home/s1/kadrlica/projects/y3q2/v6/release/depth/y2q1_maglim_g_n1024_ring.fits.gz'
+    #maglim_r : '/home/s1/kadrlica/projects/y2q/v6/release/depth/y2q1_maglim_r_n1024_ring.fits.gz'
 
     fracdet_gz : 'y3a2_griz_o.4096_t.32768_coverfoot_EQU.fits.gz'
     fracdet : 'y3a2_griz_o.4096_t.32768_coverfoot_EQU_decompressed.fits'
 
 y3a2:
     mode : 1 # 0: real, 1: real+sim
-    sim_catalog : 'sim_catalog.fits'
     sim_population : 'v3/sim_population_v3.fits'
     sim_dir: 'v3'
     nside          : 32
@@ -85,7 +91,6 @@ y3a2:
 
 bliss: # Need to update this
     mode: 0
-    sim_catalog: None
     sim_population: None
     sim_dir: None
     nside          : 32
@@ -155,7 +160,6 @@ maglites: # Update
 
 panstarrs:
     mode           : 1
-    sim_catalog    : None
     #sim_population : '/home/s1/kadrlica/projects/mw_substructure/y3a2/sim_population/v9_ps1/sim_population_v9_ps1_mc_source_id_0000001-0010000.fits'
     #sim_dir        : '/home/s1/kadrlica/projects/mw_substructure/y3a2/sim_population/v9_ps1'
     sim_dir : '/home/s1/kadrlica/projects/mw_substructure/y3a2/sim_population/v10_ps1'

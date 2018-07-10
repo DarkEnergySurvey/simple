@@ -32,12 +32,20 @@ with open('config.yaml', 'r') as ymlfile:
     nside = cfg[survey]['nside']
     datadir = cfg[survey]['datadir']
     mag_max = cfg[survey]['mag_max']
+
     basis_1 = cfg[survey]['basis_1']
     basis_2 = cfg[survey]['basis_2']
+
+    color_1 = cfg[survey]['color_1']
+    color_2 = cfg[survey]['color_2']
+    mag = cfg[survey]['mag']
+    mag_err = cfg[survey]['mag_err']
+    mag_dered = cfg[survey]['mag_dered']
 
     mode = cfg[survey]['mode']
     sim_population = cfg[survey]['sim_population']
     sim_dir = cfg[survey]['sim_dir']
+    object_list = cfg[survey]['object_list']
 
     fracdet_map = cfg[survey]['fracdet']
 
@@ -51,6 +59,14 @@ with open('config.yaml', 'r') as ymlfile:
         os.mkdir(results_dir)
 
 ############################################################
+
+# construct mags
+mag_1 = mag + color_1
+mag_2 = mag + color_2
+mag_err_1 = mag_err + color_1
+mag_err_2 = mag_err + color_2
+mag_dered_1 = mag_dered + color_1
+mag_dered_2 = mag_dered + color_2
 
 # main
 
@@ -93,8 +109,10 @@ elif (mode == 1):
     # inject objects for simulated object of mc_source_id
     sim_data = simple_utils.construct_sim_data(pix_nside_neighbors, mc_source_id)
     data = simple_utils.inject_sim(data, sim_data, mc_source_id)
+elif (mode == 2):
+    print('mode = 2: running only on real data')
 else:
-    print('No mode specified; running only on real data')
+    print('No/unsupported mode specified; running only on real data')
 
 # Quality cut
 quality = filters.quality_filter(survey, data)
@@ -152,6 +170,22 @@ if (mode == 0):
 elif (mode == 1):
     # grab distance_modulus from population
     sim_pop = fits.read(sim_population)
+    distance_modulus_select = sim_pop[sim_pop['MC_SOURCE_ID'] == mc_source_id]['DISTANCE_MODULUS'][0]
+
+    distance_modulus = distance_modulus_search_array[np.argmin(np.fabs(distance_modulus_search_array - distance_modulus_select))]
+    ra_peaks, dec_peaks, r_peaks, sig_peaks, dist_moduli, n_obs_peaks, n_obs_half_peaks, n_model_peaks = simple_utils.searchBySimulation(nside, data, distance_modulus, pix_nside_select, ra_select, dec_select, mag_max, fracdet)
+    ra_peak_array.append(ra_peaks)
+    dec_peak_array.append(dec_peaks)
+    r_peak_array.append(r_peaks)
+    sig_peak_array.append(sig_peaks)
+    distance_modulus_array.append(dist_moduli)
+    n_obs_peak_array.append(n_obs_peaks)
+    n_obs_half_peak_array.append(n_obs_half_peaks)
+    n_model_peak_array.append(n_model_peaks)
+    mc_source_id_array.append(np.tile(mc_source_id, len(sig_peaks)))
+elif (mode == 2):
+    # grab distance_modulus from population
+    sim_pop = fits.read(object_list)
     distance_modulus_select = sim_pop[sim_pop['MC_SOURCE_ID'] == mc_source_id]['DISTANCE_MODULUS'][0]
 
     distance_modulus = distance_modulus_search_array[np.argmin(np.fabs(distance_modulus_search_array - distance_modulus_select))]
