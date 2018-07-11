@@ -96,6 +96,8 @@ print('Search coordinates: (RA, Dec) = ({:0.2f}, {:0.2f})').format(ra_select, de
 pix_nside_select = ugali.utils.healpix.angToPix(nside, ra_select, dec_select)
 #ra_select, dec_select = ugali.utils.healpix.pixToAng(nside, pix_nside_select)
 pix_nside_neighbors = np.concatenate([[pix_nside_select], hp.get_all_neighbours(nside, pix_nside_select)])
+print('Center healpixel: {}'.format(pix_nside_select))
+print('Healpixels: {}'.format(pix_nside_neighbors))
 
 # Construct data
 #data = simple_utils.construct_modal_data(mode, pix_nside_neighbors, mc_source_id)
@@ -185,7 +187,8 @@ elif (mode == 1):
     mc_source_id_array.append(np.tile(mc_source_id, len(sig_peaks)))
 elif (mode == 2):
     # grab distance_modulus from population
-    sim_pop = fits.read(object_list)
+    #sim_pop = fits.read(object_list)
+    sim_pop = np.genfromtxt(object_list, delimiter=',', names=['RA', 'DEC', 'DISTANCE_MODULUS', 'MC_SOURCE_ID', 'NAME'])[1:]
     distance_modulus_select = sim_pop[sim_pop['MC_SOURCE_ID'] == mc_source_id]['DISTANCE_MODULUS'][0]
 
     distance_modulus = distance_modulus_search_array[np.argmin(np.fabs(distance_modulus_search_array - distance_modulus_select))]

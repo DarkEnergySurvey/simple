@@ -95,7 +95,8 @@ elif (mode == 1): # real+sim
         submitJob(ra, dec, pix, mc_source_id, mode)
 
 elif (mode == 2): # real objects
-    sim_pop = fits.read(object_list)
+    #sim_pop = fits.read(object_list)
+    sim_pop = np.genfromtxt(object_list, delimiter=',', names=['RA', 'DEC', 'DISTANCE_MODULUS', 'MC_SOURCE_ID', 'NAME'])[1:]
     for sim in sim_pop[:]:
         #if (sim['DIFFICULTY'] == 0): # check to make sure simulated object has stars
         ra, dec, mc_source_id = sim[basis_1], sim[basis_2], sim['MC_SOURCE_ID']

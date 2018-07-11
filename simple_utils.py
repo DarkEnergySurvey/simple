@@ -483,7 +483,7 @@ def searchByDistance(nside, data, distance_modulus, pix_nside_select, ra_select,
 
     print('Distance = {:0.1f} kpc (m-M = {:0.1f})').format(ugali.utils.projector.distanceModulusToDistance(distance_modulus), distance_modulus)
 
-    iso = ugali.isochrone.factory(name=isoname, survey=isosurvey, band_1=lower(color_1), band_2=lower(color_2))
+    iso = ugali.isochrone.factory(name=isoname, survey=isosurvey, band_1=color_1.lower(), band_2=color_2.lower())
     iso.age = 12.
     iso.metallicity = 0.0001
     iso.distance_modulus = distance_modulus
@@ -552,7 +552,7 @@ def searchBySimulation(nside, data, distance_modulus, pix_nside_select, ra_selec
 
     print('Distance = {:0.1f} kpc (m-M = {:0.1f})').format(ugali.utils.projector.distanceModulusToDistance(distance_modulus), distance_modulus)
 
-    iso = ugali.isochrone.factory(name=isoname, survey=isosurvey, band_1=lower(color_1), band_2=lower(color_2))
+    iso = ugali.isochrone.factory(name=isoname, survey=isosurvey, band_1=color_1.lower(), band_2=color_2.lower())
     iso.age = 12.
     iso.metallicity = 0.0001
     iso.distance_modulus = distance_modulus
@@ -625,7 +625,7 @@ def searchByObject(nside, data, distance_modulus, pix_nside_select, ra_select, d
 
     print('Distance = {:0.1f} kpc (m-M = {:0.1f})').format(ugali.utils.projector.distanceModulusToDistance(distance_modulus), distance_modulus)
 
-    iso = ugali.isochrone.factory(name=isoname, survey=isosurvey, band_1=lower(color_1), band_2=lower(color_2))
+    iso = ugali.isochrone.factory(name=isoname, survey=isosurvey, band_1=color_1.lower(), band_2=color_2.lower())
     iso.age = 12.
     iso.metallicity = 0.0001
     iso.distance_modulus = distance_modulus

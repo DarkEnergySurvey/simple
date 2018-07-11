@@ -15,16 +15,17 @@ survey: 'y3_gold_2_0' # parameter to change for runs across different data
 #survey: 'bliss'
 
 y3_gold_2_0:
-    mode : 0 # 0: real, 1: real+sim
+    mode : 2 # 0: real, 1: real+sim, 2: candidates
     sim_population : '/home/s1/kadrlica/projects/mw_substructure/y3a2/sim_population/v10_des/sim_population_v10_des_mc_source_id_0000001-0010000.fits'
     sim_dir: '/home/s1/kadrlica/projects/mw_substructure/y3a2/sim_population/v10_des'
     nside          : 32
     #datadir        : '/home/s1/kadrlica/projects/y3a2/data/gold/v2.0/skim_ext_0_3'
-    datadir        : '/home/s1/kadrlica/projects/y3a2/data/gold/v2.0/healpix'
+    datadir        : '/home/s1/kadrlica/projects/y3a2/data/gold/v2.0/skim_gri_ext_0_3'
+    #datadir        : '/home/s1/kadrlica/projects/y3a2/data/gold/v2.0/healpix'
     isoname: 'Bressan2012'
     isosurvey: 'des'
-    object_list: 'object_list.fits'
-    candidate_list : 'candidate_list_r-i.fits'
+    object_list: 'object_list.csv'
+    candidate_list : 'candidate_list.fits'
     mag_max : 24.5
 
     basis_1: 'RA'
@@ -32,10 +33,10 @@ y3_gold_2_0:
 
     # Dev #############################################################
     # # change to band_1, band_2
-    color_1: 'R'
-    color_2: 'I'
-    #mag: 'SOF_PSF_MAG_CORRECTED_'
-    mag: 'SOF_PSF_MAG_'
+    color_1: 'G'
+    color_2: 'R'
+    mag: 'SOF_PSF_MAG_CORRECTED_'
+    #mag: 'SOF_PSF_MAG_'
     mag_err: 'SOF_PSF_MAG_ERR_'
     mag_dered: 'MAG_DERED_'
 
