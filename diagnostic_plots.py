@@ -60,12 +60,12 @@ with open('config.yaml', 'r') as ymlfile:
     mag_dered = cfg[survey]['mag_dered']
 
 # construct mags
-mag_1 = mag + band_1
-mag_2 = mag + band_2
-mag_err_1 = mag_err + band_1
-mag_err_2 = mag_err + band_2
-mag_dered_1 = mag_dered + band_1
-mag_dered_2 = mag_dered + band_2
+mag_1 = mag + band_1.upper()
+mag_2 = mag + band_2.upper()
+mag_err_1 = mag_err + band_1.upper()
+mag_err_2 = mag_err + band_2.upper()
+mag_dered_1 = mag_dered + band_1.upper()
+mag_dered_2 = mag_dered + band_2.upper()
     
 ################################################################################
 
@@ -99,7 +99,7 @@ def analysis(targ_ra, targ_dec, mod, mc_source_id):
     data = filters.dered_mag(survey, data)
 
     # This should be generalized to also take the survey
-    iso = isochrone_factory(name=isoname, survey=isosurvey, age=12, z=0.0001, distance_modulus=mod, band_1=lower(band_1), band_2=lower(band_2))
+    iso = isochrone_factory(name=isoname, survey=isosurvey, age=12, z=0.0001, distance_modulus=mod, band_1=band_1.lower(), band_2=band_2.lower())
 
     # g_radius estimate
     filter = filters.star_filter(survey, data)
@@ -255,8 +255,8 @@ def cmPlot(targ_ra, targ_dec, data, iso, g_radius, nbhd, type):
     plt.gca().invert_yaxis()
     plt.gca().set_aspect(1./4.)
     plt.legend(loc='upper left')
-    plt.xlabel('{} - {} (mag)'.format(band_1, band_2))
-    plt.ylabel('{} (mag)'.format(band_1))
+    plt.xlabel('{} - {} (mag)'.format(band_1.lower(), band_2.lower()))
+    plt.ylabel('{} (mag)'.format(band_1.lower()))
 
 def hessPlot(targ_ra, targ_dec, data, iso, g_radius, nbhd):
     """Hess plot"""
@@ -305,8 +305,8 @@ def hessPlot(targ_ra, targ_dec, data, iso, g_radius, nbhd):
     plt.axis([-0.5, 1.0, 16, mag_max])
     plt.gca().invert_yaxis()
     plt.gca().set_aspect(1./4.)
-    plt.xlabel('{} - {} (mag)'.format(band_1, band_2))
-    plt.ylabel('{} (mag)'.format(band_1))
+    plt.xlabel('{} - {} (mag)'.format(band_1.lower(), band_2.lower()))
+    plt.ylabel('{} (mag)'.format(band_1,lower()))
 
 def radialPlot(targ_ra, targ_dec, data, iso, g_radius, nbhd, field_density=None):
     """Radial distribution plot"""

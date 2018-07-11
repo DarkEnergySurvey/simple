@@ -60,13 +60,12 @@ with open('config.yaml', 'r') as ymlfile:
         os.mkdir(results_dir)
 
 # construct mags
-mag_1 = mag + band_1
-mag_2 = mag + band_2
-mag_err_1 = mag_err + band_1
-mag_err_2 = mag_err + band_2
-mag_dered_1 = mag_dered + band_1
-mag_dered_2 = mag_dered + band_2
-    
+mag_1 = mag + band_1.upper()
+mag_2 = mag + band_2.upper()
+mag_err_1 = mag_err + band_1.upper()
+mag_err_2 = mag_err + band_2.upper()
+mag_dered_1 = mag_dered + band_1.upper()
+mag_dered_2 = mag_dered + band_2.upper()
 
 ########################################################################
 
