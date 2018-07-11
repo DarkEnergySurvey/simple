@@ -31,18 +31,12 @@ y3_gold_2_0:
     basis_1: 'RA'
     basis_2: 'DEC'
 
-    # Dev #############################################################
-    # # change to band_1, band_2
     band_1: 'G'
     band_2: 'R'
-    mag: 'SOF_PSF_MAG_CORRECTED_'
-    #mag: 'SOF_PSF_MAG_'
-    mag_err: 'SOF_PSF_MAG_ERR_'
-    mag_dered: 'MAG_DERED_'
-
-    #mag_1_err: '' #'SOF_PSF_MAG_ERR_G'
-    #mag_2_err: '' #'SOF_PSF_MAG_ERR_R'
-    ###################################################################
+    mag: 'SOF_PSF_MAG_CORRECTED_{}'
+    #mag: 'SOF_PSF_MAG_{}'
+    mag_err: 'SOF_PSF_MAG_ERR_{}'
+    mag_dered: 'MAG_DERED_{}'
 
     mag_g : 'MAG_G'
     mag_r : 'MAG_R'
@@ -106,27 +100,18 @@ bliss: # Need to update this
 
     basis_1: 'RA'
     basis_2: 'DEC'
+    band_1: 'G'
+    band_2: 'R'
+    mag: 'MAG_PSF_SFD_{}'
+    mag_err: 'WAVG_MAGERR_PSF_{}'
+    mag_dered: 'MAG_DERED_{}'
+
     mag_g : 'MAG_G'
     mag_r : 'MAG_R'
     mag_g_err : 'WAVG_MAGERR_PSF_G'
     mag_r_err : 'WAVG_MAGERR_PSF_R'
     #mag_g_err             : 'PSF_MAG_ERR_G'
     #mag_r_err             : 'PSF_MAG_ERR_R'
-
-    #mag_g_dred_flag            : 'PSF_MAG_SFD_G'
-    #mag_r_dred_flag            : 'PSF_MAG_SFD_R'
-    ##mag_g_flag                : 'CM_MAG_G'
-    ##mag_r_flag                : 'CM_MAG_R'
-    #mag_err_g_flag             : 'PSF_MAG_ERR_G'
-    #mag_err_r_flag             : 'PSF_MAG_ERR_R'
-    ##extinction_g_flag         : 'EXTINCTION_G'
-    ##extinction_r_flag         : 'EXTINCTION_R'
-    #star_galaxy_classification : 'EXTENDED_CLASS_MASH' #spread_model_r_flag
-
-    #spread_model_r_flag        : 'CM_T' # use for BISS/MagLiteS
-    #spread_model_r_err_flag    : 'CM_T_ERR'
-    #flags_g                    : 'SEXTRACTOR_FLAGS_G'
-    #flags_r                    : 'SEXTRACTOR_FLAGS_R'
 
     fracdet : None
 
@@ -183,6 +168,12 @@ panstarrs:
     mag_r_err : 'RFPSFMAGERR'
     flags_g : 'GFLAGS'
     flags_r : 'RFLAGS'
+
+    band_1: 'G'
+    band_2: 'R'
+    mag: '{}FPSFMAG_SFD'
+    #mag_err: 'SOF_PSF_MAG_ERR_'
+    mag_dered: 'MAG_DERED_{}'
 
     fracdet_gz : 'panstarrs_pseudo_fracdet.fits.gz'
     fracdet : 'panstarrs_pseudo_fracdet.fits'
