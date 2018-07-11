@@ -49,8 +49,8 @@ with open('config.yaml', 'r') as ymlfile:
     mag_g_err = cfg[survey]['mag_g_err']
     mag_r_err = cfg[survey]['mag_r_err']
 
-    color_1 = cfg[survey]['color_1']
-    color_2 = cfg[survey]['color_2']
+    band_1 = cfg[survey]['band_1']
+    band_2 = cfg[survey]['band_2']
     mag = cfg[survey]['mag']
     mag_err = cfg[survey]['mag_err']
     mag_dered = cfg[survey]['mag_dered']
@@ -60,12 +60,12 @@ with open('config.yaml', 'r') as ymlfile:
         os.mkdir(results_dir)
 
 # construct mags
-mag_1 = mag + color_1
-mag_2 = mag + color_2
-mag_err_1 = mag_err + color_1
-mag_err_2 = mag_err + color_2
-mag_dered_1 = mag_dered + color_1
-mag_dered_2 = mag_dered + color_2
+mag_1 = mag + band_1
+mag_2 = mag + band_2
+mag_err_1 = mag_err + band_1
+mag_err_2 = mag_err + band_2
+mag_dered_1 = mag_dered + band_1
+mag_dered_2 = mag_dered + band_2
     
 
 ########################################################################
@@ -483,7 +483,7 @@ def searchByDistance(nside, data, distance_modulus, pix_nside_select, ra_select,
 
     print('Distance = {:0.1f} kpc (m-M = {:0.1f})').format(ugali.utils.projector.distanceModulusToDistance(distance_modulus), distance_modulus)
 
-    iso = ugali.isochrone.factory(name=isoname, survey=isosurvey, band_1=color_1.lower(), band_2=color_2.lower())
+    iso = ugali.isochrone.factory(name=isoname, survey=isosurvey, band_1=band_1.lower(), band_2=band_2.lower())
     iso.age = 12.
     iso.metallicity = 0.0001
     iso.distance_modulus = distance_modulus
@@ -552,7 +552,7 @@ def searchBySimulation(nside, data, distance_modulus, pix_nside_select, ra_selec
 
     print('Distance = {:0.1f} kpc (m-M = {:0.1f})').format(ugali.utils.projector.distanceModulusToDistance(distance_modulus), distance_modulus)
 
-    iso = ugali.isochrone.factory(name=isoname, survey=isosurvey, band_1=color_1.lower(), band_2=color_2.lower())
+    iso = ugali.isochrone.factory(name=isoname, survey=isosurvey, band_1=band_1.lower(), band_2=band_2.lower())
     iso.age = 12.
     iso.metallicity = 0.0001
     iso.distance_modulus = distance_modulus
@@ -625,7 +625,7 @@ def searchByObject(nside, data, distance_modulus, pix_nside_select, ra_select, d
 
     print('Distance = {:0.1f} kpc (m-M = {:0.1f})').format(ugali.utils.projector.distanceModulusToDistance(distance_modulus), distance_modulus)
 
-    iso = ugali.isochrone.factory(name=isoname, survey=isosurvey, band_1=color_1.lower(), band_2=color_2.lower())
+    iso = ugali.isochrone.factory(name=isoname, survey=isosurvey, band_1=band_1.lower(), band_2=band_2.lower())
     iso.age = 12.
     iso.metallicity = 0.0001
     iso.distance_modulus = distance_modulus

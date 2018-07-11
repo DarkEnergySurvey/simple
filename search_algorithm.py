@@ -36,8 +36,8 @@ with open('config.yaml', 'r') as ymlfile:
     basis_1 = cfg[survey]['basis_1']
     basis_2 = cfg[survey]['basis_2']
 
-    color_1 = cfg[survey]['color_1']
-    color_2 = cfg[survey]['color_2']
+    band_1 = cfg[survey]['band_1']
+    band_2 = cfg[survey]['band_2']
     mag = cfg[survey]['mag']
     mag_err = cfg[survey]['mag_err']
     mag_dered = cfg[survey]['mag_dered']
@@ -61,12 +61,12 @@ with open('config.yaml', 'r') as ymlfile:
 ############################################################
 
 # construct mags
-mag_1 = mag + color_1
-mag_2 = mag + color_2
-mag_err_1 = mag_err + color_1
-mag_err_2 = mag_err + color_2
-mag_dered_1 = mag_dered + color_1
-mag_dered_2 = mag_dered + color_2
+mag_1 = mag + band_1
+mag_2 = mag + band_2
+mag_err_1 = mag_err + band_1
+mag_err_2 = mag_err + band_2
+mag_dered_1 = mag_dered + band_1
+mag_dered_2 = mag_dered + band_2
 
 # main
 

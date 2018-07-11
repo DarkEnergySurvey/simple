@@ -33,8 +33,8 @@ y3_gold_2_0:
 
     # Dev #############################################################
     # # change to band_1, band_2
-    color_1: 'G'
-    color_2: 'R'
+    band_1: 'G'
+    band_2: 'R'
     mag: 'SOF_PSF_MAG_CORRECTED_'
     #mag: 'SOF_PSF_MAG_'
     mag_err: 'SOF_PSF_MAG_ERR_'
