@@ -15,8 +15,8 @@ survey: 'y3_gold_2_0' # parameter to change for runs across different data
 #survey: 'bliss'
 
 y3_gold_2_0:
-    mode : 2 # 0: real, 1: real+sim, 2: candidates
-    sim_population : '/home/s1/kadrlica/projects/mw_substructure/y3a2/sim_population/v10_des/sim_population_v10_des_mc_source_id_0000001-0010000.fits'
+    mode : 1 # 0: real, 1: real+sim, 2: candidates
+    sim_population : '/home/s1/kadrlica/projects/mw_substructure/y3a2/sim_population/v12_des/sim_population_v12_des_mc_source_id_0000001-0010000.fits'
     sim_dir: '/home/s1/kadrlica/projects/mw_substructure/y3a2/sim_population/v10_des'
     nside          : 32
     #datadir        : '/home/s1/kadrlica/projects/y3a2/data/gold/v2.0/skim_ext_0_3'
@@ -149,7 +149,7 @@ panstarrs:
     #sim_population : '/home/s1/kadrlica/projects/mw_substructure/y3a2/sim_population/v9_ps1/sim_population_v9_ps1_mc_source_id_0000001-0010000.fits'
     #sim_dir        : '/home/s1/kadrlica/projects/mw_substructure/y3a2/sim_population/v9_ps1'
     sim_dir : '/home/s1/kadrlica/projects/mw_substructure/y3a2/sim_population/v10_ps1'
-    sim_population : '/home/s1/kadrlica/projects/mw_substructure/y3a2/sim_population/v10_ps1/sim_population_v10_ps1_mc_source_id_0000001-0010000.fits'
+    sim_population : '/home/s1/kadrlica/projects/mw_substructure/y3a2/sim_population/v12_ps1/sim_population_v12_ps1_mc_source_id_0000001-0010000.fits'
     nside          : 32
     #datadir        : '/data/des40.b/data/pan-starrs/dr1/healpix'
     datadir        : '/home/s1/kadrlica/projects/ps1/dr1/v0/skim_ext_0_1'
@@ -157,7 +157,8 @@ panstarrs:
     #isodir         : '/Users/keithbechtol/Documents/DES/projects/mw_substructure/ugalidir/isochrones/ps1/dotter2016/'
     isoname        : 'Bressan2012' #'Dotter2016'
     isosurvey      : 'ps1'
-    candidate_list : 'candidate_list_sim.fits'
+    candidate_list : 'candidate_list.fits'
+    object_list: 'None'
     mag_max : 22.5
 
     basis_1: 'RA'
@@ -172,7 +173,7 @@ panstarrs:
     band_1: 'G'
     band_2: 'R'
     mag: '{}FPSFMAG_SFD'
-    #mag_err: 'SOF_PSF_MAG_ERR_'
+    mag_err: '{}FPSFMAGERR'
     mag_dered: 'MAG_DERED_{}'
 
     fracdet_gz : 'panstarrs_pseudo_fracdet.fits.gz'
