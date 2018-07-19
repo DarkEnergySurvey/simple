@@ -125,7 +125,7 @@ def color_filter(survey, data):
     elif survey == 'y3a2':
         cut = ((data['PSF_MAG_SFD_G'] - data['PSF_MAG_SFD_R']) < 0.4) # 0.2
     elif survey == 'bliss':
-        cut = ((data[mag_g] - data[mag_r]) < 0.4) # 0.2
+        cut = ((data[mag_1] - data[mag_2]) < 0.4) # 0.2
     elif survey == 'maglites':
         cut = ((data[mag_g] - data[mag_r]) < 0.4) # 0.2
     elif survey == 'panstarrs':
@@ -148,7 +148,8 @@ def dered_mag(survey, data):
     elif survey == 'bliss':
         #data = mlab.rec_append_fields(data, [mag_g, mag_r], [data['CM_MAG_G'] - data['EXINCTION_G'], data['CM_MAG_R'] - data['EXTINCTION_R']])
         #data = mlab.rec_append_fields(data, [mag_g, mag_r], [data['WAVG_MAG_PSF_G'], data['WAVG_MAG_PSF_R']])
-        data = mlab.rec_append_fields(data, [mag_g, mag_r], [data['MAG_PSF_SFD_G'], data['MAG_PSF_SFD_R']])
+        #data = mlab.rec_append_fields(data, [mag_g, mag_r], [data['MAG_PSF_SFD_G'], data['MAG_PSF_SFD_R']])
+        data = numpy.lib.recfunctions.append_fields(data, [mag_dered_1, mag_dered_2], [data[mag_1], data[mag_2]], usemask=False, asrecarray=True)
         #data = mlab.rec_append_fields(data, [mag_g, mag_r], [data['PSF_MAG_SFD_G'], data['PSF_MAG_SFD_R']])
         #data = numpy.lib.recfunctions.append_fields(data, [mag_g, mag_r], [data['PSF_MAG_SFD_G'], data['PSF_MAG_SFD_R']], 
         #                                            usemask=False, asrecarray=True)
@@ -162,5 +163,6 @@ def dered_mag(survey, data):
         #data = numpy.lib.recfunctions.append_fields(data, [mag_g, mag_r], [data['GFPSFMAG'] - data['EXTSFD_G'], data['RFPSFMAG'] - data['EXTSFD_R']], 
         #                                            usemask=False, asrecarray=True)
         #data = ugali.utils.mlab.rec_append_fields(data, [mag_g, mag_r], [data['GFPSFMAG'] - data['EXTSFD_G'], data['RFPSFMAG'] - data['EXTSFD_R']])
-        data = numpy.lib.recfunctions.append_fields(data, [mag_g, mag_r], [data['GFPSFMAG_SFD'], data['RFPSFMAG_SFD']], usemask=False, asrecarray=True)
+        #data = numpy.lib.recfunctions.append_fields(data, [mag_g, mag_r], [data['GFPSFMAG_SFD'], data['RFPSFMAG_SFD']], usemask=False, asrecarray=True)
+        data = numpy.lib.recfunctions.append_fields(data, [mag_dered_1, mag_dered_2], [data[mag_1], data[mag_2]], usemask=False, asrecarray=True)
     return data
