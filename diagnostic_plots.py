@@ -23,7 +23,6 @@ from scipy.signal import argrelextrema
 import scipy.ndimage
 
 import pylab as plt
-import pyfits
 import matplotlib
 from matplotlib import mlab
 from mpl_toolkits.axes_grid1 import make_axes_locatable
@@ -306,7 +305,7 @@ def hessPlot(targ_ra, targ_dec, data, iso, g_radius, nbhd):
     plt.gca().invert_yaxis()
     plt.gca().set_aspect(1./4.)
     plt.xlabel('{} - {} (mag)'.format(band_1.lower(), band_2.lower()))
-    plt.ylabel('{} (mag)'.format(band_1,lower()))
+    plt.ylabel('{} (mag)'.format(band_1.lower()))
 
 def radialPlot(targ_ra, targ_dec, data, iso, g_radius, nbhd, field_density=None):
     """Radial distribution plot"""
