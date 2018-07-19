@@ -25,7 +25,7 @@ with open('config.yaml', 'r') as ymlfile:
     nside = cfg[survey]['nside']
     datadir = cfg[survey]['datadir']
     mode = cfg[survey]['mode']
-    sim_population = cfg[survey]['sim_population']
+    #sim_population = cfg[survey]['sim_population']
 
 results_dir = os.path.join(os.getcwd(), cfg['output']['results_dir'])
 if not os.path.exists(results_dir):
@@ -37,31 +37,28 @@ if not os.path.exists(log_dir):
 
 ############################################################
 
+#try:
+#    mc_first, mc_last, outfile, logfile = float(sys.argv[1]), float(sys.argv[2]), sys.argv[3], sys.argv[4]
+#except:
+#    sys.exit('ERROR!')
+
 try:
-    mc_first, mc_last, outfile, logfile = float(sys.argv[1]), float(sys.argv[2]), sys.argv[3], sys.argv[4]
+    pop_infile =  sys.argv[1]
 except:
     sys.exit('ERROR!')
 
 ############################################################
 
-def execute_batch_jobs(sub_sim_list, outfile, logfile):
-    for sim in sub_sim_list:
-        if (sim['DIFFICULTY'] == 0):
-            ra, dec, mc_source_id = sim[basis_1], sim[basis_2], sim['MC_SOURCE_ID']
-            pix = hp.ang2pix(nside, ra, dec, lonlat=True)
+outfile = '{}/results_{}.csv'.format(results_dir, pop_infile[-20:-5])
+logfile = '{}/log_{}.log'.format(log_dir, pop_infile[-20:-5])
+
+sim_pop = fits.read(pop_infile)
+for sim in sim_pop:
+    ra, dec, mc_source_id = sim[basis_1], sim[basis_2], sim['MC_SOURCE_ID']
     
-            command = 'python {}/search_algorithm.py {:0.2f} {:0.2f} {:0.2f} {} >> {}'.format(simple_dir, ra, dec, mc_source_id, outfile, logfile)
-
-            print(command)
-            os.system(command) # Submit to queue
-
-    return
-
-############################################################
-
-# Main:
-
-sim_pop = fits.read(sim_population)
-sub_sim_list = sim_pop[(sim_pop['MC_SOURCE_ID'] >= mc_first) & (sim_pop['MC_SOURCE_ID'] <= mc_last)]
-
-execute_batch_jobs(sub_sim_list, outfile, logfile)
+    pix = hp.ang2pix(nside, ra, dec, lonlat=True)
+    
+    command = 'python {}/search_algorithm.py {:0.2f} {:0.2f} {:0.2f} {} >> {}'.format(simple_dir, ra, dec, mc_source_id, outfile, logfile)
+    
+    print(command)
+    os.system(command) # Submit to queue
