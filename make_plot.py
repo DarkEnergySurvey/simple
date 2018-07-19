@@ -99,8 +99,8 @@ except: # simple
 association_string = str(np.char.strip(association_string))
 association_string = repr(association_string)
 
-plt.suptitle('{}\n'.format(association_string) + r'($\alpha$, $\delta$, $\mu$, $\sigma$, MC_SOURCE_ID) = ({}, {}, {}, {}, {})'.format(targ_ra, targ_dec, mod, sig, mc_source_id), fontsize=24)
+plt.suptitle('{}\n'.format(association_string) + r'($\alpha$, $\delta$, $\mu$, $\sigma$, MC_SOURCE_ID) = ({:0.2f}, {:0.2f}, {:0.2f}, {:0.2f}, {:0.0f})'.format(targ_ra, targ_dec, mod, sig, mc_source_id), fontsize=24)
 
-file_name = 'candidate_{}_{}'.format(targ_ra, targ_dec)
+file_name = 'candidate_{:0.2f}_{:0.2f}'.format(targ_ra, targ_dec)
 plt.savefig(save_dir+'/'+file_name+'.png',  bbox_inches='tight')
 plt.close()
