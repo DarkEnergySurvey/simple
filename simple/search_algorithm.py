@@ -20,8 +20,8 @@ import ugali.utils.healpix
 import ugali.utils.projector
 
 # Simple binner modules
-import filters
-import simple_utils
+import simple.filters
+import simple.simple_utils
 
 ###########################################################
 

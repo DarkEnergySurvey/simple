@@ -18,7 +18,8 @@ from matplotlib import gridspec
 
 import ugali.utils.projector
 import ugali.candidate.associate
-import diagnostic_plots
+
+import simple.diagnostic_plots
 
 print(matplotlib.get_backend())
 

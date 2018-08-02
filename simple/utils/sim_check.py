@@ -30,9 +30,9 @@ from matplotlib import gridspec
 #import ugali.utils.mlab
 import ugali.utils.healpix
 
-import filters
-import simple_utils
-import diagnostic_plots
+import simple.filters
+import simple.simple_utils
+import simple.diagnostic_plots
 
 ########################################################################
 
