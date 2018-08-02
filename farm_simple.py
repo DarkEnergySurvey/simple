@@ -57,7 +57,8 @@ def submitJob(ra, dec, pix, mc_source_id, mode, **population_file):
     elif (mode == 2):
         outfile = '{}/results_mc_source_id_{}.csv'.format(results_dir, mc_source_id) # all values in mc_source_id_array should be the same
         logfile = '{}/results_mc_source_id_{}.log'.format(log_dir, mc_source_id) # all values in mc_source_id_array should be the same
-    batch = 'csub -n {} -o {} '.format(jobs, logfile)
+    #batch = 'csub -n {} -o {} '.format(jobs, logfile)
+    batch = 'csub -n {} -o {} --host all '.format(jobs, logfile) # testing condor updates
     command = 'python {}/search_algorithm.py {:0.2f} {:0.2f} {:0.2f} {} {}'.format(simple_dir, ra, dec, mc_source_id, outfile, logfile)
     command_queue = batch + command
 
@@ -87,7 +88,8 @@ if (mode == 0): # real
     
 elif (mode == 1): # real+sim
     sim_pop = fits.read(sim_population)
-    for sim in sim_pop[:]:
+    #for sim in sim_pop[:]:
+    for sim in sim_pop[:20]:
         #if (sim['DIFFICULTY'] == 0): # check to make sure simulated object has stars
         ra, dec, mc_source_id = sim[basis_1], sim[basis_2], sim['MC_SOURCE_ID']
         pix = hp.ang2pix(nside, ra, dec, lonlat=True)

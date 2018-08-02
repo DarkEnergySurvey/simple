@@ -103,6 +103,7 @@ print('Healpixels: {}'.format(pix_nside_neighbors))
 #data = simple_utils.construct_modal_data(mode, pix_nside_neighbors, mc_source_id)
 data = simple_utils.construct_real_data(pix_nside_neighbors)
 
+print('MC_SOURCE_ID = {}'.format(mc_source_id))
 if (mode == 0):
     print('mode = 0: running only on real data')
 elif (mode == 1):

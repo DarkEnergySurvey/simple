@@ -92,7 +92,7 @@ def getCatalogFile(catalog_dir, mc_source_id):
 
     assert len(mc_source_id_array) == len(np.unique(mc_source_id_array)), 'Found non-unique MC_SOURCE_ID values in filenames'
     assert np.in1d(mc_source_id, mc_source_id_array), 'Requested MC_SOURCE_ID value not among files'
-    mc_source_id_index = np.nonzero(mc_source_id == mc_source_id_array)[0]
+    mc_source_id_index = np.nonzero(mc_source_id == mc_source_id_array)[0][0] # second [0] added by smau 7/23/18 to fix incompatiable type bug
     return catalog_infiles[catalog_infile_index_array[mc_source_id_index]]
 
 def construct_real_data(pix_nside_neighbors):
@@ -135,9 +135,10 @@ def inject_sim(real_data, sim_data, mc_source_id):
     columns = inject_data.dtype
     # inject_data has boolean extended class
     # real_data has pseudo-boolean extended class
+
     real_data = real_data.astype(columns)
-    #real_data_reshape = np.ndarray(real_data.shape, columns, real_data, 0, real_data.strides)
     data = np.concatenate((real_data, inject_data), axis=0)
+    #real_data_reshape = np.ndarray(real_data.shape, columns, real_data, 0, real_data.strides)
     #data = np.concatenate((real_data_reshape, inject_data), axis=0)
 
     return data
