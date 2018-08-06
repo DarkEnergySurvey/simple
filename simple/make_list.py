@@ -32,10 +32,7 @@ for file in glob.glob('{}/*.csv'.format(cfg['output']['results_dir'])):
     csvfile.close()
 
 data = np.asarray(results)
-dt = np.dtype([('SIG', '>f4'), (basis_1, '>f4'), (basis_2, '>f4'), ('MODULUS', '>f4'), ('r', '>f4'), ('N_OBS', '>f4'), ('N_OBS_HALF', '>f4'), ('N_MODEL', '>f4'), ('MC_SOURCE_ID', '>f4')])
-data = data.astype(dt)
 
-import pdb;pdb.set_trace()
 # Create fits columns
 c0 = fits.Column(name='SIG',          format='E', array=data[:,0])
 c1 = fits.Column(name=basis_1,        format='E', array=data[:,1])
