@@ -88,9 +88,9 @@ for infile in file_array:
     data_array.append(fits.read(infile))
 
 data = np.concatenate(data_array)
-#data = filters.dered_mag(survey, data)
+#data = simple.filters.dered_mag(survey, data)
 
-#filter = filters.star_filter(survey, data)
+#filter = simple.filters.star_filter(survey, data)
 #data = data[filter]
 
 ###

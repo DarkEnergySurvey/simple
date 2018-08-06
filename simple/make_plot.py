@@ -51,33 +51,33 @@ fig = plt.figure(figsize=(20, 17))
 fig.subplots_adjust(wspace=0.3, hspace=0.3)
 gs = gridspec.GridSpec(3, 3)
 
-data, iso, g_radius, nbhd = diagnostic_plots.analysis(targ_ra, targ_dec, mod, mc_source_id)
+data, iso, g_radius, nbhd = simple.diagnostic_plots.analysis(targ_ra, targ_dec, mod, mc_source_id)
 
 print('Making diagnostic plots for ({}, {}) = ({}, {})...'.format(basis_1, basis_2, targ_ra, targ_dec))
 
 fig.add_subplot(gs[0,0])
-diagnostic_plots.densityPlot(targ_ra, targ_dec, data, iso, g_radius, nbhd, 'stars')
+simple.diagnostic_plots.densityPlot(targ_ra, targ_dec, data, iso, g_radius, nbhd, 'stars')
 
 fig.add_subplot(gs[1,0])
-diagnostic_plots.densityPlot(targ_ra, targ_dec, data, iso, g_radius, nbhd, 'galaxies')
+simple.diagnostic_plots.densityPlot(targ_ra, targ_dec, data, iso, g_radius, nbhd, 'galaxies')
 
 fig.add_subplot(gs[2,0])
-diagnostic_plots.densityPlot(targ_ra, targ_dec, data, iso, g_radius, nbhd, 'blue_stars')
+simple.diagnostic_plots.densityPlot(targ_ra, targ_dec, data, iso, g_radius, nbhd, 'blue_stars')
 
 fig.add_subplot(gs[0,1])
-diagnostic_plots.cmPlot(targ_ra, targ_dec, data, iso, g_radius, nbhd, 'stars')
+simple.diagnostic_plots.cmPlot(targ_ra, targ_dec, data, iso, g_radius, nbhd, 'stars')
 
 fig.add_subplot(gs[1,1])
-diagnostic_plots.cmPlot(targ_ra, targ_dec, data, iso, g_radius, nbhd, 'galaxies')
+simple.diagnostic_plots.cmPlot(targ_ra, targ_dec, data, iso, g_radius, nbhd, 'galaxies')
 
 fig.add_subplot(gs[0,2])
-diagnostic_plots.hessPlot(targ_ra, targ_dec, data, iso, g_radius, nbhd)
+simple.diagnostic_plots.hessPlot(targ_ra, targ_dec, data, iso, g_radius, nbhd)
 
 fig.add_subplot(gs[1,2])
-diagnostic_plots.starPlot(targ_ra, targ_dec, data, iso, g_radius, nbhd)
+simple.diagnostic_plots.starPlot(targ_ra, targ_dec, data, iso, g_radius, nbhd)
 
 fig.add_subplot(gs[2,1:3])
-diagnostic_plots.radialPlot(targ_ra, targ_dec, data, iso, g_radius, nbhd, field_density)
+simple.diagnostic_plots.radialPlot(targ_ra, targ_dec, data, iso, g_radius, nbhd, field_density)
 
 # Name
 try: # ugali

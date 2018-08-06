@@ -101,7 +101,7 @@ print('Healpixels: {}'.format(pix_nside_neighbors))
 
 # Construct data
 #data = simple_utils.construct_modal_data(mode, pix_nside_neighbors, mc_source_id)
-data = simple_utils.construct_real_data(pix_nside_neighbors)
+data = simple.simple_utils.construct_real_data(pix_nside_neighbors)
 
 print('MC_SOURCE_ID = {}'.format(mc_source_id))
 if (mode == 0):
@@ -110,25 +110,25 @@ elif (mode == 1):
     print('mode = 1: running on real data and simulated data')
     
     # inject objects for simulated object of mc_source_id
-    sim_data = simple_utils.construct_sim_data(pix_nside_neighbors, mc_source_id)
-    data = simple_utils.inject_sim(data, sim_data, mc_source_id)
+    sim_data = simple.simple_utils.construct_sim_data(pix_nside_neighbors, mc_source_id)
+    data = simple.simple_utils.inject_sim(data, sim_data, mc_source_id)
 elif (mode == 2):
     print('mode = 2: running only on real data')
 else:
     print('No/unsupported mode specified; running only on real data')
 
 # Quality cut
-quality = filters.quality_filter(survey, data)
+quality = simple.filters.quality_filter(survey, data)
 data = data[quality]
 
 # Deredden magnitudes
-data = filters.dered_mag(survey, data)
+data = simple.filters.dered_mag(survey, data)
 
 print('Found {} objects...').format(len(data))
 
 print('Applying cuts...')
-cut = filters.star_filter(survey, data)
-cut_gal = filters.galaxy_filter(survey, data)
+cut = simple.filters.star_filter(survey, data)
+cut_gal = simple.filters.galaxy_filter(survey, data)
 
 data_gal = data[cut_gal] # this isn't used at all other than for noting number of galaxy-like objects in ROI
 data = data[cut]
@@ -160,7 +160,7 @@ n_model_peak_array = []
 
 if (mode == 0):
     for distance_modulus in distance_modulus_search_array:
-        ra_peaks, dec_peaks, r_peaks, sig_peaks, dist_moduli, n_obs_peaks, n_obs_half_peaks, n_model_peaks = simple_utils.searchByDistance(nside, data, distance_modulus, pix_nside_select, ra_select, dec_select, mag_max, fracdet)
+        ra_peaks, dec_peaks, r_peaks, sig_peaks, dist_moduli, n_obs_peaks, n_obs_half_peaks, n_model_peaks = simple.simple_utils.searchByDistance(nside, data, distance_modulus, pix_nside_select, ra_select, dec_select, mag_max, fracdet)
         ra_peak_array.append(ra_peaks)
         dec_peak_array.append(dec_peaks)
         r_peak_array.append(r_peaks)
@@ -176,7 +176,7 @@ elif (mode == 1):
     distance_modulus_select = sim_pop[sim_pop['MC_SOURCE_ID'] == mc_source_id]['DISTANCE_MODULUS'][0]
 
     distance_modulus = distance_modulus_search_array[np.argmin(np.fabs(distance_modulus_search_array - distance_modulus_select))]
-    ra_peaks, dec_peaks, r_peaks, sig_peaks, dist_moduli, n_obs_peaks, n_obs_half_peaks, n_model_peaks = simple_utils.searchBySimulation(nside, data, distance_modulus, pix_nside_select, ra_select, dec_select, mag_max, fracdet)
+    ra_peaks, dec_peaks, r_peaks, sig_peaks, dist_moduli, n_obs_peaks, n_obs_half_peaks, n_model_peaks = simple.simple_utils.searchBySimulation(nside, data, distance_modulus, pix_nside_select, ra_select, dec_select, mag_max, fracdet)
     ra_peak_array.append(ra_peaks)
     dec_peak_array.append(dec_peaks)
     r_peak_array.append(r_peaks)
@@ -193,7 +193,7 @@ elif (mode == 2):
     distance_modulus_select = sim_pop[sim_pop['MC_SOURCE_ID'] == mc_source_id]['DISTANCE_MODULUS'][0]
 
     distance_modulus = distance_modulus_search_array[np.argmin(np.fabs(distance_modulus_search_array - distance_modulus_select))]
-    ra_peaks, dec_peaks, r_peaks, sig_peaks, dist_moduli, n_obs_peaks, n_obs_half_peaks, n_model_peaks = simple_utils.searchBySimulation(nside, data, distance_modulus, pix_nside_select, ra_select, dec_select, mag_max, fracdet)
+    ra_peaks, dec_peaks, r_peaks, sig_peaks, dist_moduli, n_obs_peaks, n_obs_half_peaks, n_model_peaks = simple.simple_utils.searchBySimulation(nside, data, distance_modulus, pix_nside_select, ra_select, dec_select, mag_max, fracdet)
     ra_peak_array.append(ra_peaks)
     dec_peak_array.append(dec_peaks)
     r_peak_array.append(r_peaks)
@@ -257,7 +257,7 @@ for ii in range(0, len(sig_peak_array)):
 
 # Write output
 if (len(sig_peak_array) > 0):
-    simple_utils.writeOutput(results_dir, nside, pix_nside_select, ra_peak_array, dec_peak_array, r_peak_array, distance_modulus_array, 
+    simple.simple_utils.writeOutput(results_dir, nside, pix_nside_select, ra_peak_array, dec_peak_array, r_peak_array, distance_modulus_array, 
                              n_obs_peak_array, n_obs_half_peak_array, n_model_peak_array, 
                              sig_peak_array, mc_source_id_array, mode, outfile)
 else:
