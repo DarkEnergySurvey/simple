@@ -161,7 +161,7 @@ def analysis(targ_ra, targ_dec, mod, mc_source_id):
 
     return(data, iso, g_radius, nbhd)
 
-def densityPlot(targ_ra, targ_dec, data, iso, g_radius, nbhd, type):
+def density_plot(targ_ra, targ_dec, data, iso, g_radius, nbhd, type):
     """Stellar density plot"""
 
     if type == 'stars':
@@ -203,7 +203,7 @@ def densityPlot(targ_ra, targ_dec, data, iso, g_radius, nbhd, type):
     cax = divider.append_axes('right', size = '5%', pad=0)
     plt.colorbar(cax=cax)
 
-def starPlot(targ_ra, targ_dec, data, iso, g_radius, nbhd):
+def star_plot(targ_ra, targ_dec, data, iso, g_radius, nbhd):
     """Star bin plot"""
 
     filter = simple.filters.star_filter(survey, data)
@@ -223,7 +223,7 @@ def starPlot(targ_ra, targ_dec, data, iso, g_radius, nbhd):
 
     plt.title('Stars')
 
-def cmPlot(targ_ra, targ_dec, data, iso, g_radius, nbhd, type):
+def cm_plot(targ_ra, targ_dec, data, iso, g_radius, nbhd, type):
     """Color-magnitude plot"""
 
     angsep = ugali.utils.projector.angsep(targ_ra, targ_dec, data[basis_1], data[basis_2])
@@ -257,7 +257,7 @@ def cmPlot(targ_ra, targ_dec, data, iso, g_radius, nbhd, type):
     plt.xlabel('{} - {} (mag)'.format(band_1.lower(), band_2.lower()))
     plt.ylabel('{} (mag)'.format(band_1.lower()))
 
-def hessPlot(targ_ra, targ_dec, data, iso, g_radius, nbhd):
+def hess_plot(targ_ra, targ_dec, data, iso, g_radius, nbhd):
     """Hess plot"""
 
     filter = simple.filters.star_filter(survey, data)
@@ -307,7 +307,7 @@ def hessPlot(targ_ra, targ_dec, data, iso, g_radius, nbhd):
     plt.xlabel('{} - {} (mag)'.format(band_1.lower(), band_2.lower()))
     plt.ylabel('{} (mag)'.format(band_1.lower()))
 
-def radialPlot(targ_ra, targ_dec, data, iso, g_radius, nbhd, field_density=None):
+def radial_plot(targ_ra, targ_dec, data, iso, g_radius, nbhd, field_density=None):
     """Radial distribution plot"""
 
     ## Deprecated?

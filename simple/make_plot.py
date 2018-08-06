@@ -56,28 +56,28 @@ data, iso, g_radius, nbhd = simple.diagnostic_plots.analysis(targ_ra, targ_dec, 
 print('Making diagnostic plots for ({}, {}) = ({}, {})...'.format(basis_1, basis_2, targ_ra, targ_dec))
 
 fig.add_subplot(gs[0,0])
-simple.diagnostic_plots.densityPlot(targ_ra, targ_dec, data, iso, g_radius, nbhd, 'stars')
+simple.diagnostic_plots.density_plot(targ_ra, targ_dec, data, iso, g_radius, nbhd, 'stars')
 
 fig.add_subplot(gs[1,0])
-simple.diagnostic_plots.densityPlot(targ_ra, targ_dec, data, iso, g_radius, nbhd, 'galaxies')
+simple.diagnostic_plots.density_plot(targ_ra, targ_dec, data, iso, g_radius, nbhd, 'galaxies')
 
 fig.add_subplot(gs[2,0])
-simple.diagnostic_plots.densityPlot(targ_ra, targ_dec, data, iso, g_radius, nbhd, 'blue_stars')
+simple.diagnostic_plots.density_plot(targ_ra, targ_dec, data, iso, g_radius, nbhd, 'blue_stars')
 
 fig.add_subplot(gs[0,1])
-simple.diagnostic_plots.cmPlot(targ_ra, targ_dec, data, iso, g_radius, nbhd, 'stars')
+simple.diagnostic_plots.cm_plot(targ_ra, targ_dec, data, iso, g_radius, nbhd, 'stars')
 
 fig.add_subplot(gs[1,1])
-simple.diagnostic_plots.cmPlot(targ_ra, targ_dec, data, iso, g_radius, nbhd, 'galaxies')
+simple.diagnostic_plots.cm_plot(targ_ra, targ_dec, data, iso, g_radius, nbhd, 'galaxies')
 
 fig.add_subplot(gs[0,2])
-simple.diagnostic_plots.hessPlot(targ_ra, targ_dec, data, iso, g_radius, nbhd)
+simple.diagnostic_plots.hess_plot(targ_ra, targ_dec, data, iso, g_radius, nbhd)
 
 fig.add_subplot(gs[1,2])
-simple.diagnostic_plots.starPlot(targ_ra, targ_dec, data, iso, g_radius, nbhd)
+simple.diagnostic_plots.star_plot(targ_ra, targ_dec, data, iso, g_radius, nbhd)
 
 fig.add_subplot(gs[2,1:3])
-simple.diagnostic_plots.radialPlot(targ_ra, targ_dec, data, iso, g_radius, nbhd, field_density)
+simple.diagnostic_plots.radial_plot(targ_ra, targ_dec, data, iso, g_radius, nbhd, field_density)
 
 # Name
 try: # ugali

@@ -69,7 +69,7 @@ mag_dered_2 = mag_dered.format(band_2.upper())
 
 ########################################################################
 
-def getCatalogFile(catalog_dir, mc_source_id):
+def get_catalog_file(catalog_dir, mc_source_id):
     """
     Inputs:
         catalog_dir = string corresponding to directory containing the stellar catalog infiles
@@ -121,7 +121,7 @@ def construct_real_data(pix_nside_neighbors):
 
 def construct_sim_data(pix_nside_neighbors, mc_source_id):
     data_array = []
-    cat_file = getCatalogFile(sim_dir, mc_source_id)
+    cat_file = get_catalog_file(sim_dir, mc_source_id)
     cat_data = fits.read(cat_file)
     pix = hp.ang2pix(nside,cat_data[basis_1],cat_data[basis_2],lonlat=True)
     pix_data = cat_data[np.in1d(pix, pix_nside_neighbors)]
@@ -162,7 +162,7 @@ def construct_modal_data(mode, pix_nside_neighbors, mc_source_id):
 
 ########################################################################
 
-def cutIsochronePath(g, r, g_err, r_err, isochrone, radius=0.1, return_all=False):
+def cut_isochrone_path(g, r, g_err, r_err, isochrone, radius=0.1, return_all=False):
     """
     Cut to identify objects within isochrone cookie-cutter.
     """
@@ -206,7 +206,7 @@ def cutIsochronePath(g, r, g_err, r_err, isochrone, radius=0.1, return_all=False
 
 ########################################################################
 
-def computeCharDensity(nside, data, ra_select, dec_select, magnitude_threshold=mag_max, fracdet=None):
+def compute_char_density(nside, data, ra_select, dec_select, magnitude_threshold=mag_max, fracdet=None):
     """
     Compute the characteristic density of a region
     Convlve the field and find overdensity peaks
@@ -277,7 +277,7 @@ def computeCharDensity(nside, data, ra_select, dec_select, magnitude_threshold=m
 
     return characteristic_density
 
-def computeLocalCharDensity(nside, data, characteristic_density, ra_select, dec_select, x_peak, y_peak, angsep_peak, magnitude_threshold=mag_max, fracdet=None):
+def compute_local_char_density(nside, data, characteristic_density, ra_select, dec_select, x_peak, y_peak, angsep_peak, magnitude_threshold=mag_max, fracdet=None):
     """
     Compute the local characteristic density of a region
     """
@@ -294,7 +294,7 @@ def computeLocalCharDensity(nside, data, characteristic_density, ra_select, dec_
     # If fracdet map is available, use that information to either compute local density,
     # or in regions of spotty coverage, use the typical density of the region
     if fracdet is not None:
-        # The following is copied from how it's used in computeCharDensity
+        # The following is copied from how it's used in compute_char_density
         fracdet_zero = np.tile(0., len(fracdet))
         cut = (fracdet != hp.UNSEEN)
         fracdet_zero[cut] = fracdet[cut]
@@ -357,7 +357,7 @@ def computeLocalCharDensity(nside, data, characteristic_density, ra_select, dec_
 
 ########################################################################
 
-def findPeaks(nside, data, characteristic_density, distance_modulus, pix_nside_select, ra_select, dec_select, magnitude_threshold=mag_max, fracdet=None):
+def find_peaks(nside, data, characteristic_density, distance_modulus, pix_nside_select, ra_select, dec_select, magnitude_threshold=mag_max, fracdet=None):
     """
     Convolve field to find characteristic density and peaks within the selected pixel
     """
@@ -413,7 +413,7 @@ def findPeaks(nside, data, characteristic_density, distance_modulus, pix_nside_s
 
 ########################################################################
 
-def fitAperture(proj, distance_modulus, characteristic_density_local, x_peak, y_peak, angsep_peak):
+def fit_aperture(proj, distance_modulus, characteristic_density_local, x_peak, y_peak, angsep_peak):
     """
     Fit aperture by varing radius and computing the significance
     """
@@ -469,7 +469,7 @@ def fitAperture(proj, distance_modulus, characteristic_density_local, x_peak, y_
 ########################################################################
 
 # mode = 0
-def searchByDistance(nside, data, distance_modulus, pix_nside_select, ra_select, dec_select, magnitude_threshold=mag_max, fracdet=None):
+def search_by_distance(nside, data, distance_modulus, pix_nside_select, ra_select, dec_select, magnitude_threshold=mag_max, fracdet=None):
     """
     Idea: 
     Send a data extension that goes to faint magnitudes, e.g., g < 24.
@@ -488,13 +488,13 @@ def searchByDistance(nside, data, distance_modulus, pix_nside_select, ra_select,
     iso.metallicity = 0.0001
     iso.distance_modulus = distance_modulus
 
-    cut = cutIsochronePath(data[mag_dered_1], data[mag_dered_2], data[mag_err_1], data[mag_err_2], iso, radius=0.1)
+    cut = cut_isochrone_path(data[mag_dered_1], data[mag_dered_2], data[mag_err_1], data[mag_err_2], iso, radius=0.1)
     data = data[cut]
 
     print('{} objects left after isochrone cut...').format(len(data))
 
     # Compute characteristic density at this distance
-    characteristic_density = computeCharDensity(nside, data, ra_select, dec_select, mag_max, fracdet)
+    characteristic_density = compute_char_density(nside, data, ra_select, dec_select, mag_max, fracdet)
 
     ra_peak_array = []
     dec_peak_array = []
@@ -507,13 +507,13 @@ def searchByDistance(nside, data, distance_modulus, pix_nside_select, ra_select,
 
     proj = ugali.utils.projector.Projector(ra_select, dec_select)
 
-    x_peak_array, y_peak_array, angsep_peak_array = findPeaks(nside, data, characteristic_density, distance_modulus, pix_nside_select, ra_select, dec_select, magnitude_threshold, fracdet)
+    x_peak_array, y_peak_array, angsep_peak_array = find_peaks(nside, data, characteristic_density, distance_modulus, pix_nside_select, ra_select, dec_select, magnitude_threshold, fracdet)
 
     for x_peak, y_peak, angsep_peak in itertools.izip(x_peak_array, y_peak_array, angsep_peak_array):
-        characteristic_density_local = computeLocalCharDensity(nside, data, characteristic_density, ra_select, dec_select, x_peak, y_peak, angsep_peak, mag_max, fracdet)
+        characteristic_density_local = compute_local_char_density(nside, data, characteristic_density, ra_select, dec_select, x_peak, y_peak, angsep_peak, mag_max, fracdet)
         # Aperture fitting
         print('Fitting aperture to hotspot...')
-        ra_peaks, dec_peaks, r_peaks, sig_peaks, distance_moduli, n_obs_peaks, n_obs_half_peaks, n_model_peaks = fitAperture(proj, distance_modulus, characteristic_density_local, x_peak, y_peak, angsep_peak)
+        ra_peaks, dec_peaks, r_peaks, sig_peaks, distance_moduli, n_obs_peaks, n_obs_half_peaks, n_model_peaks = fit_aperture(proj, distance_modulus, characteristic_density_local, x_peak, y_peak, angsep_peak)
         
         ra_peak_array.append(ra_peaks)
         dec_peak_array.append(dec_peaks)
@@ -538,7 +538,7 @@ def searchByDistance(nside, data, distance_modulus, pix_nside_select, ra_select,
 ########################################################################
 
 # mode = 1
-def searchBySimulation(nside, data, distance_modulus, pix_nside_select, ra_select, dec_select, magnitude_threshold=mag_max, fracdet=None):
+def search_by_simulation(nside, data, distance_modulus, pix_nside_select, ra_select, dec_select, magnitude_threshold=mag_max, fracdet=None):
     """
     Idea: 
     Send a data extension that goes to faint magnitudes, e.g., g < 24.
@@ -557,14 +557,14 @@ def searchBySimulation(nside, data, distance_modulus, pix_nside_select, ra_selec
     iso.metallicity = 0.0001
     iso.distance_modulus = distance_modulus
 
-    cut = cutIsochronePath(data[mag_dered_1], data[mag_dered_2], data[mag_err_1], data[mag_err_2], iso, radius=0.1)
+    cut = cut_isochrone_path(data[mag_dered_1], data[mag_dered_2], data[mag_err_1], data[mag_err_2], iso, radius=0.1)
     data = data[cut]
 
     print('{} objects left after isochrone cut...'.format(len(data)))
     print('{} simulated objects left after isochrone cut...'.format(np.sum(data['MC_SOURCE_ID'] != 0)))
 
     # Compute characteristic density at this distance
-    characteristic_density = computeCharDensity(nside, data, ra_select, dec_select, mag_max, fracdet)
+    characteristic_density = compute_char_density(nside, data, ra_select, dec_select, mag_max, fracdet)
 
     ra_peak_array = []
     dec_peak_array = []
@@ -582,11 +582,11 @@ def searchBySimulation(nside, data, distance_modulus, pix_nside_select, ra_selec
     x, y = proj.sphereToImage(data[basis_1][cut_magnitude_threshold], data[basis_2][cut_magnitude_threshold])
     angsep_peak = np.sqrt((x - x_peak)**2 + (y - y_peak)**2)
 
-    characteristic_density_local = computeLocalCharDensity(nside, data, characteristic_density, ra_select, dec_select, x_peak, y_peak, angsep_peak, mag_max, fracdet)
+    characteristic_density_local = compute_local_char_density(nside, data, characteristic_density, ra_select, dec_select, x_peak, y_peak, angsep_peak, mag_max, fracdet)
 
     # Aperture fitting
     print('Fitting aperture to hotspot...')
-    ra_peaks, dec_peaks, r_peaks, sig_peaks, distance_moduli, n_obs_peaks, n_obs_half_peaks, n_model_peaks = fitAperture(proj, distance_modulus, characteristic_density_local, x_peak, y_peak, angsep_peak)
+    ra_peaks, dec_peaks, r_peaks, sig_peaks, distance_moduli, n_obs_peaks, n_obs_half_peaks, n_model_peaks = fit_aperture(proj, distance_modulus, characteristic_density_local, x_peak, y_peak, angsep_peak)
     
     ra_peak_array.append(ra_peaks)
     dec_peak_array.append(dec_peaks)
@@ -611,7 +611,7 @@ def searchBySimulation(nside, data, distance_modulus, pix_nside_select, ra_selec
 ########################################################################
 
 # mode = 2
-def searchByObject(nside, data, distance_modulus, pix_nside_select, ra_select, dec_select, magnitude_threshold=mag_max, fracdet=None):
+def search_by_object(nside, data, distance_modulus, pix_nside_select, ra_select, dec_select, magnitude_threshold=mag_max, fracdet=None):
     """
     Idea: 
     Send a data extension that goes to faint magnitudes, e.g., g < 24.
@@ -630,14 +630,14 @@ def searchByObject(nside, data, distance_modulus, pix_nside_select, ra_select, d
     iso.metallicity = 0.0001
     iso.distance_modulus = distance_modulus
 
-    cut = cutIsochronePath(data[mag_dered_1], data[mag_dered_2], data[mag_err_1], data[mag_err_2], iso, radius=0.1)
+    cut = cut_isochrone_path(data[mag_dered_1], data[mag_dered_2], data[mag_err_1], data[mag_err_2], iso, radius=0.1)
     data = data[cut]
 
     print('{} objects left after isochrone cut...'.format(len(data)))
     print('{} simulated objects left after isochrone cut...'.format(np.sum(data['MC_SOURCE_ID'] != 0)))
 
     # Compute characteristic density at this distance
-    characteristic_density = computeCharDensity(nside, data, ra_select, dec_select, mag_max, fracdet)
+    characteristic_density = compute_char_density(nside, data, ra_select, dec_select, mag_max, fracdet)
 
     ra_peak_array = []
     dec_peak_array = []
@@ -655,11 +655,11 @@ def searchByObject(nside, data, distance_modulus, pix_nside_select, ra_select, d
     x, y = proj.sphereToImage(data[basis_1][cut_magnitude_threshold], data[basis_2][cut_magnitude_threshold])
     angsep_peak = np.sqrt((x - x_peak)**2 + (y - y_peak)**2)
 
-    characteristic_density_local = computeLocalCharDensity(nside, data, characteristic_density, ra_select, dec_select, x_peak, y_peak, angsep_peak, mag_max, fracdet)
+    characteristic_density_local = compute_local_char_density(nside, data, characteristic_density, ra_select, dec_select, x_peak, y_peak, angsep_peak, mag_max, fracdet)
 
     # Aperture fitting
     print('Fitting aperture to hotspot...')
-    ra_peaks, dec_peaks, r_peaks, sig_peaks, distance_moduli, n_obs_peaks, n_obs_half_peaks, n_model_peaks = fitAperture(proj, distance_modulus, characteristic_density_local, x_peak, y_peak, angsep_peak)
+    ra_peaks, dec_peaks, r_peaks, sig_peaks, distance_moduli, n_obs_peaks, n_obs_half_peaks, n_model_peaks = fit_aperture(proj, distance_modulus, characteristic_density_local, x_peak, y_peak, angsep_peak)
     
     ra_peak_array.append(ra_peaks)
     dec_peak_array.append(dec_peaks)
@@ -683,7 +683,7 @@ def searchByObject(nside, data, distance_modulus, pix_nside_select, ra_select, d
 
 ########################################################################
 
-def writeOutput(results_dir, nside, pix_nside_select, ra_peak_array, dec_peak_array, r_peak_array, distance_modulus_array, 
+def write_output(results_dir, nside, pix_nside_select, ra_peak_array, dec_peak_array, r_peak_array, distance_modulus_array, 
                 n_obs_peak_array, n_obs_half_peak_array, n_model_peak_array, 
                 sig_peak_array, mc_source_id_array, mode, outfile):
     writer = open(outfile, 'a') # don't overwrite; append

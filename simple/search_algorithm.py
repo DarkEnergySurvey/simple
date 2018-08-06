@@ -160,7 +160,7 @@ n_model_peak_array = []
 
 if (mode == 0):
     for distance_modulus in distance_modulus_search_array:
-        ra_peaks, dec_peaks, r_peaks, sig_peaks, dist_moduli, n_obs_peaks, n_obs_half_peaks, n_model_peaks = simple.simple_utils.searchByDistance(nside, data, distance_modulus, pix_nside_select, ra_select, dec_select, mag_max, fracdet)
+        ra_peaks, dec_peaks, r_peaks, sig_peaks, dist_moduli, n_obs_peaks, n_obs_half_peaks, n_model_peaks = simple.simple_utils.search_by_distance(nside, data, distance_modulus, pix_nside_select, ra_select, dec_select, mag_max, fracdet)
         ra_peak_array.append(ra_peaks)
         dec_peak_array.append(dec_peaks)
         r_peak_array.append(r_peaks)
@@ -176,7 +176,7 @@ elif (mode == 1):
     distance_modulus_select = sim_pop[sim_pop['MC_SOURCE_ID'] == mc_source_id]['DISTANCE_MODULUS'][0]
 
     distance_modulus = distance_modulus_search_array[np.argmin(np.fabs(distance_modulus_search_array - distance_modulus_select))]
-    ra_peaks, dec_peaks, r_peaks, sig_peaks, dist_moduli, n_obs_peaks, n_obs_half_peaks, n_model_peaks = simple.simple_utils.searchBySimulation(nside, data, distance_modulus, pix_nside_select, ra_select, dec_select, mag_max, fracdet)
+    ra_peaks, dec_peaks, r_peaks, sig_peaks, dist_moduli, n_obs_peaks, n_obs_half_peaks, n_model_peaks = simple.simple_utils.search_by_simulation(nside, data, distance_modulus, pix_nside_select, ra_select, dec_select, mag_max, fracdet)
     ra_peak_array.append(ra_peaks)
     dec_peak_array.append(dec_peaks)
     r_peak_array.append(r_peaks)
@@ -193,7 +193,7 @@ elif (mode == 2):
     distance_modulus_select = sim_pop[sim_pop['MC_SOURCE_ID'] == mc_source_id]['DISTANCE_MODULUS'][0]
 
     distance_modulus = distance_modulus_search_array[np.argmin(np.fabs(distance_modulus_search_array - distance_modulus_select))]
-    ra_peaks, dec_peaks, r_peaks, sig_peaks, dist_moduli, n_obs_peaks, n_obs_half_peaks, n_model_peaks = simple.simple_utils.searchBySimulation(nside, data, distance_modulus, pix_nside_select, ra_select, dec_select, mag_max, fracdet)
+    ra_peaks, dec_peaks, r_peaks, sig_peaks, dist_moduli, n_obs_peaks, n_obs_half_peaks, n_model_peaks = simple.simple_utils.search_by_simulation(nside, data, distance_modulus, pix_nside_select, ra_select, dec_select, mag_max, fracdet)
     ra_peak_array.append(ra_peaks)
     dec_peak_array.append(dec_peaks)
     r_peak_array.append(r_peaks)
@@ -257,7 +257,7 @@ for ii in range(0, len(sig_peak_array)):
 
 # Write output
 if (len(sig_peak_array) > 0):
-    simple.simple_utils.writeOutput(results_dir, nside, pix_nside_select, ra_peak_array, dec_peak_array, r_peak_array, distance_modulus_array, 
+    simple.simple_utils.write_output(results_dir, nside, pix_nside_select, ra_peak_array, dec_peak_array, r_peak_array, distance_modulus_array, 
                              n_obs_peak_array, n_obs_half_peak_array, n_model_peak_array, 
                              sig_peak_array, mc_source_id_array, mode, outfile)
 else:
