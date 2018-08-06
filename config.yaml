@@ -1,5 +1,5 @@
 setup:
-    simple_dir : '/home/s1/smau/software/simple'
+    simple_dir : '/home/s1/smau/software/simple/simple'
     #simple_dir : '/Users/keithbechtol/Documents/DES/code/simple'
 
 output:

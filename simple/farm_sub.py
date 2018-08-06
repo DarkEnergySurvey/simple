@@ -46,7 +46,7 @@ pop_infiles = sorted(glob.glob(sim_dir + '/*population*.fits'))
 
 for pop_infile in pop_infiles:
     logfile = 'log_' + pop_infile[-20:-5] + '.log'
-    batch = 'csub -n {} -o {} '.format(jobs, logfile)
+    batch = 'csub -n {} -o {} --host des50,des51 '.format(jobs, logfile)
 
     command = 'python {}/batch_submit.py {}'.format(simple_dir, pop_infile)
     command_queue = batch + command

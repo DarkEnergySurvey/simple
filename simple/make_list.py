@@ -37,14 +37,14 @@ data = data.astype(dt)
 
 import pdb;pdb.set_trace()
 # Create fits columns
-c0 = fits.Column(name='SIG',     format='E', array=data[:,0])
-c1 = fits.Column(name=basis_1,      format='E', array=data[:,1])
-c2 = fits.Column(name=basis_2,     format='E', array=data[:,2])
-c3 = fits.Column(name='MODULUS', format='E', array=data[:,3])
-c4 = fits.Column(name='r',       format='E', array=data[:,4])
-c5 = fits.Column(name='N_OBS',       format='E', array=data[:,5])
-c6 = fits.Column(name='N_OBS_HALF',       format='E', array=data[:,6])
-c7 = fits.Column(name='N_MODEL',       format='E', array=data[:,7])
+c0 = fits.Column(name='SIG',          format='E', array=data[:,0])
+c1 = fits.Column(name=basis_1,        format='E', array=data[:,1])
+c2 = fits.Column(name=basis_2,        format='E', array=data[:,2])
+c3 = fits.Column(name='MODULUS',      format='E', array=data[:,3])
+c4 = fits.Column(name='r',            format='E', array=data[:,4])
+c5 = fits.Column(name='N_OBS',        format='E', array=data[:,5])
+c6 = fits.Column(name='N_OBS_HALF',   format='E', array=data[:,6])
+c7 = fits.Column(name='N_MODEL',      format='E', array=data[:,7])
 c8 = fits.Column(name='MC_SOURCE_ID', format='E', array=data[:,8])
 
 # Write fits output
