@@ -18,6 +18,8 @@ import yaml
 
 from multiprocessing import Pool
 
+import simple.simple_utils
+
 ############################################################
 
 with open('config.yaml', 'r') as ymlfile:
@@ -88,20 +90,22 @@ if (mode == 0): # real
     
 elif (mode == 1): # real+sim
     sim_pop = fits.read(sim_population)
+    results = simple.simple_utils.read_output(results)
     #for sim in sim_pop[:]:
-    for sim in sim_pop[:20]:
-        #if (sim['DIFFICULTY'] == 0): # check to make sure simulated object has stars
-        ra, dec, mc_source_id = sim[basis_1], sim[basis_2], sim['MC_SOURCE_ID']
-        pix = hp.ang2pix(nside, ra, dec, lonlat=True)
+    for sim in sim_pop[:]:
+        if (np.in1d(sim['MC_SOURCE_ID'], results['MC_SOURCE_ID']) == False):
+            ra, dec, mc_source_id = sim[basis_1], sim[basis_2], sim['MC_SOURCE_ID']
+            pix = hp.ang2pix(nside, ra, dec, lonlat=True)
 
-        submitJob(ra, dec, pix, mc_source_id, mode)
+            submitJob(ra, dec, pix, mc_source_id, mode)
 
 elif (mode == 2): # real objects
     #sim_pop = fits.read(object_list)
     sim_pop = np.genfromtxt(object_list, delimiter=',', names=['RA', 'DEC', 'DISTANCE_MODULUS', 'MC_SOURCE_ID', 'NAME'])[1:]
+    results = simple.simple_utils.read_output(results)
     for sim in sim_pop[:]:
-        #if (sim['DIFFICULTY'] == 0): # check to make sure simulated object has stars
-        ra, dec, mc_source_id = sim[basis_1], sim[basis_2], sim['MC_SOURCE_ID']
-        pix = hp.ang2pix(nside, ra, dec, lonlat=True)
+        if (np.in1d(sim['MC_SOURCE_ID'], results['MC_SOURCE_ID']) == False):
+            ra, dec, mc_source_id = sim[basis_1], sim[basis_2], sim['MC_SOURCE_ID']
+            pix = hp.ang2pix(nside, ra, dec, lonlat=True)
 
-        submitJob(ra, dec, pix, mc_source_id, mode)
+            submitJob(ra, dec, pix, mc_source_id, mode)

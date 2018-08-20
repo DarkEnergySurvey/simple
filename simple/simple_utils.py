@@ -701,3 +701,7 @@ def write_output(results_dir, nside, pix_nside_select, ra_peak_array, dec_peak_a
 
 ########################################################################
 
+def read_output(results_dir):
+    infiles = sorted(glob.glob(results_dir + '/*.csv'))
+    results = np.concatenate([np.genfromtxt(infile, delimiter=',', names=['SIG', 'RA', 'DEC', 'DISTANCE_MODULUS', 'R_PEAK', 'N_OBS_PEAK', 'N_OBS_HALF_PEAK', 'N_MODEL_PEAK', 'MC_SOURCE_ID']) for infile in infiles])
+    return results
