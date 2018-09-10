@@ -47,7 +47,7 @@ if not os.path.exists(log_dir):
 
 ############################################################
 
-def submitJob(ra, dec, pix, mc_source_id, mode, **population_file):
+def submit_job(ra, dec, pix, mc_source_id, mode, **population_file):
     if (mode == 0):
         outfile = '{}/results_nside_{}_{}.csv'.format(results_dir, nside, pix)
         logfile = '{}/results_nside_{}_{}.log'.format(log_dir, nside, pix)
@@ -85,27 +85,27 @@ if (mode == 0): # real
     for ii in range(0, 19):
         ra, dec = ugali.utils.healpix.pixToAng(nside, pix_nside[ii])
     
-        submitJob(ra, dec, pix_nside[ii], 0, mode) # TODO: mc_source_id (0 for real)
+        submit_job(ra, dec, pix_nside[ii], 0, mode) # TODO: mc_source_id (0 for real)
         print('({}/{})').format(ii, len(pix_nside))
     
 elif (mode == 1): # real+sim
     sim_pop = fits.read(sim_population)
-    results = simple.simple_utils.read_output(results)
+    results = simple.simple_utils.read_output(results_dir)
     #for sim in sim_pop[:]:
     for sim in sim_pop[:]:
         if (np.in1d(sim['MC_SOURCE_ID'], results['MC_SOURCE_ID']) == False):
             ra, dec, mc_source_id = sim[basis_1], sim[basis_2], sim['MC_SOURCE_ID']
             pix = hp.ang2pix(nside, ra, dec, lonlat=True)
 
-            submitJob(ra, dec, pix, mc_source_id, mode)
+            submit_job(ra, dec, pix, mc_source_id, mode)
 
 elif (mode == 2): # real objects
     #sim_pop = fits.read(object_list)
-    sim_pop = np.genfromtxt(object_list, delimiter=',', names=['RA', 'DEC', 'DISTANCE_MODULUS', 'MC_SOURCE_ID', 'NAME'])[1:]
-    results = simple.simple_utils.read_output(results)
+    sim_pop = np.genfromtxt(object_list, delimiter=',', names=True)[1:]
+    results = simple.simple_utils.read_output(results_dir)
     for sim in sim_pop[:]:
         if (np.in1d(sim['MC_SOURCE_ID'], results['MC_SOURCE_ID']) == False):
             ra, dec, mc_source_id = sim[basis_1], sim[basis_2], sim['MC_SOURCE_ID']
             pix = hp.ang2pix(nside, ra, dec, lonlat=True)
 
-            submitJob(ra, dec, pix, mc_source_id, mode)
+            submit_job(ra, dec, pix, mc_source_id, mode)
