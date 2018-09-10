@@ -8,7 +8,6 @@ import numpy as np
 #from matplotlib import mlab
 import numpy.lib.recfunctions
 import healpy as hp
-import astropy.io.fits as pyfits # migrate to fitsio
 import fitsio as fits
 import sys
 import pylab as plt
@@ -20,7 +19,6 @@ from scipy.signal import argrelextrema
 import scipy.ndimage
 
 import pylab as plt
-import pyfits
 import matplotlib
 from matplotlib import mlab
 from mpl_toolkits.axes_grid1 import make_axes_locatable
@@ -73,6 +71,7 @@ data.sort(order='MC_SOURCE_ID')
 sim_pop.sort(order='MC_SOURCE_ID')
 
 # STELLAR MASS
+import pdb;pdb.set_trace()
 plt.scatter(sim_pop['STELLAR_MASS'], data['SIG'], c=sim_pop['DIFFICULTY'], s=1)
 plt.xlabel('STELLAR_MASS')
 plt.ylabel('SIG')
