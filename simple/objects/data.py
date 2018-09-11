@@ -49,9 +49,9 @@ class Data:
 
     @property
     def load_fracdet(self):
-        if self.fracdet is not none:
+        if self.fracdet is not None:
             return fits.read(self.fracdet)
-        else
+        else:
             msg = "No fracdet found at {}".format(self.fracdet)
             raise Exception(msg)
             return
