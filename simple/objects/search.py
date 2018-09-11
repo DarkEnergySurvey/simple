@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-Search algorithms
+Search algorithm
 """
 __author__ = "Sid Mau"
 
@@ -13,6 +13,7 @@ import ugali.utils.projector
 import ugali.isochrone
 
 # Simple libraries
+import simple.simple_utils
 import simple.objects.point
 
 # TODO:
@@ -39,8 +40,6 @@ class Search:
         magnitude threshold, e.g., g < 23, so not susceptible to variations 
         in depth. Then compute the local field density using a small annulus 
         around each individual hotspot, e.g., radius 0.3 to 0.5 deg.
-    
-        fracdet corresponds to a fracdet map (numpy array, assumed to be EQUATORIAL and RING)
         """
     
         print('Distance = {:0.1f} kpc (m-M = {:0.1f})').format(ugali.utils.projector.distanceModulusToDistance(distance_modulus),
@@ -58,7 +57,7 @@ class Search:
                                       band_1=self.band_1.lower(),
                                       band_2=self.band_2.lower())
     
-        cut = cut_isochrone_path(data[data.mag_dered_1], data[data.mag_dered_2], data[data.mag_err_1], data[data.mag_err_2], iso, radius=0.1)
+        cut = simple.simple_utils.cut_isochrone_path(data[data.mag_dered_1], data[data.mag_dered_2], data[data.mag_err_1], data[data.mag_err_2], iso, radius=0.1)
         data = data[cut]
     
         print('{} objects left after isochrone cut...').format(len(data))
@@ -123,7 +122,7 @@ class Search:
     #    iso.metallicity = 0.0001
     #    iso.distance_modulus = distance_modulus
     #
-    #    cut = cut_isochrone_path(data[mag_dered_1], data[mag_dered_2], data[mag_err_1], data[mag_err_2], iso, radius=0.1)
+    #    cut = simple.simple_utils.cut_isochrone_path(data[mag_dered_1], data[mag_dered_2], data[mag_err_1], data[mag_err_2], iso, radius=0.1)
     #    data = data[cut]
     #
     #    print('{} objects left after isochrone cut...'.format(len(data)))
@@ -196,7 +195,7 @@ class Search:
     #    iso.metallicity = 0.0001
     #    iso.distance_modulus = distance_modulus
     #
-    #    cut = cut_isochrone_path(data[mag_dered_1], data[mag_dered_2], data[mag_err_1], data[mag_err_2], iso, radius=0.1)
+    #    cut = simple.simple_utils.cut_isochrone_path(data[mag_dered_1], data[mag_dered_2], data[mag_err_1], data[mag_err_2], iso, radius=0.1)
     #    data = data[cut]
     #
     #    print('{} objects left after isochrone cut...'.format(len(data)))
