@@ -25,12 +25,13 @@ class Result:
     """
     Class object to write, store, and read results.
     """
-    def __init__(self, rfile):
+    def __init__(self, rdir, rfile):
+        self.rdir  = rdir
         self.rfile = rfile
 
-    def write_output(results_dir, nside, pix_nside_select, ra_peak_array, dec_peak_array, r_peak_array, distance_modulus_array, 
+    def write_output(self, ra_peak_array, dec_peak_array, r_peak_array, distance_modulus_array, 
                     n_obs_peak_array, n_obs_half_peak_array, n_model_peak_array, 
-                    sig_peak_array, mc_source_id_array, mode, outfile):
+                    sig_peak_array, mc_source_id_array,  outfile):
         writer = open(outfile, 'a') # don't overwrite; append
         for ii in range(0, len(sig_peak_array)):
             # SIG, RA, DEC, MODULUS, r, n_obs, n_model, mc_source_id
@@ -44,7 +45,10 @@ class Result:
                                                                                                                              n_model_peak_array[ii],
                                                                                                                              mc_source_id_array[ii]))
     
-    def read_output(results_dir):
+    def make_list(self):
+       #
+
+    def read_output(self, results_dir):
         infiles = sorted(glob.glob(results_dir + '/*.csv'))
         results = np.concatenate([np.genfromtxt(infile, delimiter=',', names=['SIG', 'RA', 'DEC', 'DISTANCE_MODULUS', 'R_PEAK', 'N_OBS_PEAK', 'N_OBS_HALF_PEAK', 'N_MODEL_PEAK', 'MC_SOURCE_ID']) for infile in infiles])
         return results
