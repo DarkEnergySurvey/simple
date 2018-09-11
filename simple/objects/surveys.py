@@ -29,7 +29,7 @@ class DES(Data):
     def __init__(self):
         self.survey = 'DES'
         self.nside  = 32
-        self.dirname = '/home/s1/kadrlica/projects/y3a2/data/gold/v2.0/healpix'
+        self.datadir = '/home/s1/kadrlica/projects/y3a2/data/gold/v2.0/healpix'
         self.fracdet = 'y3a2_griz_o.4096_t.32768_coverfoot_EQU_decompressed.fits'
         self.band_1 = 'G'
         self.band_2 = 'R"'

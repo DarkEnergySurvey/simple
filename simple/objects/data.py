@@ -21,7 +21,6 @@ import ugali.isochrone
 
 # TODO:
 # - use point
-# - make search functions
 # - make derived classes for each survey
 
 ########################################################################
@@ -30,10 +29,10 @@ class Data:
     """
     Class object for analyzing photometric data.
     """
-    def __init__(self, survey, nside, dirname, fracdet, band_1, band_2, mag, mag_err, mag_dered, basis_1, basis_2, mag_max):
+    def __init__(self, survey, nside, datadir, fracdet, band_1, band_2, mag, mag_err, mag_dered, basis_1, basis_2, mag_max):
         self.survey      = survey
         self.nside       = nside
-        self.dirname     = dirname
+        self.datadir     = datadir
         self.fracdet     = fracdet
         self.band_1      = band_1
         self.band_2      = band_2
