@@ -22,18 +22,48 @@ import ugali.isochrone
 # Simple libraries
 from simple.objects.data import Data
 
-DES = Data(survey = "DES",
-           nside  = 32,
-           dirname = "/home/s1/kadrlica/projects/y3a2/data/gold/v2.0/healpix",
-           fracdet = "y3a2_griz_o.4096_t.32768_coverfoot_EQU_decompressed.fits",
-           band_1 = "G",
-           band_2 = "R",
-           mag = "SOF_PSF_MAG_{}",
-           mag_err = "SOF_PSF_MAG_ERR_{}",
-           mag_dered = "SOF_PSF_MAG_CORRECTED_{}",
-           basis_1 = "RA",
-           basis_2 = "DEC",
-           mag_max = 24.5)
+class DES(Data):
+    """
+    Class for working with DES data.
+    """
+    def __init__(self):
+        self.survey = 'DES'
+        self.nside  = 32
+        self.dirname = '/home/s1/kadrlica/projects/y3a2/data/gold/v2.0/healpix'
+        self.fracdet = 'y3a2_griz_o.4096_t.32768_coverfoot_EQU_decompressed.fits'
+        self.band_1 = 'G'
+        self.band_2 = 'R"'
+        self.mag = 'SOF_PSF_MAG_{}'
+        self.mag_err = 'SOF_PSF_MAG_ERR_{}'
+        self.mag_dered = 'SOF_PSF_MAG_CORRECTED_{}'
+        self.basis_1 = 'RA'
+        self.basis_2 = 'DEC'
+        self.mag_max = 24.5
+
+    def quality_mask(self, data):
+        """
+        Return cut on data quality.
+        """
+        return (data[self.mag_1] < self.mag_max)
+
+    def star_mask(self, data):
+        """
+        Return cut on stellar-like objects.
+        """
+        return ((data['EXTENDED_CLASS_MASH_SOF'] >= 0)\
+               &(data['EXTENDED_CLASS_MASH_SOF'] <= 2))
+
+    def galaxy_mask(self, data):
+        """
+        Return cut on galaxy-like objects.
+        """
+        return (data['EXTENDED_CLASS_MASH_SOF'] > 2)
+
+    def color_mask(self, data):
+        """
+        Return cut on blue objects.
+        """
+        return ((data[self.mag_1] - data[self.mag_2]) < 0.4) # 0.2
 
 import pdb;pdb.set_trace()
 
