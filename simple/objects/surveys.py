@@ -22,6 +22,8 @@ import ugali.isochrone
 # Simple libraries
 from simple.objects.data import Data
 
+# Currently unused; likely to be removed.
+
 class DES(Data):
     """
     Class for working with DES data.
