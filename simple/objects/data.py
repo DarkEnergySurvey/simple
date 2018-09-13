@@ -310,6 +310,7 @@ class Data:
         Fit aperture by varing radius and computing the significance.
         """
     
+        # use result.Result()
         ra_peak_array          = []
         dec_peak_array         = []
         r_peak_array           = []
