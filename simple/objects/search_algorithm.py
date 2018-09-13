@@ -117,17 +117,17 @@ if __name__ == "__main__":
         print('No/unsupported mode specified; running only on real data')
     
     # Quality cut
-    quality = simple.filters.quality_filter(survey, data)
+    quality = simple.filters.quality_filter(Survey.survey, data)
     data = data[quality]
     
     # Deredden magnitudes
-    data = simple.filters.dered_mag(survey, data)
+    data = simple.filters.dered_mag(Survey.survey, data)
     
     print('Found {} objects...').format(len(data))
     
     print('Applying cuts...')
-    cut = simple.filters.star_filter(survey, data)
-    cut_gal = simple.filters.galaxy_filter(survey, data)
+    cut = simple.filters.star_filter(Survey.survey, data)
+    cut_gal = simple.filters.galaxy_filter(Survey.survey, data)
     
     data_gal = data[cut_gal] # this isn't used at all other than for noting number of galaxy-like objects in ROI
     data = data[cut]
