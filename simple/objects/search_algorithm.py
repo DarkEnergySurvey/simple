@@ -20,7 +20,6 @@ import ugali.utils.healpix
 import ugali.utils.projector
 
 # Simple binner modules
-import simple.filters
 import simple.simple_utils
 import simple.objects.data
 import simple.objects.point
@@ -117,20 +116,16 @@ if __name__ == "__main__":
         print('No/unsupported mode specified; running only on real data')
     
     # Quality cut
-    quality = simple.filters.quality_filter(Survey.survey, data)
-    data = data[quality]
+    data = data[Survey.quality_filter(data)]
     
     # Deredden magnitudes
-    data = simple.filters.dered_mag(Survey.survey, data)
+    data = Survey.dered_mag(data)
     
     print('Found {} objects...').format(len(data))
     
     print('Applying cuts...')
-    cut = simple.filters.star_filter(Survey.survey, data)
-    cut_gal = simple.filters.galaxy_filter(Survey.survey, data)
-    
-    data_gal = data[cut_gal] # this isn't used at all other than for noting number of galaxy-like objects in ROI
-    data = data[cut]
+    data_gal = data[Survey.galaxy_filter(data)]
+    data = data[Survey.star_filter(data)]
 
     search = simple.objects.search.Search(data)
     
