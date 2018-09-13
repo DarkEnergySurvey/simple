@@ -41,6 +41,22 @@ class Result:
         self.n_model_peak_array     = []
         self.mc_source_id_array     = []
 
+    @property
+    def results(self):
+        """
+        Return tuple of results.
+        """
+        return (self.ra_peak_array,
+                self.dec_peak_array,
+                self.r_peak_array,
+                self.sig_peak_array,
+                self.distance_modulus_array,
+                self.mc_source_id_array,
+                self.n_obs_peak_array,
+                self.n_obs_half_peak_array,
+                self.n_model_peak_array,
+                self.mc_source_id_array)
+
     def append_results(self, ra_peaks, dec_peaks, r_peaks, sig_peaks, distance_moduli, n_obs_peaks, n_obs_half_peaks, n_model_peaks):
         """
         Append results from Search.search_by_distance().
