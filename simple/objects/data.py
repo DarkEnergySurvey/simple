@@ -82,6 +82,9 @@ class Data:
 
     @property
     def load_fracdet(self):
+        """
+        Load fracdet if given.
+        """
         if self.fracdet is not None:
             return fits.read(self.fracdet)
         else:
@@ -94,7 +97,7 @@ class Data:
         Load data corresponding to the 8 nearest neighbors of the
         centroid at (ra, dec) into memory.
         """
-        hpixel = ugali.utils.healpix.angToPix(self.nside, ra, dec)
+        hpixel  = ugali.utils.healpix.angToPix(self.nside, ra, dec)
         hpixels = np.concatenate([[hpixel], hp.get_all_neighbours(self.nside, hpixel)])
 
         data_array = []
