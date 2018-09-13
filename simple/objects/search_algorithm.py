@@ -136,15 +136,15 @@ if __name__ == "__main__":
     
     distance_modulus_search_array = np.arange(16., mag_max, 0.5)
     
-    ra_peak_array = []
-    dec_peak_array = [] 
-    r_peak_array = []
-    sig_peak_array = []
+    ra_peak_array          = []
+    dec_peak_array         = [] 
+    r_peak_array           = []
+    sig_peak_array         = []
     distance_modulus_array = []
-    mc_source_id_array = []
-    n_obs_peak_array = []
-    n_obs_half_peak_array = []
-    n_model_peak_array = []
+    mc_source_id_array     = []
+    n_obs_peak_array       = []
+    n_obs_half_peak_array  = []
+    n_model_peak_array     = []
     
     if (mode == 0):
         for distance_modulus in distance_modulus_search_array:
@@ -192,27 +192,27 @@ if __name__ == "__main__":
     #    n_model_peak_array.append(n_model_peaks)
     #    mc_source_id_array.append(np.tile(mc_source_id, len(sig_peaks)))
     
-    ra_peak_array = np.concatenate(ra_peak_array)
-    dec_peak_array = np.concatenate(dec_peak_array)
-    r_peak_array = np.concatenate(r_peak_array)
-    sig_peak_array = np.concatenate(sig_peak_array)
+    ra_peak_array          = np.concatenate(ra_peak_array)
+    dec_peak_array         = np.concatenate(dec_peak_array)
+    r_peak_array           = np.concatenate(r_peak_array)
+    sig_peak_array         = np.concatenate(sig_peak_array)
     distance_modulus_array = np.concatenate(distance_modulus_array)
-    n_obs_peak_array = np.concatenate(n_obs_peak_array)
-    n_obs_half_peak_array = np.concatenate(n_obs_half_peak_array)
-    n_model_peak_array = np.concatenate(n_model_peak_array)
-    mc_source_id_array = np.concatenate(mc_source_id_array)
+    n_obs_peak_array       = np.concatenate(n_obs_peak_array)
+    n_obs_half_peak_array  = np.concatenate(n_obs_half_peak_array)
+    n_model_peak_array     = np.concatenate(n_model_peak_array)
+    mc_source_id_array     = np.concatenate(mc_source_id_array)
     
     # Sort peaks according to significance
-    index_sort = np.argsort(sig_peak_array)[::-1]
-    ra_peak_array = ra_peak_array[index_sort]
-    dec_peak_array = dec_peak_array[index_sort]
-    r_peak_array = r_peak_array[index_sort]
-    sig_peak_array = sig_peak_array[index_sort]
+    index_sort             = np.argsort(sig_peak_array)[::-1]
+    ra_peak_array          = ra_peak_array[index_sort]
+    dec_peak_array         = dec_peak_array[index_sort]
+    r_peak_array           = r_peak_array[index_sort]
+    sig_peak_array         = sig_peak_array[index_sort]
     distance_modulus_array = distance_modulus_array[index_sort]
-    n_obs_peak_array = n_obs_peak_array[index_sort]
-    n_obs_half_peak_array = n_obs_half_peak_array[index_sort]
-    n_model_peak_array = n_model_peak_array[index_sort]
-    mc_source_id_array = mc_source_id_array[index_sort]
+    n_obs_peak_array       = n_obs_peak_array[index_sort]
+    n_obs_half_peak_array  = n_obs_half_peak_array[index_sort]
+    n_model_peak_array     = n_model_peak_array[index_sort]
+    mc_source_id_array     = mc_source_id_array[index_sort]
     
     # Collect overlapping peaks
     for ii in range(0, len(sig_peak_array)):
@@ -224,15 +224,15 @@ if __name__ == "__main__":
     
     if (mode == 0):
         # Prune the list of peaks
-        ra_peak_array = ra_peak_array[sig_peak_array > 0.]
-        dec_peak_array = dec_peak_array[sig_peak_array > 0.]
-        r_peak_array = r_peak_array[sig_peak_array > 0.]
+        ra_peak_array          = ra_peak_array[sig_peak_array > 0.]
+        dec_peak_array         = dec_peak_array[sig_peak_array > 0.]
+        r_peak_array           = r_peak_array[sig_peak_array > 0.]
         distance_modulus_array = distance_modulus_array[sig_peak_array > 0.]
-        n_obs_peak_array = n_obs_peak_array[sig_peak_array > 0.]
-        n_obs_half_peak_array = n_obs_half_peak_array[sig_peak_array > 0.]
-        n_model_peak_array = n_model_peak_array[sig_peak_array > 0.]
-        mc_source_id_array = mc_source_id_array[sig_peak_array > 0.]
-        sig_peak_array = sig_peak_array[sig_peak_array > 0.] # Update the sig_peak_array last!
+        n_obs_peak_array       = n_obs_peak_array[sig_peak_array > 0.]
+        n_obs_half_peak_array  = n_obs_half_peak_array[sig_peak_array > 0.]
+        n_model_peak_array     = n_model_peak_array[sig_peak_array > 0.]
+        mc_source_id_array     = mc_source_id_array[sig_peak_array > 0.]
+        sig_peak_array         = sig_peak_array[sig_peak_array > 0.] # Update the sig_peak_array last!
     
     for ii in range(0, len(sig_peak_array)):
         print('{:0.2f} sigma; (RA, Dec, d) = ({:0.2f}, {:0.2f}); r = {:0.2f} deg; d = {:0.1f}, mu = {:0.2f} mag), mc_source_id: {:0.2f}'.format(sig_peak_array[ii], 
