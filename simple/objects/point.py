@@ -19,7 +19,7 @@ class Point:
     Class object for working with data of a point in the sky.
     """
     def __init__(self, ra, dec):
-        self.ra = ra
+        self.ra  = ra
         self.dec = dec
 
     @property
