@@ -25,9 +25,9 @@ class Result:
     """
     Class object to write, store, and read results.
     """
-    def __init__(self, rdir, rfile):
-        self.rdir  = rdir
-        self.rfile = rfile
+    def __init__(self, result_dir, result_file):
+        self.result_dir  = result_dir
+        self.result_file = result_file
 
         # Initialize result arrays
         self.ra_peak_array          = []
@@ -43,7 +43,7 @@ class Result:
 
     def append_results(self, ra_peaks, dec_peaks, r_peaks, sig_peaks, distance_moduli, n_obs_peaks, n_obs_half_peaks, n_model_peaks):
         """
-        Append, concatenate, and sort results from Search.search_by_distance().
+        Append results from Search.search_by_distance().
         """
         # Append results to result arrays
         self.ra_peak_array.append(ra_peaks)
@@ -56,6 +56,12 @@ class Result:
         self.n_model_peak_array.append(n_model_peaks)
         self.mc_source_id_array.append(np.tile(0, len(sig_peaks)))
 
+        return
+
+    def concatenate_results(self)
+        """
+        Concatenate result arrays.
+        """
         # Concatenate result arrays
         self.ra_peak_array          = np.concatenate(self.ra_peak_array)
         self.dec_peak_array         = np.concatenate(self.dec_peak_array)
@@ -67,6 +73,12 @@ class Result:
         self.n_model_peak_array     = np.concatenate(self.n_model_peak_array)
         self.mc_source_id_array     = np.concatenate(self.mc_source_id_array)
 
+        return
+
+    def sort_results(self)
+        """
+        Sort result arrays.
+        """
         # Sort peaks according to significance
         index_sort                  = np.argsort(self.sig_peak_array)[::-1]
         self.ra_peak_array          = self.ra_peak_array[index_sort]
