@@ -19,6 +19,9 @@ import ugali.utils.healpix
 import ugali.utils.projector
 import ugali.isochrone
 
+# Simple libraries
+import simple.filters
+
 # TODO:
 # - use point
 # - make derived classes for each survey
@@ -46,6 +49,37 @@ class Data:
         self.basis_2     = basis_2
         self.mag_max     = mag_max
 
+    def quality_filter(self, data):
+        """
+        Return cut on high quality objects.
+        """
+        return simple.filters.quality_filter(self.survey, data)
+
+    def star_filter(self, data):
+        """
+        Return cut on star-like objects.
+        """
+        return simple.filters.star_filter(self.survey, data)
+
+    def galaxy_filter(self, data):
+        """
+        Return cut on galaxy-like objects.
+        """
+        return simple.filters.galaxy_filter(self.survey, data)
+
+    def color_filter(self, data):
+        """
+        Return cut on blue objects.
+        """
+        return simple.filters.color_filter(self.survey, data)
+
+    def dered_mag(self, data):
+        """
+        Deredden magnitudes.
+        """
+        return simple.filters.dered_mag(self.survey, data)
+
+
     @property
     def load_fracdet(self):
         if self.fracdet is not None:
@@ -53,7 +87,7 @@ class Data:
         else:
             msg = "No fracdet found at {}".format(self.fracdet)
             raise Exception(msg)
-            return
+            return None
 
     def load_local_data(self, ra, dec):
         """
