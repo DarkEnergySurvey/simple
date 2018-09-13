@@ -309,14 +309,14 @@ class Data:
         Fit aperture by varing radius and computing the significance.
         """
     
-        ra_peak_array = []
-        dec_peak_array = []
-        r_peak_array = []
-        sig_peak_array = []
+        ra_peak_array          = []
+        dec_peak_array         = []
+        r_peak_array           = []
+        sig_peak_array         = []
         distance_modulus_array = []
-        n_obs_peak_array = []
-        n_obs_half_peak_array = []
-        n_model_peak_array = []
+        n_obs_peak_array       = []
+        n_obs_half_peak_array  = []
+        n_model_peak_array     = []
     
         size_array = np.arange(0.01, 0.3, 0.01)
         sig_array = np.tile(0., len(size_array))
