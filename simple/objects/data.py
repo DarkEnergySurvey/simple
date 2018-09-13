@@ -310,15 +310,7 @@ class Data:
         Fit aperture by varing radius and computing the significance.
         """
     
-        # use result.Result()
-        ra_peak_array          = []
-        dec_peak_array         = []
-        r_peak_array           = []
-        sig_peak_array         = []
-        distance_modulus_array = []
-        n_obs_peak_array       = []
-        n_obs_half_peak_array  = []
-        n_model_peak_array     = []
+        result = simple.objects.result.Result()
     
         size_array = np.arange(0.01, 0.3, 0.01)
         sig_array = np.tile(0., len(size_array))
@@ -349,14 +341,14 @@ class Data:
     
         # Compile resilts
         print('Candidate: x_peak: {:12.3f}, y_peak: {:12.3f}, r_peak: {:12.3f}, sig: {:12.3f}, ra_peak: {:12.3f}, dec_peak: {:12.3f}'.format(x_peak, y_peak, r_peak, np.max(sig_array), ra_peak, dec_peak))
-        ra_peak_array.append(ra_peak)
-        dec_peak_array.append(dec_peak)
-        r_peak_array.append(r_peak)
-        #sig_peak_array.append(np.max(sig_array))
-        sig_peak_array.append(sig_array[index_peak])
-        distance_modulus_array.append(distance_modulus)
-        n_obs_peak_array.append(n_obs_peak)
-        n_obs_half_peak_array.append(n_obs_half_peak)
-        n_model_peak_array.append(n_model_peak)
+        result.append_results(ra_peak,
+                              dec_peak,
+                              r_peak,
+                              sig_array[index_peak],
+                              distance_modulus,
+                              n_obs_peak,
+                              n_obs_half_peak,
+                              n_model_peak)
     
-        return (ra_peak_array, dec_peak_array, r_peak_array, sig_peak_array, distance_modulus_array, n_obs_peak_array, n_obs_half_peak_array, n_model_peak_array)
+        #return (ra_peak_array, dec_peak_array, r_peak_array, sig_peak_array, distance_modulus_array, n_obs_peak_array, n_obs_half_peak_array, n_model_peak_array)
+        return result.results
