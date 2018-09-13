@@ -25,7 +25,7 @@ class Result:
     """
     Class object to write, store, and read results.
     """
-    def __init__(self, result_dir, result_file):
+    def __init__(self, result_dir='.', result_file='results.csv'):
         self.result_dir  = result_dir
         self.result_file = result_file
 
