@@ -58,7 +58,7 @@ class Result:
 
         return
 
-    def concatenate_results(self)
+    def concatenate_results(self):
         """
         Concatenate result arrays.
         """
@@ -75,7 +75,7 @@ class Result:
 
         return
 
-    def sort_results(self)
+    def sort_results(self):
         """
         Sort result arrays.
         """
