@@ -25,10 +25,10 @@ class Search:
     Class for searching.
     """
     def __init__(self, data)
-        self.data = data
-        self.nside = data.nside
-        self.band_1 = data.band_1
-        self.band_2 = data.band_2
+        self.data    = data
+        self.nside   = data.nside
+        self.band_1  = data.band_1
+        self.band_2  = data.band_2
         self.basis_1 = data.basis_1
         self.basis_2 = data.basis_2
 
@@ -64,14 +64,14 @@ class Search:
     
         characteristic_density = data.compute_char_density(ra, dec)
     
-        ra_peak_array = []
-        dec_peak_array = []
-        r_peak_array = []
-        sig_peak_array = []
+        ra_peak_array          = []
+        dec_peak_array         = []
+        r_peak_array           = []
+        sig_peak_array         = []
         distance_modulus_array = []
-        n_obs_peak_array = []
-        n_obs_half_peak_array = []
-        n_model_peak_array = []
+        n_obs_peak_array       = []
+        n_obs_half_peak_array  = []
+        n_model_peak_array     = []
     
         fracdet = data.load_fracdet
         x_peak_array, y_peak_array, angsep_peak_array = data.find_peaks(ra, dec, distance_modulus)
@@ -91,14 +91,14 @@ class Search:
             n_obs_half_peak_array.append(n_obs_half_peaks)
             n_model_peak_array.append(n_model_peaks)
     
-        ra_peak_array = np.concatenate(ra_peak_array)
-        dec_peak_array = np.concatenate(dec_peak_array)
-        r_peak_array = np.concatenate(r_peak_array)
-        sig_peak_array = np.concatenate(sig_peak_array)
+        ra_peak_array          = np.concatenate(ra_peak_array)
+        dec_peak_array         = np.concatenate(dec_peak_array)
+        r_peak_array           = np.concatenate(r_peak_array)
+        sig_peak_array         = np.concatenate(sig_peak_array)
         distance_modulus_array = np.concatenate(distance_modulus_array)
-        n_obs_peak_array = np.concatenate(n_obs_peak_array)
-        n_obs_half_peak_array = np.concatenate(n_obs_half_peak_array)
-        n_model_peak_array = np.concatenate(n_model_peak_array)
+        n_obs_peak_array       = np.concatenate(n_obs_peak_array)
+        n_obs_half_peak_array  = np.concatenate(n_obs_half_peak_array)
+        n_model_peak_array     = np.concatenate(n_model_peak_array)
     
         return ra_peak_array, dec_peak_array, r_peak_array, sig_peak_array, distance_modulus_array, n_obs_peak_array, n_obs_half_peak_array, n_model_peak_array
 
