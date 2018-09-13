@@ -8,16 +8,13 @@ __author__ = "Sid Mau"
 import os
 import glob
 import numpy as np
-import numpy.lib.recfunctions
 import healpy as hp
 import fitsio as fits
 import scipy.ndimage
-import itertools
 
 # Ugali libraries
 import ugali.utils.healpix
 import ugali.utils.projector
-import ugali.isochrone
 
 # Simple libraries
 import simple.filters

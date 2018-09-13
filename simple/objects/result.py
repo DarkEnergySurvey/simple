@@ -5,18 +5,8 @@ Classy results
 __author__ = "Sid Mau"
 
 # Python libraries
-import os
 import glob
-import yaml
 import numpy as np
-import numpy.lib.recfunctions
-import fitsio as fits
-import itertools
-
-# Ugali libraries
-import ugali.utils.healpix
-import ugali.utils.projector
-import ugali.isochrone
 
 ########################################################################
 

@@ -7,13 +7,7 @@ __author__ = "Keith Bechtol"
 # Python libraries
 import sys
 import os
-import glob
-import yaml
-from matplotlib import mlab
 import numpy as np
-import healpy as hp
-import astropy.io.fits as pyfits
-import fitsio as fits
 
 # Ugali libraries
 import ugali.utils.healpix
