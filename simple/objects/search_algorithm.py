@@ -23,7 +23,6 @@ import ugali.utils.projector
 import simple.simple_utils
 import simple.objects.data
 import simple.objects.point
-import simple.objects.surveys
 import simple.objects.search
 import simple.objects.result
 
