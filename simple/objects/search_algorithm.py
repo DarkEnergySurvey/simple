@@ -137,32 +137,12 @@ if __name__ == "__main__":
     
     distance_modulus_search_array = np.arange(16., mag_max, 0.5)
     
-    #ra_peak_array          = []
-    #dec_peak_array         = [] 
-    #r_peak_array           = []
-    #sig_peak_array         = []
-    #distance_modulus_array = []
-    #mc_source_id_array     = []
-    #n_obs_peak_array       = []
-    #n_obs_half_peak_array  = []
-    #n_model_peak_array     = []
-
     result = simple.objects.result.Result(results_dir, outfile)
     
     if (mode == 0):
         for distance_modulus in distance_modulus_search_array:
-            #ra_peaks, dec_peaks, r_peaks, sig_peaks, dist_moduli, n_obs_peaks, n_obs_half_peaks, n_model_peaks = search.search_by_distance(nside, data, distance_modulus, point.ra, point.dec)
-            results = search.search_by_distance(nside, data, distance_modulus, point.ra, point.dec)
-            result.append(*results)
-            #ra_peak_array.append(ra_peaks)
-            #dec_peak_array.append(dec_peaks)
-            #r_peak_array.append(r_peaks)
-            #sig_peak_array.append(sig_peaks)
-            #distance_modulus_array.append(dist_moduli)
-            #n_obs_peak_array.append(n_obs_peaks)
-            #n_obs_half_peak_array.append(n_obs_half_peaks)
-            #n_model_peak_array.append(n_model_peaks)
-            #mc_source_id_array.append(np.tile(0, len(sig_peaks)))
+            search_result = search.search_by_distance(nside, data, distance_modulus, point.ra, point.dec)
+            result.append(search_result.results)
     #elif (mode == 1):
     #    # grab distance_modulus from population
     #    sim_pop = fits.read(sim_population)
@@ -197,28 +177,6 @@ if __name__ == "__main__":
     #    n_model_peak_array.append(n_model_peaks)
     #    mc_source_id_array.append(np.tile(mc_source_id, len(sig_peaks)))
     
-    #ra_peak_array          = np.concatenate(ra_peak_array)
-    #dec_peak_array         = np.concatenate(dec_peak_array)
-    #r_peak_array           = np.concatenate(r_peak_array)
-    #sig_peak_array         = np.concatenate(sig_peak_array)
-    #distance_modulus_array = np.concatenate(distance_modulus_array)
-    #n_obs_peak_array       = np.concatenate(n_obs_peak_array)
-    #n_obs_half_peak_array  = np.concatenate(n_obs_half_peak_array)
-    #n_model_peak_array     = np.concatenate(n_model_peak_array)
-    #mc_source_id_array     = np.concatenate(mc_source_id_array)
-    #
-    ## Sort peaks according to significance
-    #index_sort             = np.argsort(sig_peak_array)[::-1]
-    #ra_peak_array          = ra_peak_array[index_sort]
-    #dec_peak_array         = dec_peak_array[index_sort]
-    #r_peak_array           = r_peak_array[index_sort]
-    #sig_peak_array         = sig_peak_array[index_sort]
-    #distance_modulus_array = distance_modulus_array[index_sort]
-    #n_obs_peak_array       = n_obs_peak_array[index_sort]
-    #n_obs_half_peak_array  = n_obs_half_peak_array[index_sort]
-    #n_model_peak_array     = n_model_peak_array[index_sort]
-    #mc_source_id_array     = mc_source_id_array[index_sort]
-
     result.concatenate_results()
     result.sort_results()
     

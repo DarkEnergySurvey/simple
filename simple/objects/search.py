@@ -33,7 +33,7 @@ class Search:
         self.basis_1 = data.basis_1
         self.basis_2 = data.basis_2
 
-    def search_by_distance(self, nside, data, distance_modulus, ra, dec, result):
+    def search_by_distance(self, nside, data, distance_modulus, ra, dec):
         """
         Idea: 
         Send a data extension that goes to faint magnitudes, e.g., g < 24.
@@ -65,14 +65,7 @@ class Search:
     
         characteristic_density = data.compute_char_density(ra, dec)
     
-        #ra_peak_array          = []
-        #dec_peak_array         = []
-        #r_peak_array           = []
-        #sig_peak_array         = []
-        #distance_modulus_array = []
-        #n_obs_peak_array       = []
-        #n_obs_half_peak_array  = []
-        #n_model_peak_array     = []
+        search_result = simple.objects.result.Result()
     
         fracdet = data.load_fracdet
         x_peak_array, y_peak_array, angsep_peak_array = data.find_peaks(ra, dec, distance_modulus)
@@ -81,32 +74,12 @@ class Search:
             characteristic_density_local = data.compute_local_char_density(ra, dec, x_peak, y_peak, angsep_peak)
             # Aperture fitting
             print('Fitting aperture to hotspot...')
-            #ra_peaks, dec_peaks, r_peaks, sig_peaks, distance_moduli, n_obs_peaks, n_obs_half_peaks, n_model_peaks = data.fit_aperture(ra, dec, proj, distance_modulus, x_peak, y_peak, angsep_peak)
             results = data.fit_aperture(ra, dec, proj, distance_modulus, x_peak, y_peak, angsep_peak)
-            result.append_results(*results)
-            
-            #ra_peak_array.append(ra_peaks)
-            #dec_peak_array.append(dec_peaks)
-            #r_peak_array.append(r_peaks)
-            #sig_peak_array.append(sig_peaks)
-            #distance_modulus_array.append(distance_moduli)
-            #n_obs_peak_array.append(n_obs_peaks)
-            #n_obs_half_peak_array.append(n_obs_half_peaks)
-            #n_model_peak_array.append(n_model_peaks)
+            search_result.append_results(*results)
     
-        #ra_peak_array          = np.concatenate(ra_peak_array)
-        #dec_peak_array         = np.concatenate(dec_peak_array)
-        #r_peak_array           = np.concatenate(r_peak_array)
-        #sig_peak_array         = np.concatenate(sig_peak_array)
-        #distance_modulus_array = np.concatenate(distance_modulus_array)
-        #n_obs_peak_array       = np.concatenate(n_obs_peak_array)
-        #n_obs_half_peak_array  = np.concatenate(n_obs_half_peak_array)
-        #n_model_peak_array     = np.concatenate(n_model_peak_array)
-
-        result.concatenate_reslts()
+        search_result.concatenate_results()
     
-        #return ra_peak_array, dec_peak_array, r_peak_array, sig_peak_array, distance_modulus_array, n_obs_peak_array, n_obs_half_peak_array, n_model_peak_array
-        return result
+        return search_result
 
     ## mode = 1
     #def search_by_simulation(nside, data, distance_modulus, pix_nside_select, ra_select, dec_select, magnitude_threshold=mag_max, fracdet=None):
