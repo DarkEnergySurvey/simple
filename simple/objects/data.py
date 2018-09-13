@@ -162,15 +162,6 @@ class Data:
             cut = (fracdet[subpix_region_array] != hp.UNSEEN)
             mean_fracdet = np.mean(fracdet[subpix_region_array[cut]])
     
-            # smau: this doesn't seem to be used in the non-local density estimation
-            subpix_region_array = subpix_region_array[fracdet[subpix_region_array] > 0.99]
-            subpix = ugali.utils.healpix.angToPix(nside_fracdet, 
-                                                  data[self.basis_1][mag_cut], 
-                                                  data[self.basis_2][mag_cut]) # Remember to apply mag threshold to objects
-            characteristic_density_fracdet = float(np.sum(np.in1d(subpix, subpix_region_array))) \
-                                             / (hp.nside2pixarea(nside_fracdet, degrees=True) * len(subpix_region_array)) # deg^-2
-            print('Characteristic density fracdet = {:0.1f} deg^-2').format(characteristic_density_fracdet)
-            
             # Correct the characteristic density by the mean fracdet value
             characteristic_density_raw = 1. * characteristic_density
             characteristic_density /= mean_fracdet 
