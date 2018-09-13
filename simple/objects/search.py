@@ -25,7 +25,7 @@ class Search:
     """
     Class for searching.
     """
-    def __init__(self, data)
+    def __init__(self, data):
         self.data    = data
         self.nside   = data.nside
         self.band_1  = data.band_1
