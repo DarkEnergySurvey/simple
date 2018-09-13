@@ -75,6 +75,7 @@ class Search:
             # Aperture fitting
             print('Fitting aperture to hotspot...')
             results = data.fit_aperture(ra, dec, proj, distance_modulus, x_peak, y_peak, angsep_peak)
+            # TODO: need to add in mc_source_id_array somewhere into this pipeline
             search_result.append_results(*results)
     
         search_result.concatenate_results()
