@@ -5,18 +5,8 @@ Classy results
 __author__ = "Sid Mau"
 
 # Python libraries
-import os
 import glob
-import yaml
 import numpy as np
-import numpy.lib.recfunctions
-import fitsio as fits
-import itertools
-
-# Ugali libraries
-import ugali.utils.healpix
-import ugali.utils.projector
-import ugali.isochrone
 
 ########################################################################
 
@@ -25,7 +15,7 @@ class Result:
     """
     Class object to write, store, and read results.
     """
-    def __init__(self, result_dir, result_file):
+    def __init__(self, result_dir='.', result_file='results.csv'):
         self.result_dir  = result_dir
         self.result_file = result_file
 
@@ -40,6 +30,22 @@ class Result:
         self.n_obs_half_peak_array  = []
         self.n_model_peak_array     = []
         self.mc_source_id_array     = []
+
+    @property
+    def results(self):
+        """
+        Return tuple of results.
+        """
+        return (self.ra_peak_array,
+                self.dec_peak_array,
+                self.r_peak_array,
+                self.sig_peak_array,
+                self.distance_modulus_array,
+                self.mc_source_id_array,
+                self.n_obs_peak_array,
+                self.n_obs_half_peak_array,
+                self.n_model_peak_array,
+                self.mc_source_id_array)
 
     def append_results(self, ra_peaks, dec_peaks, r_peaks, sig_peaks, distance_moduli, n_obs_peaks, n_obs_half_peaks, n_model_peaks):
         """
@@ -58,7 +64,7 @@ class Result:
 
         return
 
-    def concatenate_results(self)
+    def concatenate_results(self):
         """
         Concatenate result arrays.
         """
@@ -75,7 +81,7 @@ class Result:
 
         return
 
-    def sort_results(self)
+    def sort_results(self):
         """
         Sort result arrays.
         """

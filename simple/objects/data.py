@@ -8,19 +8,17 @@ __author__ = "Sid Mau"
 import os
 import glob
 import numpy as np
-import numpy.lib.recfunctions
 import healpy as hp
 import fitsio as fits
 import scipy.ndimage
-import itertools
 
 # Ugali libraries
 import ugali.utils.healpix
 import ugali.utils.projector
-import ugali.isochrone
 
 # Simple libraries
 import simple.filters
+import simple.objects.result
 
 # TODO:
 # - use point
@@ -309,6 +307,7 @@ class Data:
         Fit aperture by varing radius and computing the significance.
         """
     
+        # use result.Result()
         ra_peak_array          = []
         dec_peak_array         = []
         r_peak_array           = []
@@ -357,4 +356,4 @@ class Data:
         n_obs_half_peak_array.append(n_obs_half_peak)
         n_model_peak_array.append(n_model_peak)
     
-        return ra_peak_array, dec_peak_array, r_peak_array, sig_peak_array, distance_modulus_array, n_obs_peak_array, n_obs_half_peak_array, n_model_peak_array
+        return (ra_peak_array, dec_peak_array, r_peak_array, sig_peak_array, distance_modulus_array, n_obs_peak_array, n_obs_half_peak_array, n_model_peak_array)
