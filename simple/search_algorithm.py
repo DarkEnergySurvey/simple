@@ -125,6 +125,14 @@ data = data[quality]
 data = simple.filters.dered_mag(survey, data)
 
 print('Found {} objects...').format(len(data))
+if (len(data) == 0):
+    print('Ending search prematurely. Look at data for debugging.')
+    nan_array = [np.nan]
+    simple.simple_utils.write_output(results_dir, nside, pix_nside_select,
+                             nan_array, nan_array, nan_array, nan_array, 
+                             nan_array, nan_array, nan_array, nan_array,
+                             [mc_source_id], mode, outfile)
+    exit()
 
 print('Applying cuts...')
 cut = simple.filters.star_filter(survey, data)
@@ -262,3 +270,8 @@ if (len(sig_peak_array) > 0):
                              sig_peak_array, mc_source_id_array, mode, outfile)
 else:
     print('No significant hotspots found.')
+    nan_array = [np.nan]
+    simple.simple_utils.write_output(results_dir, nside, pix_nside_select,
+                             nan_array, nan_array, nan_array, nan_array, 
+                             nan_array, nan_array, nan_array, nan_array,
+                             [mc_source_id], mode, outfile)
