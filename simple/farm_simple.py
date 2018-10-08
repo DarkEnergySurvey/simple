@@ -91,12 +91,16 @@ if (mode == 0): # real
 elif (mode == 1): # real+sim
     sim_pop = fits.read(sim_population)
     results = simple.simple_utils.read_output(results_dir)
-    #for sim in sim_pop[:]:
-    for sim in sim_pop[:]:
-        if (np.in1d(sim['MC_SOURCE_ID'], results['MC_SOURCE_ID']) == False):
+    if (len(results) > 0):
+        for sim in sim_pop[:]:
+            if (np.in1d(sim['MC_SOURCE_ID'], results['MC_SOURCE_ID']) == False):
+                ra, dec, mc_source_id = sim[basis_1], sim[basis_2], sim['MC_SOURCE_ID']
+                pix = hp.ang2pix(nside, ra, dec, lonlat=True)
+                submit_job(ra, dec, pix, mc_source_id, mode)
+    else: 
+        for sim in sim_pop[:]:
             ra, dec, mc_source_id = sim[basis_1], sim[basis_2], sim['MC_SOURCE_ID']
             pix = hp.ang2pix(nside, ra, dec, lonlat=True)
-
             submit_job(ra, dec, pix, mc_source_id, mode)
 
 elif (mode == 2): # real objects
