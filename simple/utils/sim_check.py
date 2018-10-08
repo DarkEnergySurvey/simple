@@ -71,7 +71,6 @@ data.sort(order='MC_SOURCE_ID')
 sim_pop.sort(order='MC_SOURCE_ID')
 
 # STELLAR MASS
-import pdb;pdb.set_trace()
 plt.scatter(sim_pop['STELLAR_MASS'], data['SIG'], c=sim_pop['DIFFICULTY'], s=1)
 plt.xlabel('STELLAR_MASS')
 plt.ylabel('SIG')
