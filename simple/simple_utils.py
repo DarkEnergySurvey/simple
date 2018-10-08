@@ -132,14 +132,12 @@ def construct_sim_data(pix_nside_neighbors, mc_source_id):
 
 def inject_sim(real_data, sim_data, mc_source_id):
     inject_data = sim_data[sim_data['MC_SOURCE_ID'] == mc_source_id]
-    columns = inject_data.dtype
+    names = [name for name in real_data.dtype.names]
+    inject_data = inject_data[names]
     # inject_data has boolean extended class
     # real_data has pseudo-boolean extended class
-
-    real_data = real_data.astype(columns)
+    real_data = real_data.astype(inject_data.dtype)
     data = np.concatenate((real_data, inject_data), axis=0)
-    #real_data_reshape = np.ndarray(real_data.shape, columns, real_data, 0, real_data.strides)
-    #data = np.concatenate((real_data_reshape, inject_data), axis=0)
 
     return data
 
@@ -493,6 +491,9 @@ def search_by_distance(nside, data, distance_modulus, pix_nside_select, ra_selec
 
     print('{} objects left after isochrone cut...').format(len(data))
 
+    if (len(data) == 0):
+        return [], [], [], [], [], [], [], []
+
     # Compute characteristic density at this distance
     characteristic_density = compute_char_density(nside, data, ra_select, dec_select, mag_max, fracdet)
 
@@ -562,6 +563,9 @@ def search_by_simulation(nside, data, distance_modulus, pix_nside_select, ra_sel
 
     print('{} objects left after isochrone cut...'.format(len(data)))
     print('{} simulated objects left after isochrone cut...'.format(np.sum(data['MC_SOURCE_ID'] != 0)))
+
+    if (len(data) == 0):
+        return [], [], [], [], [], [], [], []
 
     # Compute characteristic density at this distance
     characteristic_density = compute_char_density(nside, data, ra_select, dec_select, mag_max, fracdet)
@@ -636,6 +640,9 @@ def search_by_object(nside, data, distance_modulus, pix_nside_select, ra_select,
     print('{} objects left after isochrone cut...'.format(len(data)))
     print('{} simulated objects left after isochrone cut...'.format(np.sum(data['MC_SOURCE_ID'] != 0)))
 
+    if (len(data) == 0):
+        return [], [], [], [], [], [], [], []
+
     # Compute characteristic density at this distance
     characteristic_density = compute_char_density(nside, data, ra_select, dec_select, mag_max, fracdet)
 
@@ -686,7 +693,7 @@ def search_by_object(nside, data, distance_modulus, pix_nside_select, ra_select,
 def write_output(results_dir, nside, pix_nside_select, ra_peak_array, dec_peak_array, r_peak_array, distance_modulus_array, 
                 n_obs_peak_array, n_obs_half_peak_array, n_model_peak_array, 
                 sig_peak_array, mc_source_id_array, mode, outfile):
-    writer = open(outfile, 'a') # don't overwrite; append
+    writer = open(outfile, 'w') # overwrite if exists
     for ii in range(0, len(sig_peak_array)):
         # SIG, RA, DEC, MODULUS, r, n_obs, n_model, mc_source_id
         writer.write('{:10.3f}, {:10.3f}, {:10.3f}, {:10.3f}, {:10.3f}, {:10.3f}, {:10.3f}, {:10.3f}, {:10.3f}\n'.format(sig_peak_array[ii], 
@@ -703,5 +710,11 @@ def write_output(results_dir, nside, pix_nside_select, ra_peak_array, dec_peak_a
 
 def read_output(results_dir):
     infiles = sorted(glob.glob(results_dir + '/*.csv'))
-    results = np.concatenate([np.genfromtxt(infile, delimiter=',', names=['SIG', 'RA', 'DEC', 'DISTANCE_MODULUS', 'R_PEAK', 'N_OBS_PEAK', 'N_OBS_HALF_PEAK', 'N_MODEL_PEAK', 'MC_SOURCE_ID']) for infile in infiles])
+    if (len(infiles) > 0):
+        results = [np.genfromtxt(infile, delimiter=',', names=['SIG', 'RA', 'DEC', 'DISTANCE_MODULUS', 'R_PEAK', 'N_OBS_PEAK', 'N_OBS_HALF_PEAK', 'N_MODEL_PEAK', 'MC_SOURCE_ID']) for infile in infiles]
+        results = [result for result in results if (result.size != 0)]
+        results = np.concatenate(np.vstack(results))
+    else:
+        results = []
+
     return results
