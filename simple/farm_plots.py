@@ -9,7 +9,6 @@ import sys
 import time
 import subprocess
 import glob
-import pyfits
 import healpy
 import numpy
 import numpy as np
