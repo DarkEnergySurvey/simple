@@ -32,6 +32,7 @@ for file in glob.glob('{}/*.csv'.format(cfg['output']['results_dir'])):
     csvfile.close()
 
 data = np.asarray(results)
+#data = data[np.unique([data[i][-1] for i in range(len(data))], return_index=True)[1]]
 
 # Create fits columns
 c0 = fits.Column(name='SIG',          format='E', array=data[:,0])

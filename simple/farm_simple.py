@@ -53,8 +53,10 @@ def submit_job(ra, dec, pix, mc_source_id, mode, **population_file):
         logfile = '{}/results_nside_{}_{}.log'.format(log_dir, nside, pix)
         #command = 'python {}/search_algorithm.py {:0.2f} {:0.2f} {:0.2f} {} {}'.format(simple_dir, ra, dec, mc_source_id, outfile, logfile)
     elif (mode == 1):
-        outfile = '{}/results_mc_source_id_{}.csv'.format(results_dir, mc_source_id) # all values in mc_source_id_array should be the same
-        logfile = '{}/results_mc_source_id_{}.log'.format(log_dir, mc_source_id) # all values in mc_source_id_array should be the same
+        #outfile = '{}/results_mc_source_id_{}.csv'.format(results_dir, mc_source_id) # all values in mc_source_id_array should be the same
+        #logfile = '{}/results_mc_source_id_{}.log'.format(log_dir, mc_source_id) # all values in mc_source_id_array should be the same
+        outfile = '{}/results_nside_{}_{}.csv'.format(results_dir, nside, pix)
+        logfile = '{}/results_nside_{}_{}.log'.format(log_dir, nside, pix)
         #command = 'python {}/search_algorithm.py {:0.2f} {:0.2f} {:0.2f} {} {} {}'.format(simple_dir, ra, dec, mc_source_id, outfile, logfile, population_file)
     elif (mode == 2):
         outfile = '{}/results_mc_source_id_{}.csv'.format(results_dir, mc_source_id) # all values in mc_source_id_array should be the same
@@ -81,8 +83,7 @@ if (mode == 0): # real
     for infile in infiles:
         pix_nside.append(int(infile.split('.fits')[0].split('_')[-1]))
 
-    #for ii in range(0, len(pix_nside)):
-    for ii in range(0, 19):
+    for ii in range(0, len(pix_nside)):
         ra, dec = ugali.utils.healpix.pixToAng(nside, pix_nside[ii])
     
         submit_job(ra, dec, pix_nside[ii], 0, mode) # TODO: mc_source_id (0 for real)
@@ -90,26 +91,29 @@ if (mode == 0): # real
     
 elif (mode == 1): # real+sim
     sim_pop = fits.read(sim_population)
-    results = simple.simple_utils.read_output(results_dir)
-    if (len(results) > 0):
-        for sim in sim_pop[:]:
-            if (np.in1d(sim['MC_SOURCE_ID'], results['MC_SOURCE_ID']) == False):
-                ra, dec, mc_source_id = sim[basis_1], sim[basis_2], sim['MC_SOURCE_ID']
-                pix = hp.ang2pix(nside, ra, dec, lonlat=True)
-                submit_job(ra, dec, pix, mc_source_id, mode)
-    else: 
-        for sim in sim_pop[:]:
-            ra, dec, mc_source_id = sim[basis_1], sim[basis_2], sim['MC_SOURCE_ID']
-            pix = hp.ang2pix(nside, ra, dec, lonlat=True)
+    for sim in sim_pop[:]:
+        ra, dec, mc_source_id = sim[basis_1], sim[basis_2], sim['MC_SOURCE_ID']
+        pix = hp.ang2pix(nside, ra, dec, lonlat=True)
+        print('MC_SOURCE_ID = {}\nPIX = {}\n'.format(mc_source_id, pix))
+        results = simple.simple_utils.read_output(results_dir, pix)
+        if (np.in1d(sim['MC_SOURCE_ID'], results['MC_SOURCE_ID']) == False):
+            print('    submitting...')
             submit_job(ra, dec, pix, mc_source_id, mode)
+    #else: 
+    #    for sim in sim_pop[:]:
+    #        ra, dec, mc_source_id = sim[basis_1], sim[basis_2], sim['MC_SOURCE_ID']
+    #        pix = hp.ang2pix(nside, ra, dec, lonlat=True)
+    #        submit_job(ra, dec, pix, mc_source_id, mode)
 
 elif (mode == 2): # real objects
     #sim_pop = fits.read(object_list)
-    sim_pop = np.genfromtxt(object_list, delimiter=',', names=True)[1:]
-    results = simple.simple_utils.read_output(results_dir)
+    sim_pop = np.genfromtxt(object_list, delimiter=',', names=True)[:]
     for sim in sim_pop[:]:
-        if (np.in1d(sim['MC_SOURCE_ID'], results['MC_SOURCE_ID']) == False):
-            ra, dec, mc_source_id = sim[basis_1], sim[basis_2], sim['MC_SOURCE_ID']
-            pix = hp.ang2pix(nside, ra, dec, lonlat=True)
-
-            submit_job(ra, dec, pix, mc_source_id, mode)
+        ra, dec, mc_source_id = sim[basis_1], sim[basis_2], sim['MC_SOURCE_ID']
+        pix = hp.ang2pix(nside, ra, dec, lonlat=True)
+        print('MC_SOURCE_ID = {}\nPIX = {}\n'.format(mc_source_id, pix))
+        #results = simple.simple_utils.read_output(results_dir, pix)
+        #if (np.in1d(sim['MC_SOURCE_ID'], results['MC_SOURCE_ID']) == False):
+        #    print('    submitting...')
+        #    submit_job(ra, dec, pix, mc_source_id, mode)
+        submit_job(ra, dec, pix, mc_source_id, mode)

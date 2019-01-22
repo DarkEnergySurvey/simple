@@ -45,7 +45,7 @@ with open('config.yaml', 'r') as ymlfile:
     mode = cfg[survey]['mode']
     sim_population = cfg[survey]['sim_population']
     sim_dir = cfg[survey]['sim_dir']
-    object_list = cfg[survey]['object_list']
+    #object_list = cfg[survey]['object_list']
 
     fracdet_map = cfg[survey]['fracdet']
 

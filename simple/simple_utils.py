@@ -693,7 +693,7 @@ def search_by_object(nside, data, distance_modulus, pix_nside_select, ra_select,
 def write_output(results_dir, nside, pix_nside_select, ra_peak_array, dec_peak_array, r_peak_array, distance_modulus_array, 
                 n_obs_peak_array, n_obs_half_peak_array, n_model_peak_array, 
                 sig_peak_array, mc_source_id_array, mode, outfile):
-    writer = open(outfile, 'w') # overwrite if exists
+    writer = open(outfile, 'a') # append if exists
     for ii in range(0, len(sig_peak_array)):
         # SIG, RA, DEC, MODULUS, r, n_obs, n_model, mc_source_id
         writer.write('{:10.3f}, {:10.3f}, {:10.3f}, {:10.3f}, {:10.3f}, {:10.3f}, {:10.3f}, {:10.3f}, {:10.3f}\n'.format(sig_peak_array[ii], 
@@ -708,12 +708,16 @@ def write_output(results_dir, nside, pix_nside_select, ra_peak_array, dec_peak_a
 
 ########################################################################
 
-def read_output(results_dir):
-    infiles = sorted(glob.glob(results_dir + '/*.csv'))
-    if (len(infiles) > 0):
-        results = [np.genfromtxt(infile, delimiter=',', names=['SIG', 'RA', 'DEC', 'DISTANCE_MODULUS', 'R_PEAK', 'N_OBS_PEAK', 'N_OBS_HALF_PEAK', 'N_MODEL_PEAK', 'MC_SOURCE_ID']) for infile in infiles]
-        results = [result for result in results if (result.size != 0)]
-        results = np.concatenate(np.vstack(results))
+def read_output(results_dir, pix):
+    #infiles = sorted(glob.glob(results_dir + '/*{}.csv'.format(pix)))
+    #if (len(infiles) > 0):
+    #    results = [np.genfromtxt(infile, delimiter=',', names=['SIG', 'RA', 'DEC', 'DISTANCE_MODULUS', 'R_PEAK', 'N_OBS_PEAK', 'N_OBS_HALF_PEAK', 'N_MODEL_PEAK', 'MC_SOURCE_ID']) for infile in infiles]
+    #    results = [result for result in results if (result.size != 0)]
+    #    #results = np.concatenate(np.vstack(results))
+    #    results = np.concatenate(results)
+    infile = glob.glob(results_dir + '/*{}.csv'.format(pix))
+    if (len(infile) > 0):
+        results = np.genfromtxt(infile[0], delimiter=',', names=['SIG', 'RA', 'DEC', 'DISTANCE_MODULUS', 'R_PEAK', 'N_OBS_PEAK', 'N_OBS_HALF_PEAK', 'N_MODEL_PEAK', 'MC_SOURCE_ID'])
     else:
         results = []
 
