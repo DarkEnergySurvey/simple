@@ -1,0 +1,16 @@
+there is a significant speed in IO when calling fits.read() with the argument columns=['x,', 'y,', ...]
+
+this should be implemented when reading the file, and should consider generating a list of these columns based off of the config vars,
+
+i.e. in python, define
+>>> COLS=[basis_1, basis_2, mag_1, mag_2, etc...]
+>>> fits.read(infile, columns=COLS)
+
+basis_1
+basis_2
+mag_1
+mag_dered_1
+mag_2
+mag_dered_2
+
+will need to find a clever way to handle the filtering...

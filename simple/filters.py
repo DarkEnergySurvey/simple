@@ -17,8 +17,8 @@ with open('config.yaml', 'r') as ymlfile:
 
     basis_1 = cfg[survey]['basis_1']
     basis_2 = cfg[survey]['basis_2']
-    mag_g = cfg[survey]['mag_g']
-    mag_r = cfg[survey]['mag_r']
+    #mag_g = cfg[survey]['mag_g']
+    #mag_r = cfg[survey]['mag_r']
     mag_max = cfg[survey]['mag_max']
 
     band_1 = cfg[survey]['band_1']
@@ -127,9 +127,9 @@ def color_filter(survey, data):
     elif survey == 'bliss':
         cut = ((data[mag_1] - data[mag_2]) < 0.4) # 0.2
     elif survey == 'maglites':
-        cut = ((data[mag_g] - data[mag_r]) < 0.4) # 0.2
+        cut = ((data[mag_1] - data[mag_2]) < 0.4) # 0.2
     elif survey == 'panstarrs':
-        cut = ((data[mag_g] - data[mag_r]) < 0.4) # 0.2
+        cut = ((data[mag_1] - data[mag_2]) < 0.4) # 0.2
         #cut = ((data['GFPSFMAG'] - data['IFPSFMAG']) > -0.5) \
         #    & ((data['GFPSFMAG'] - data['IFPSFMAG']) < 1.0)
     return cut

@@ -37,16 +37,16 @@ plt.title("{} Hotspots".format(survey))
 # Plot hotspots
 plt.scatter(data[basis_1], data[basis_1], edgecolor='none', s=1, c='black', alpha=0.5)
 
-# Overplot known objects
-catalog_array = ['McConnachie15', 'ExtraDwarfs']
-catalog = ugali.candidate.associate.SourceCatalog()
-for catalog_name in catalog_array:
-    catalog += ugali.candidate.associate.catalogFactory(catalog_name)
-plt.scatter(catalog['ra'], catalog['dec'], edgecolor='red', s=20, linewidth=0.5, c='none', label='known objects')
+## Overplot known objects
+#catalog_array = ['McConnachie15', 'ExtraDwarfs']
+#catalog = ugali.candidate.associate.SourceCatalog()
+#for catalog_name in catalog_array:
+#    catalog += ugali.candidate.associate.catalogFactory(catalog_name)
+#plt.scatter(catalog['ra'], catalog['dec'], edgecolor='red', s=20, linewidth=0.5, c='none', label='known objects')
 
 plt.xlim([min(data[basis_1]), max(data[basis_2])])
 plt.ylim([min(data[basis_1]), max(data[basis_2])])
 plt.gca().invert_xaxis()
-plt.legend(loc='upper right')
+#plt.legend(loc='upper right')
 plt.savefig("{}_hotspots.png".format(survey), bbox_inches='tight', dpi=300)
 plt.close()

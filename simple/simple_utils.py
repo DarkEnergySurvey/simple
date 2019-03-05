@@ -105,7 +105,7 @@ def construct_real_data(pix_nside_neighbors):
             #reader = pyfits.open(infile)
             #data_array.append(reader[1].data)
             #reader.close()
-            data_array.append(fits.read(infile))
+            data_array.append(fits.read(infile)) # add COLS=??? to speed up IO; use yaml
     data = np.concatenate(data_array)
 
     # Guarantee data has MC_SOURCE_ID

@@ -51,6 +51,9 @@ try: # simple
 except: # ugali
     candidate_list = candidate_list[candidate_list['TS'] > 25]
 
+# for PS1
+candidate_list = candidate_list[candidate_list['DEC'] > -15]
+
 print('{} candidates found...').format(len(candidate_list))
 
 ############################################################
@@ -69,7 +72,8 @@ for candidate in candidate_list:
         field_density = round(candidate['N_MODEL'] / (np.pi * (candidate['r'] * 60.)**2), 4) # field density (arcmin^-2)
     
     logfile = '{}/candidate_{}_{}.log'.format(log_dir, ra, dec)
-    batch = 'csub -n {} -o {} '.format(jobs, logfile)
+    #batch = 'csub -n {} -o {} '.format(jobs, logfile)
+    batch = 'csub -n {} -o {} --host all '.format(jobs, logfile) # testing condor updates
     if 'N_MODEL' in candidate_list.dtype.names:
         command = 'python {}/make_plot.py {:0.2f} {:0.2f} {:0.2f} {:0.2f} {:0.2f} {:0.4f}'.format(simple_dir, ra, dec, mod, sig, mc_source_id, field_density)
     else:
