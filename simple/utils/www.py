@@ -40,11 +40,10 @@ TABLE = """
 ROW = """
     <tr>
       <th>%(name)s</th>
-      <!--<td> <a id="%(fname)s"></a><a href="%(fname)s.png"><img src="%(fname)s.png" width="400"></a></td>-->
-      <!--<td> <a id="%(fname)s_dist"></a><a href="%(fname)s_dist.png"><img src="%(fname)s_dist.png" width="400"></a></td>-->
-      <!--<td> <a id="%(fname)s_scat"></a><a href="%(fname)s_scat.png"><img src="%(fname)s_scat.png" width="400"></a></td>-->
-	  <td> <a id="%(fname)s"></a><a href="%(fname)s.png"><img src="%(fname)s.png" width="400"></a></td>
-    </tr> 
+      <td> <a id="%(fname)s"></a><a href="%(fname)s.png"><img src="%(fname)s.png" width="400"></a></td>
+      <td> <a id="%(fname)s_dist"></a><a href="%(fname)s_dist.png"><img src="%(fname)s_dist.png" width="400"></a></td>
+      <td> <a id="%(fname)s_scat"></a><a href="%(fname)s_scat.png"><img src="%(fname)s_scat.png" width="400"></a></td>
+    </tr>  
 """
 
 def create_index_html(filename,candidates):
