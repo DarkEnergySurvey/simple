@@ -1,0 +1,3 @@
+"""
+Simple binner plotting subpackage.
+"""
