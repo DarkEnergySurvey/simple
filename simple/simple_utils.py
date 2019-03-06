@@ -67,6 +67,9 @@ mag_err_2 = mag_err.format(band_2.upper())
 mag_dered_1 = mag_dered.format(band_1.upper())
 mag_dered_2 = mag_dered.format(band_2.upper())
 
+# specify fits columns
+#COLS = [basis_1, basis_2, mag_1, mag_2, mag_err_1, mag_err_2, mag_dered_1, mag_dered_2,...]
+
 ########################################################################
 
 def get_catalog_file(catalog_dir, mc_source_id):
