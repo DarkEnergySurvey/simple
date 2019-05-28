@@ -49,10 +49,10 @@ with open('config.yaml', 'r') as ymlfile:
 
     fracdet_map = cfg[survey]['fracdet']
 
-    mag_g = cfg[survey]['mag_g']
-    mag_r = cfg[survey]['mag_r']
-    mag_g_err = cfg[survey]['mag_g_err']
-    mag_r_err = cfg[survey]['mag_r_err']
+    #mag_g = cfg[survey]['mag_g']
+    #mag_r = cfg[survey]['mag_r']
+    #mag_g_err = cfg[survey]['mag_g_err']
+    #mag_r_err = cfg[survey]['mag_r_err']
 
     results_dir = os.path.join(os.getcwd(), cfg['output']['results_dir'])
     if not os.path.exists(results_dir):

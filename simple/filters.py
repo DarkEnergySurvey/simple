@@ -40,25 +40,25 @@ mag_dered_2 = mag_dered.format(band_2.upper())
 def quality_filter(survey, data):
     """Return data above a quality threshold"""
     if survey == 'y3_gold_2_0':
-        cut = (data[mag_1] < mag_max)
+        sel = (data[mag_1] < mag_max)
     elif survey == 'y3a2':
-        cut = (data['PSF_MAG_SFD_G'] < mag_max)
+        sel = (data['PSF_MAG_SFD_G'] < mag_max)
     elif survey == 'bliss':
-        #cut = (data['PSF_MAG_SFD_G'] < 25)
-        #cut = (data[mag_g] < 25)
-        cut = (data['WAVG_MAG_PSF_G'] < mag_max) \
+        #sel = (data['PSF_MAG_SFD_G'] < 25)
+        #sel = (data[mag_g] < 25)
+        sel = (data['WAVG_MAG_PSF_G'] < mag_max) \
             & (data['MAG_PSF_G'] < 90) \
             & (data['MAG_PSF_R'] < 90)
             #& (data['SEXTRACTOR_FLAGS_G'] < 4) \
             #& (data['SEXTRACTOR_FLAGS_R'] < 4)
             #& ((data['PSF_MAG_SFD_G'] - data['PSF_MAG_SFD_R']) < 1.)
     elif survey == 'maglites':
-        cut = (data['PSF_MAG_SFD_G'] < mag_max) \
+        sel = (data['PSF_MAG_SFD_G'] < mag_max) \
             & (data['SEXTRACTOR_FLAGS_G'] < 4) \
             & (data['SEXTRACTOR_FLAGS_R'] < 4)
             #& ((data['PSF_MAG_SFD_G'] - data['PSF_MAG_SFD_R']) < 1.)
     elif survey == 'panstarrs':
-        #cut = (np.bitwise_and(data['QUALITYFLAG'], 16) > 0) \
+        #sel = (np.bitwise_and(data['QUALITYFLAG'], 16) > 0) \
         #    & (data['NSTACKDETECTIONS'] > 1) \
         #    & (data['NDETECTIONS'] > 0) \
         #    & (np.bitwise_and(data['GINFOFLAG'], 8) == 0) \
@@ -76,63 +76,86 @@ def quality_filter(survey, data):
         #    & (data['RFPSFMAGERR'] < 0.1) # replacing (data['GFPSFMAG'] < 22.5) after Keith's investigations
         #    #& (data['GFPSFMAG'] < 22.5) # observed magnitude - not extinction corrected
         #    #& (data['GINFOFLAG'] >= 0) # recommended by Alex; untested yet
-        cut = (data['RFPSFMAGERR'] < 0.1) # replacing (data['GFPSFMAG'] < 22.5) after Keith's investigations
-    return cut
+        sel = (data['RFPSFMAGERR'] < 0.1) # replacing (data['GFPSFMAG'] < 22.5) after Keith's investigations
+    elif survey == 'decals':
+        sel = True ###
+    return sel
 
 def star_filter(survey, data):
     """Return stellar-like objects"""
     if survey == 'y3_gold_2_0':
-        cut = (data['EXTENDED_CLASS_MASH_SOF'] >= 0) \
+        sel = (data['EXTENDED_CLASS_MASH_SOF'] >= 0) \
             & (data['EXTENDED_CLASS_MASH_SOF'] <= 2)
     elif survey == 'y3a2':
-        cut = (data['EXTENDED_CLASS_MASH'] >= 0) \
+        sel = (data['EXTENDED_CLASS_MASH'] >= 0) \
             & (data['EXTENDED_CLASS_MASH'] <= 2)
     elif survey == 'bliss':
-        #cut = (data['CM_T'] < 0.003 + data['CM_T_ERR'])
-        cut = (data['WAVG_SPREAD_MODEL_G'] < 0.003 + data['SPREADERR_MODEL_G'])
+        #sel = (data['CM_T'] < 0.003 + data['CM_T_ERR'])
+        sel = (data['WAVG_SPREAD_MODEL_G'] < 0.003 + data['SPREADERR_MODEL_G'])
     elif survey == 'maglites':
-        cut = (data['CM_T'] < 0.003 + data['CM_T_ERR'])
+        sel = (data['CM_T'] < 0.003 + data['CM_T_ERR'])
     elif survey == 'panstarrs':
-        #cut = ((data['IFPSFMAG'] - data['IFKRONMAG']) < 0.05)
+        #sel = ((data['IFPSFMAG'] - data['IFKRONMAG']) < 0.05)
         ## Label objects that fail fit stars (this happens in dense regions)
-        #cut = cut | (data['IFPSFMAG'] == -999.) 
+        #sel = sel | (data['IFPSFMAG'] == -999.) 
         ## Label objects that have exceptionally bright Kron magnitudes relative to PSF magnitudes stars (this happens in dense regions)
-        #cut = cut | ((data['IFPSFMAG'] - data['IFKRONMAG']) > 4.0)
-        cut = (data['EXTENDED_CLASS'] == 0)
-    return cut
+        #sel = sel | ((data['IFPSFMAG'] - data['IFKRONMAG']) > 4.0)
+        sel = (data['EXTENDED_CLASS'] == 0)
+    elif survey == 'decals':
+        #sel = (data['EXTENDED_CLASS'] == 0)
+        rbright = 18
+        rfaint = 19.5
+        sel = np.where((data['TYPE'].strip() == 'PSF')*
+                        (np.sum((data['FLUX_G'] > 0)*1, axis=1)==3)*
+                        (np.sum((data['FLUX_R'] > 0)*1, axis=1)==3)*
+                        (np.sum((data['FLUX_Z'] > 0)*1, axis=1)==3)*
+                        (np.sum((data['ANYMASK_G'] > 0)*1, axis=1)==0)*
+                        (np.sum((data['ANYMASK_R'] > 0)*1, axis=1)==0)*
+                        (np.sum((data['ANYMASK_Z'] > 0)*1, axis=1)==0)*
+                        (np.sum((data['FRACFLUX_G'] < 0.05)*1, axis=1)==3)*
+                        (np.sum((data['FRACFLUX_R'] < 0.05)*1, axis=1)==3)*
+                        (np.sum((data['FRACFLUX_Z'] < 0.05)*1, axis=1)==3)*
+                        (data['FLUX_R'][:,2]<(10**(0.4*(22.5-rbright))))*
+                        (data['FLUX_R'][:,2]>(10**(0.4*(22.5-rfaint)))))[0]
+    return sel
 
 def galaxy_filter(survey, data):
     """Return stellar-like objects"""
     if survey == 'y3_gold_2_0':
-        cut = (data['EXTENDED_CLASS_MASH_SOF'] > 2)
+        sel = (data['EXTENDED_CLASS_MASH_SOF'] > 2)
     elif survey == 'y3a2':
-        cut = (data['EXTENDED_CLASS_MASH'] > 2)
+        sel = (data['EXTENDED_CLASS_MASH'] > 2)
     elif survey == 'bliss':
-        #cut = (data['CM_T'] > 0.003 + data['CM_T_ERR']) # 0.005?
-        cut = (data['WAVG_SPREAD_MODEL_G'] > 0.003 + data['SPREADERR_MODEL_G'])
+        #sel = (data['CM_T'] > 0.003 + data['CM_T_ERR']) # 0.005?
+        sel = (data['WAVG_SPREAD_MODEL_G'] > 0.003 + data['SPREADERR_MODEL_G'])
     elif survey == 'maglites':
-        cut = (data['CM_T'] > 0.003 + data['CM_T_ERR']) # 0.005?
+        sel = (data['CM_T'] > 0.003 + data['CM_T_ERR']) # 0.005?
     elif survey == 'panstarrs':
-        #cut = ((data['IFPSFMAG'] - data['IFKRONMAG']) > 0.05) # just a guess
-        cut = (data['EXTENDED_CLASS'] == 1)
-    return cut
+        #sel = ((data['IFPSFMAG'] - data['IFKRONMAG']) > 0.05) # just a guess
+        sel = (data['EXTENDED_CLASS'] == 1)
+    elif survey == 'decals':
+        #sel = (data['TYPE'] != 'PSF')
+        sel = (data['EXTENDED_CLASS'] == 1)
+    return sel
 
 def color_filter(survey, data):
     """Return blue objects"""
     if survey == 'y3_gold_2_0':
-        #cut = ((data['SOF_PSF_MAG_CORRECTED_G'] - data['SOF_PSF_MAG_CORRECTED_R']) < 0.4) # 0.2
-        cut = ((data[mag_1] - data[mag_2]) < 0.4) # 0.2
+        #sel = ((data['SOF_PSF_MAG_CORRECTED_G'] - data['SOF_PSF_MAG_CORRECTED_R']) < 0.4) # 0.2
+        sel = ((data[mag_1] - data[mag_2]) < 0.4) # 0.2
     elif survey == 'y3a2':
-        cut = ((data['PSF_MAG_SFD_G'] - data['PSF_MAG_SFD_R']) < 0.4) # 0.2
+        sel = ((data['PSF_MAG_SFD_G'] - data['PSF_MAG_SFD_R']) < 0.4) # 0.2
     elif survey == 'bliss':
-        cut = ((data[mag_1] - data[mag_2]) < 0.4) # 0.2
+        sel = ((data[mag_1] - data[mag_2]) < 0.4) # 0.2
     elif survey == 'maglites':
-        cut = ((data[mag_1] - data[mag_2]) < 0.4) # 0.2
+        sel = ((data[mag_1] - data[mag_2]) < 0.4) # 0.2
     elif survey == 'panstarrs':
-        cut = ((data[mag_1] - data[mag_2]) < 0.4) # 0.2
-        #cut = ((data['GFPSFMAG'] - data['IFPSFMAG']) > -0.5) \
+        sel = ((data[mag_1] - data[mag_2]) < 0.4) # 0.2
+        #sel = ((data['GFPSFMAG'] - data['IFPSFMAG']) > -0.5) \
         #    & ((data['GFPSFMAG'] - data['IFPSFMAG']) < 1.0)
-    return cut
+    elif survey == 'decals':
+        sel = ((-2.5*np.log10(data['FLUX_G']) + 2.5*np.log10(data['FLUX_R'])) < 0.4)
+    return sel
 
 def dered_mag(survey, data):
     """Return the data with an added flag for dereddened (extinction

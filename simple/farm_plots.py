@@ -52,7 +52,7 @@ except: # ugali
     candidate_list = candidate_list[candidate_list['TS'] > 25]
 
 # for PS1
-candidate_list = candidate_list[candidate_list['DEC'] > -15]
+#candidate_list = candidate_list[candidate_list['DEC'] > -15]
 
 print('{} candidates found...').format(len(candidate_list))
 

@@ -75,9 +75,9 @@ for candidate in candidate_list:
     #batch = 'csub -n {} -o {} '.format(jobs, logfile)
     batch = 'csub -n {} -o {} --host all '.format(jobs, logfile) # testing condor updates
     if 'N_MODEL' in candidate_list.dtype.names:
-        command = 'python {}/plotting/make_plot.py {:0.2f} {:0.2f} {:0.2f} {:0.2f} {:0.2f} {:0.4f}'.format(simple_dir, ra, dec, mod, sig, mc_source_id, field_density)
+        command = 'python {}/plotting/web_plot.py {:0.2f} {:0.2f} {:0.2f} {:0.2f} {:0.2f} {:0.4f}'.format(simple_dir, ra, dec, mod, sig, mc_source_id, field_density)
     else:
-        command = 'python {}/plotting/make_plot.py {:0.2f} {:0.2f} {:0.2f} {:0.2f} {:0.2f}'.format(simple_dir, ra, dec, mod, sig, mc_source_id)
+        command = 'python {}/plotting/web_plot.py {:0.2f} {:0.2f} {:0.2f} {:0.2f} {:0.2f}'.format(simple_dir, ra, dec, mod, sig, mc_source_id)
     command_queue = batch + command
 
     #print(command)

@@ -51,42 +51,14 @@ print('Making diagnostic plots for ({}, {}) = ({}, {})...'.format(basis_1, basis
 
 file_name = 'candidate_{:0.2f}_{:0.2f}'.format(targ_ra, targ_dec)
 
-fig, axs = plt.subplots(1, 1)
-simple.plotting.diagnostic_plots.density_plot(axs, targ_ra, targ_dec, data, iso, g_radius, nbhd, 'stars')
-plt.savefig(save_dir+'/'+file_name+'_stellar_density.png', bbox_inches='tight')
-plt.close()
+fig, axs = plt.subplots(1, 5, figsize=(24, 4))
+fig.subplots_adjust(wspace=0.5, hspace=0.5)
 
-fig, axs = plt.subplots(1, 1)
-simple.plotting.diagnostic_plots.density_plot(axs, targ_ra, targ_dec, data, iso, g_radius, nbhd, 'galaxies')
-plt.savefig(save_dir+'/'+file_name+'_galactic_density.png', bbox_inches='tight')
-plt.close()
+simple.plotting.diagnostic_plots.star_plot(axs[0], targ_ra, targ_dec, data, iso, g_radius, nbhd)
+simple.plotting.diagnostic_plots.density_plot(axs[1], targ_ra, targ_dec, data, iso, g_radius, nbhd, 'stars')
+simple.plotting.diagnostic_plots.density_plot(axs[2], targ_ra, targ_dec, data, iso, g_radius, nbhd, 'galaxies')
+simple.plotting.diagnostic_plots.cm_plot(axs[3], targ_ra, targ_dec, data, iso, g_radius, nbhd, 'stars')
+simple.plotting.diagnostic_plots.hess_plot(axs[4], targ_ra, targ_dec, data, iso, g_radius, nbhd)
 
-fig, axs = plt.subplots(1, 1)
-simple.plotting.diagnostic_plots.density_plot(axs, targ_ra, targ_dec, data, iso, g_radius, nbhd, 'blue_stars')
-plt.savefig(save_dir+'/'+file_name+'_blue_stellar_density.png', bbox_inches='tight')
-plt.close()
-
-fig, axs = plt.subplots(1, 1)
-simple.plotting.diagnostic_plots.cm_plot(axs, targ_ra, targ_dec, data, iso, g_radius, nbhd, 'stars')
-plt.savefig(save_dir+'/'+file_name+'_stellar_cmd.png', bbox_inches='tight')
-plt.close()
-
-fig, axs = plt.subplots(1, 1)
-simple.plotting.diagnostic_plots.cm_plot(axs, targ_ra, targ_dec, data, iso, g_radius, nbhd, 'galaxies')
-plt.savefig(save_dir+'/'+file_name+'_galactic_cmd.png', bbox_inches='tight')
-plt.close()
-
-fig, axs = plt.subplots(1, 1)
-simple.plotting.diagnostic_plots.hess_plot(axs, targ_ra, targ_dec, data, iso, g_radius, nbhd)
-plt.savefig(save_dir+'/'+file_name+'_hess.png', bbox_inches='tight')
-plt.close()
-
-fig, axs = plt.subplots(1, 1)
-simple.plotting.diagnostic_plots.star_plot(axs, targ_ra, targ_dec, data, iso, g_radius, nbhd)
-plt.savefig(save_dir+'/'+file_name+'_stars.png', bbox_inches='tight')
-plt.close()
-
-fig, axs = plt.subplots(1, 1)
-simple.plotting.diagnostic_plots.radial_plot(axs, targ_ra, targ_dec, data, iso, g_radius, nbhd, field_density)
-plt.savefig(save_dir+'/'+file_name+'_radial.png', bbox_inches='tight')
+plt.savefig(save_dir+'/'+file_name+'.png', bbox_inches='tight')
 plt.close()

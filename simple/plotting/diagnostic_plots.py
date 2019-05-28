@@ -22,8 +22,9 @@ from scipy import interpolate
 from scipy.signal import argrelextrema
 import scipy.ndimage
 
-import pylab as plt
+import matplotlib.pylab as plt
 import matplotlib
+from matplotlib.colors import ListedColormap
 from matplotlib import mlab
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
@@ -204,14 +205,12 @@ def density_plot(ax, ra, dec, data, iso, g_radius, nbhd, type):
 
     ax.set_xlim(bound, -bound)
     ax.set_ylim(-bound, bound)
-    ax.set_aspect('equal')
     ax.set_xlabel(r'$\Delta$ RA (deg)')
     ax.set_ylabel(r'$\Delta$ Dec (deg)')
 
     divider = make_axes_locatable(ax)
     cax = divider.append_axes('right', size = '5%', pad=0)
-    cb = fig.colorbar(pc, cax=cax)
-    cb.set_label('counts')
+    plt.colorbar(pc, cax=cax, label='counts')
 
 def star_plot(ax, ra, dec, data, iso, g_radius, nbhd):
     """Star bin plot"""
@@ -225,9 +224,9 @@ def star_plot(ax, ra, dec, data, iso, g_radius, nbhd):
     x, y = proj.sphereToImage(data[filter & iso_filter][basis_1], data[filter & iso_filter][basis_2])
 
     ax.scatter(x, y, edgecolor='none', s=3, c='black')
+
     ax.set_xlim(0.25, -0.25)
     ax.set_ylim(-0.25, 0.25)
-    ax.set_aspect('equal')
     ax.set_xlabel(r'$\Delta$ RA (deg)')
     ax.set_ylabel(r'$\Delta$ Dec (deg)')
     #ax.set_title('Stars')
@@ -261,10 +260,10 @@ def cm_plot(ax, ra, dec, data, iso, g_radius, nbhd, type):
     # Plot objects in nbhd and near isochrone
     ax.scatter(data[mag_dered_1][filter & nbhd & iso_filter] - data[mag_dered_2][filter & nbhd & iso_filter], data[mag_dered_1][filter & nbhd & iso_filter], c='r', s=5, label='$\Delta$CM < 0.1')
 
+    ax.legend(loc='upper left')
+
     ax.set_xlim(-0.5, 1)
     ax.set_ylim(mag_max, 16)
-    ax.set_aspect(1./4.)
-    ax.legend(loc='upper left')
     ax.set_xlabel('{} - {} (mag)'.format(band_1.lower(), band_2.lower()))
     ax.set_ylabel('{} (mag)'.format(band_1.lower()))
 
@@ -304,14 +303,12 @@ def hess_plot(ax, ra, dec, data, iso, g_radius, nbhd):
 
     ax.set_xlim(-0.5, 1.0)
     ax.set_ylim(mag_max, 16)
-    ax.set_aspect(1./4.)
     ax.set_xlabel('{} - {} (mag)'.format(band_1.lower(), band_2.lower()))
     ax.set_ylabel('{} (mag)'.format(band_1.lower()))
 
     divider = make_axes_locatable(ax)
     cax = divider.append_axes('right', size = '5%', pad=0)
-    cb = fig.colorbar(pc, cax=cax)
-    cb.set_label('counts')
+    plt.colorbar(pc, cax=cax, label='counts')
 
 def radial_plot(ax, ra, dec, data, iso, g_radius, nbhd, field_density=None):
     """Radial distribution plot"""
@@ -398,9 +395,13 @@ def radial_plot(ax, ra, dec, data, iso, g_radius, nbhd, field_density=None):
 
     ymax = plt.ylim()[1]
     ax.annotate(r'$\approx %0.1f$' + str(round(g_radius, 3)) + '$^\circ$', (g_radius*1.1, ymax/50.), color='red', bbox=dict(boxstyle='round,pad=0.0', fc='white', alpha=0.75, ec='white', lw=0))
-    ax.set_xlim(bins[0], bins[-1])
-    ax.set_ylim(0., ymax)
+
     ax.legend(loc='upper right')
+
+    #ax.set_xlim(bins[0], bins[-1])
+    #ax.set_ylim(0., ymax)
+    ax.set_xscale('log')
+    ax.set_yscale('log')
     ax.set_xlabel('Angular Separation (deg)')
     ax.set_ylabel('Denisty (arcmin$^{-2})$')
 

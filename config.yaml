@@ -43,7 +43,7 @@ y3_gold_2_0:
     mag_g_err : 'SOF_PSF_MAG_ERR_G'
     mag_r_err : 'SOF_PSF_MAG_ERR_R'
 
-    star_galaxy_classification : 'EXTENDED_CLASS_MASH_SOF'
+    #star_galaxy_classification : 'EXTENDED_CLASS_MASH_SOF'
 
     #maglim_g : '/home/s1/kadrlica/projects/y3q2/v6/release/depth/y2q1_maglim_g_n1024_ring.fits.gz'
     #maglim_r : '/home/s1/kadrlica/projects/y2q/v6/release/depth/y2q1_maglim_r_n1024_ring.fits.gz'
