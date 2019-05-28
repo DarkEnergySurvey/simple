@@ -77,8 +77,6 @@ def quality_filter(survey, data):
         #    #& (data['GFPSFMAG'] < 22.5) # observed magnitude - not extinction corrected
         #    #& (data['GINFOFLAG'] >= 0) # recommended by Alex; untested yet
         sel = (data['RFPSFMAGERR'] < 0.1) # replacing (data['GFPSFMAG'] < 22.5) after Keith's investigations
-    elif survey == 'decals':
-        sel = True ###
     return sel
 
 def star_filter(survey, data):
@@ -101,22 +99,6 @@ def star_filter(survey, data):
         ## Label objects that have exceptionally bright Kron magnitudes relative to PSF magnitudes stars (this happens in dense regions)
         #sel = sel | ((data['IFPSFMAG'] - data['IFKRONMAG']) > 4.0)
         sel = (data['EXTENDED_CLASS'] == 0)
-    elif survey == 'decals':
-        #sel = (data['EXTENDED_CLASS'] == 0)
-        rbright = 18
-        rfaint = 19.5
-        sel = np.where((data['TYPE'].strip() == 'PSF')*
-                        (np.sum((data['FLUX_G'] > 0)*1, axis=1)==3)*
-                        (np.sum((data['FLUX_R'] > 0)*1, axis=1)==3)*
-                        (np.sum((data['FLUX_Z'] > 0)*1, axis=1)==3)*
-                        (np.sum((data['ANYMASK_G'] > 0)*1, axis=1)==0)*
-                        (np.sum((data['ANYMASK_R'] > 0)*1, axis=1)==0)*
-                        (np.sum((data['ANYMASK_Z'] > 0)*1, axis=1)==0)*
-                        (np.sum((data['FRACFLUX_G'] < 0.05)*1, axis=1)==3)*
-                        (np.sum((data['FRACFLUX_R'] < 0.05)*1, axis=1)==3)*
-                        (np.sum((data['FRACFLUX_Z'] < 0.05)*1, axis=1)==3)*
-                        (data['FLUX_R'][:,2]<(10**(0.4*(22.5-rbright))))*
-                        (data['FLUX_R'][:,2]>(10**(0.4*(22.5-rfaint)))))[0]
     return sel
 
 def galaxy_filter(survey, data):
@@ -132,9 +114,6 @@ def galaxy_filter(survey, data):
         sel = (data['CM_T'] > 0.003 + data['CM_T_ERR']) # 0.005?
     elif survey == 'panstarrs':
         #sel = ((data['IFPSFMAG'] - data['IFKRONMAG']) > 0.05) # just a guess
-        sel = (data['EXTENDED_CLASS'] == 1)
-    elif survey == 'decals':
-        #sel = (data['TYPE'] != 'PSF')
         sel = (data['EXTENDED_CLASS'] == 1)
     return sel
 
@@ -153,8 +132,6 @@ def color_filter(survey, data):
         sel = ((data[mag_1] - data[mag_2]) < 0.4) # 0.2
         #sel = ((data['GFPSFMAG'] - data['IFPSFMAG']) > -0.5) \
         #    & ((data['GFPSFMAG'] - data['IFPSFMAG']) < 1.0)
-    elif survey == 'decals':
-        sel = ((-2.5*np.log10(data['FLUX_G']) + 2.5*np.log10(data['FLUX_R'])) < 0.4)
     return sel
 
 def dered_mag(survey, data):
