@@ -26,6 +26,7 @@ with open('config.yaml', 'r') as ymlfile:
     log_dir = cfg['output']['log_dir']
     basis_1 = cfg[survey]['basis_1']
     basis_2 = cfg[survey]['basis_2']
+    candidate_list = cfg[survey]['candidate_list']
 
 log_dir = os.path.join(cfg['output']['save_dir'], cfg['output']['log_dir'])
 if not os.path.exists(save_dir):
@@ -34,7 +35,11 @@ if not os.path.exists(log_dir):
     os.mkdir(log_dir)
 
 outfile = 'index.html'
-survey = 'ps1'
+if survey == 'panstarrs':
+    survey = 'ps1'
+elif survey == 'y3_gold_2_0':
+    survey = 'des'
+
 plots = os.listdir(save_dir)
 
 ################################################################################
@@ -49,7 +54,7 @@ plots = os.listdir(save_dir)
 #candidate_list = np.genfromtxt('remains_des_simple.txt', names=True)
 #candidate_list[::-1].sort(order='SIG')
 
-candidate_list = fits.read('remains_ps1_simple.fits')
+candidate_list = fits.read(candidate_list)
 candidate_list[::-1].sort(order='SIG')
 
 ################################################################################
@@ -152,12 +157,12 @@ def create_entry(candidate):
         os.system(command_queue) # Submit to queue
 
     image_file = 'image_{:0.2f}_{:0.2f}.png'.format(ra, dec)
-    if image_file not in plots:
-        print('Image not found; retrieving image for {}'.format(name))
-        image_url = simple.utils.query_image.retrieve_image(image_file, ra, dec, survey)
+    #if image_file not in plots:
+    #    print('Image not found; retrieving image for {}'.format(name))
+    #    image_url = simple.utils.query_image.retrieve_image(image_file, ra, dec, survey)
+    image_url = simple.utils.query_image.retrieve_image(image_file, ra, dec, survey)
     image = '{}/{}'.format(save_dir, image_file)
     image_name = image.strip('.png')
-    #image_url = "http://legacysurvey.org/viewer?ra={0}&dec={1}&zoom={2}&layer=des-dr1".format(ra, dec, 10)
 
     tablerow = ROW%dict(name=plot.strip('.png'), fname=save_dir+'/'+plot.strip('.png'))
     tablerow = """

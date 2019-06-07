@@ -48,11 +48,6 @@ with open('config.yaml', 'r') as ymlfile:
     mode = cfg[survey]['mode']
     sim_population = cfg[survey]['sim_population']
     
-    mag_g = cfg[survey]['mag_g']
-    mag_r = cfg[survey]['mag_r']
-    mag_g_err = cfg[survey]['mag_g_err']
-    mag_r_err = cfg[survey]['mag_r_err']
-
     band_1 = cfg[survey]['band_1']
     band_2 = cfg[survey]['band_2']
     mag = cfg[survey]['mag']
@@ -255,7 +250,7 @@ def cm_plot(ax, ra, dec, data, iso, g_radius, nbhd, type):
     ugali.utils.plotting.drawIsochrone(iso, lw=2, label='{} Gyr, z = {}'.format(iso.age, iso.metallicity))
 
     # Plot objects in nbhd
-    ax.scatter(data[mag_dered_1][filter & nbhd] - data[mag_dered_2][filter & nbhd], data[mag_dered_2][filter & nbhd], c='g', s=5, label='r < {:.3f}$^\circ$'.format(g_radius))
+    ax.scatter(data[mag_dered_1][filter & nbhd] - data[mag_dered_2][filter & nbhd], data[mag_dered_1][filter & nbhd], c='g', s=5, label='r < {:.3f}$^\circ$'.format(g_radius))
 
     # Plot objects in nbhd and near isochrone
     ax.scatter(data[mag_dered_1][filter & nbhd & iso_filter] - data[mag_dered_2][filter & nbhd & iso_filter], data[mag_dered_1][filter & nbhd & iso_filter], c='r', s=5, label='$\Delta$CM < 0.1')

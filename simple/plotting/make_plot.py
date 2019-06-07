@@ -50,9 +50,9 @@ except:
 #gs = gridspec.GridSpec(3, 3)
 
 fig, axs = plt.subplots(3, 3, figsize=(15, 15))
-fig.subplots.adjust(wspace=0.5, hspace-0.5)
+fig.subplots_adjust(wspace=0.5, hspace=0.5)
 
-data, iso, g_radius, nbhd = simple.diagnostic_plots.analysis(targ_ra, targ_dec, mod, mc_source_id)
+data, iso, g_radius, nbhd = simple.plotting.diagnostic_plots.analysis(targ_ra, targ_dec, mod, mc_source_id)
 
 print('Making diagnostic plots for ({}, {}) = ({}, {})...'.format(basis_1, basis_2, targ_ra, targ_dec))
 
@@ -68,9 +68,9 @@ simple.plotting.diagnostic_plots.cm_plot(axs[1][1], targ_ra, targ_dec, data, iso
 
 simple.plotting.diagnostic_plots.hess_plot(axs[2][1], targ_ra, targ_dec, data, iso, g_radius, nbhd)
 
-simple.plotting.diagnostic_plots.star_plot(axs[0][3], targ_ra, targ_dec, data, iso, g_radius, nbhd)
+simple.plotting.diagnostic_plots.star_plot(axs[0][2], targ_ra, targ_dec, data, iso, g_radius, nbhd)
 
-simple.plotting.diagnostic_plots.radial_plot(axs[1][3], targ_ra, targ_dec, data, iso, g_radius, nbhd, field_density)
+simple.plotting.diagnostic_plots.radial_plot(axs[1][2], targ_ra, targ_dec, data, iso, g_radius, nbhd, field_density)
 
 # Name
 try: # ugali

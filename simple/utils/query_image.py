@@ -27,10 +27,19 @@ def retrieve_ps1_image(filename, ra, dec):
 
     return(page_url)
 
+def retrieve_decals_dr7_image(filename, ra, dec):
+    filename = '{}/image_{:0.2f}_{:0.2f}.png'.format(save_dir, ra, dec)
+    url = "http://legacysurvey.org/viewer/jpeg-cutout?ra={0}&dec={1}&zoom={2}&layer=decals-dr7".format(ra, dec, 10)
+    urllib.urlretrieve(url, filename) #Retreaves and saves each image
+
+    return(url)
+
 def retrieve_image(filename, ra, dec, survey):
     if(survey == 'des'):
         return(retrieve_des_dr1_image(filename, ra, dec))
     elif(survey == 'ps1'):
         return(retrieve_ps1_image(filename, ra, dec))
+    elif(survey == 'decals'):
+        return(retrieve_decals_dr7_image(filename, ra, dec))
     else:
         return("No image found")
