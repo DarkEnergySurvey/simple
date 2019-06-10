@@ -26,7 +26,8 @@ log_dir = os.path.join(os.getcwd(), cfg['output']['save_dir'], cfg['output']['lo
 if not os.path.exists(log_dir):
     os.mkdir(log_dir)
 
-data = fits.read(candidate_list)
+#data = fits.read(candidate_list)
+data = np.load(candidate_list)
 
 try:
     sig_sel, plot = float(sys.argv[1]), float(sys.argv[2])

@@ -34,7 +34,7 @@ If you have fracdet or maglim files, those should also be copied or linked here;
 
 To run the simple binning search, run `farm_simple.py` in `simple_run/`.
 This will run `search_algorithm.py` over the given data set and write the output to `results_dir/`, logging each job in `results_dir/log_dir`.
-The results can then be compiled into a candidate list by running `make_list.py` from `simple_run/` (this is saved as a `.fits` file).
+The results can then be compiled into a candidate list by running `make_list.py` from `simple_run/` (this is saved as a `.npy` file).
 
 To produce plots from a candidate list, run `farm_plots.py` in `simple_run/`.
 The output will be written to `save_dir/` with logs in `save_dir/log_dir/`.
@@ -43,5 +43,3 @@ The output will be written to `save_dir/` with logs in `save_dir/log_dir/`.
 
 By default, `farm_plots.py` will only produce plots for hotspots with statistical significance greater than 5.5 sigma.
 This threshold has intentionally chosen to be low (such that investigations can be made of very low-significance hotsposts and candidates) but also to minimize junk.
-
-This code is currently going through an architectural overhaul to capitalize on the OOP nature of python.

@@ -696,18 +696,21 @@ def search_by_object(nside, data, distance_modulus, pix_nside_select, ra_select,
 def write_output(results_dir, nside, pix_nside_select, ra_peak_array, dec_peak_array, r_peak_array, distance_modulus_array, 
                 n_obs_peak_array, n_obs_half_peak_array, n_model_peak_array, 
                 sig_peak_array, mc_source_id_array, mode, outfile):
-    writer = open(outfile, 'a') # append if exists
-    for ii in range(0, len(sig_peak_array)):
-        # SIG, RA, DEC, MODULUS, r, n_obs, n_model, mc_source_id
-        writer.write('{:10.3f}, {:10.3f}, {:10.3f}, {:10.3f}, {:10.3f}, {:10.3f}, {:10.3f}, {:10.3f}, {:10.3f}\n'.format(sig_peak_array[ii], 
-                                                                                                                         ra_peak_array[ii], 
-                                                                                                                         dec_peak_array[ii], 
-                                                                                                                         distance_modulus_array[ii], 
-                                                                                                                         r_peak_array[ii],
-                                                                                                                         n_obs_peak_array[ii],
-                                                                                                                         n_obs_half_peak_array[ii],
-                                                                                                                         n_model_peak_array[ii],
-                                                                                                                         mc_source_id_array[ii]))
+    #writer = open(outfile, 'a') # append if exists
+    #for ii in range(0, len(sig_peak_array)):
+    #    # SIG, RA, DEC, MODULUS, r, n_obs, n_model, mc_source_id
+    #    writer.write('{:10.3f}, {:10.3f}, {:10.3f}, {:10.3f}, {:10.3f}, {:10.3f}, {:10.3f}, {:10.3f}, {:10.3f}\n'.format(sig_peak_array[ii], 
+    #                                                                                                                     ra_peak_array[ii], 
+    #                                                                                                                     dec_peak_array[ii], 
+    #                                                                                                                     distance_modulus_array[ii], 
+    #                                                                                                                     r_peak_array[ii],
+    #                                                                                                                     n_obs_peak_array[ii],
+    #                                                                                                                     n_obs_half_peak_array[ii],
+    #                                                                                                                     n_model_peak_array[ii],
+    #                                                                                                                     mc_source_id_array[ii]))
+    data = [tuple(row) for row in np.stack([sig_peak_array, ra_peak_array, dec_peak_array, distance_modulus_array, r_peak_array, n_obs_peak_array, n_obs_half_peak_array, n_model_peak_array, mc_source_id_array], axis=-1)]
+    arr = np.array(data, dtype=[('SIG', float), ('RA', float), ('DEC', float), ('DISTANCE_MODULUS', float), ('R_PEAK', float), ('N_OBS_PEAK', float), ('N_OBS_HALF_PEAK', float), ('N_MODEl_PEAK', float), ('MC_SOURCE_ID', float)])
+    np.save(outfile, arr)
 
 ########################################################################
 

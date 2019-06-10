@@ -49,17 +49,17 @@ if not os.path.exists(log_dir):
 
 def submit_job(ra, dec, pix, mc_source_id, mode, **population_file):
     if (mode == 0):
-        outfile = '{}/results_nside_{}_{}.csv'.format(results_dir, nside, pix)
+        outfile = '{}/results_nside_{}_{}.npy'.format(results_dir, nside, pix)
         logfile = '{}/results_nside_{}_{}.log'.format(log_dir, nside, pix)
         #command = 'python {}/search_algorithm.py {:0.2f} {:0.2f} {:0.2f} {} {}'.format(simple_dir, ra, dec, mc_source_id, outfile, logfile)
     elif (mode == 1):
-        #outfile = '{}/results_mc_source_id_{}.csv'.format(results_dir, mc_source_id) # all values in mc_source_id_array should be the same
+        #outfile = '{}/results_mc_source_id_{}.npy'.format(results_dir, mc_source_id) # all values in mc_source_id_array should be the same
         #logfile = '{}/results_mc_source_id_{}.log'.format(log_dir, mc_source_id) # all values in mc_source_id_array should be the same
-        outfile = '{}/results_nside_{}_{}.csv'.format(results_dir, nside, pix)
+        outfile = '{}/results_nside_{}_{}.npy'.format(results_dir, nside, pix)
         logfile = '{}/results_nside_{}_{}.log'.format(log_dir, nside, pix)
         #command = 'python {}/search_algorithm.py {:0.2f} {:0.2f} {:0.2f} {} {} {}'.format(simple_dir, ra, dec, mc_source_id, outfile, logfile, population_file)
     elif (mode == 2):
-        outfile = '{}/results_mc_source_id_{}.csv'.format(results_dir, mc_source_id) # all values in mc_source_id_array should be the same
+        outfile = '{}/results_mc_source_id_{}.npy'.format(results_dir, mc_source_id) # all values in mc_source_id_array should be the same
         logfile = '{}/results_mc_source_id_{}.log'.format(log_dir, mc_source_id) # all values in mc_source_id_array should be the same
     #batch = 'csub -n {} -o {} '.format(jobs, logfile)
     batch = 'csub -n {} -o {} --host all '.format(jobs, logfile) # testing condor updates

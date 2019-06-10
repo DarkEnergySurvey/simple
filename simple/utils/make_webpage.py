@@ -54,7 +54,8 @@ plots = os.listdir(save_dir)
 #candidate_list = np.genfromtxt('remains_des_simple.txt', names=True)
 #candidate_list[::-1].sort(order='SIG')
 
-candidate_list = fits.read(candidate_list)
+#candidate_list = fits.read(candidate_list)
+candidate_list = np.load(candidate_list)
 candidate_list[::-1].sort(order='SIG')
 
 ################################################################################

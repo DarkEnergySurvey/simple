@@ -26,7 +26,8 @@ with open('config.yaml', 'r') as ymlfile:
     basis_1 = cfg[survey]['basis_1']
     basis_2 = cfg[survey]['basis_2']
 
-data = fits.read(candidate_list)
+#data = fits.read(candidate_list)
+data = np.load(candidate_list)
 #data = data[data['SIG'] > 15]
 
 plt.figure()

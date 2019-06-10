@@ -24,7 +24,8 @@ with open('config.yaml', 'r') as ymlfile:
 
 candidate_list = cfg[survey]['candidate_list']
 
-data = fits.read(candidate_list)
+#data = fits.read(candidate_list)
+data = np.load(candidate_list)
 data = data[data['SIG'] > 15]
 
 #fracdet = fits.read('{}_pseudo_fracdet.fits.gz'.format(survey))

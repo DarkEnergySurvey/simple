@@ -60,7 +60,8 @@ with open('config.yaml', 'r') as ymlfile:
     
 ########################################################################
 
-data = fits.read(candidate_list)
+#data = fits.read(candidate_list)
+data = np.load(candidate_list)
 sim_pop = fits.read(sim_population)
 
 #data = data[(sim_pop['DIFFICULTY'] == 0) & (sim_pop['N_CATALOG'] > 0)]
