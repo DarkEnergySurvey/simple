@@ -11,11 +11,7 @@ import numpy as np
 
 with open('config.yaml', 'r') as ymlfile:
     cfg = yaml.load(ymlfile)
-
     survey = cfg['survey']
-
-    basis_1 = cfg[survey]['basis_1']
-    basis_2 = cfg[survey]['basis_2']
     candidate_list = cfg[survey]['candidate_list']
 
 

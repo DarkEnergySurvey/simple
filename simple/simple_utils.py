@@ -709,7 +709,7 @@ def write_output(results_dir, nside, pix_nside_select, ra_peak_array, dec_peak_a
     #                                                                                                                     n_model_peak_array[ii],
     #                                                                                                                     mc_source_id_array[ii]))
     data = [tuple(row) for row in np.stack([sig_peak_array, ra_peak_array, dec_peak_array, distance_modulus_array, r_peak_array, n_obs_peak_array, n_obs_half_peak_array, n_model_peak_array, mc_source_id_array], axis=-1)]
-    arr = np.array(data, dtype=[('SIG', float), ('RA', float), ('DEC', float), ('DISTANCE_MODULUS', float), ('R_PEAK', float), ('N_OBS_PEAK', float), ('N_OBS_HALF_PEAK', float), ('N_MODEl_PEAK', float), ('MC_SOURCE_ID', float)])
+    arr = np.array(data, dtype=[('SIG', float), ('RA', float), ('DEC', float), ('MODULUS', float), ('R', float), ('N_OBS', float), ('N_OBS_HALF', float), ('N_MODEL', float), ('MC_SOURCE_ID', float)])
     np.save(outfile, arr)
 
 ########################################################################
@@ -723,7 +723,7 @@ def read_output(results_dir, pix):
     #    results = np.concatenate(results)
     infile = glob.glob(results_dir + '/*{}.csv'.format(pix))
     if (len(infile) > 0):
-        results = np.genfromtxt(infile[0], delimiter=',', names=['SIG', 'RA', 'DEC', 'DISTANCE_MODULUS', 'R_PEAK', 'N_OBS_PEAK', 'N_OBS_HALF_PEAK', 'N_MODEL_PEAK', 'MC_SOURCE_ID'])
+        results = np.genfromtxt(infile[0], delimiter=',', names=['SIG', 'RA', 'DEC', 'MODULUS', 'R', 'N_OBS', 'N_OBS_HALF', 'N_MODEL', 'MC_SOURCE_ID'])
     else:
         results = []
 

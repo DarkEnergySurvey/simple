@@ -70,7 +70,7 @@ for candidate in candidate_list:
     mod     = round(candidate['MODULUS'], 2)
     mc_source_id = round(candidate['MC_SOURCE_ID'], 2)
     if 'N_MODEL' in candidate_list.dtype.names:
-        field_density = round(candidate['N_MODEL'] / (np.pi * (candidate['r'] * 60.)**2), 4) # field density (arcmin^-2)
+        field_density = round(candidate['N_MODEL'] / (np.pi * (candidate['R'] * 60.)**2), 4) # field density (arcmin^-2)
     
     logfile = '{}/candidate_{}_{}.log'.format(log_dir, ra, dec)
     #batch = 'csub -n {} -o {} '.format(jobs, logfile)

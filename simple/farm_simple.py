@@ -61,8 +61,8 @@ def submit_job(ra, dec, pix, mc_source_id, mode, **population_file):
     elif (mode == 2):
         outfile = '{}/results_mc_source_id_{}.npy'.format(results_dir, mc_source_id) # all values in mc_source_id_array should be the same
         logfile = '{}/results_mc_source_id_{}.log'.format(log_dir, mc_source_id) # all values in mc_source_id_array should be the same
-    #batch = 'csub -n {} -o {} '.format(jobs, logfile)
-    batch = 'csub -n {} -o {} --host all '.format(jobs, logfile) # testing condor updates
+    batch = 'csub -n {} -o {} '.format(jobs, logfile)
+    #batch = 'csub -n {} -o {} --host all '.format(jobs, logfile) # testing condor updates
     command = 'python {}/search_algorithm.py {:0.2f} {:0.2f} {:0.2f} {} {}'.format(simple_dir, ra, dec, mc_source_id, outfile, logfile)
     command_queue = batch + command
 
@@ -83,7 +83,7 @@ if (mode == 0): # real
     for infile in infiles:
         pix_nside.append(int(infile.split('.fits')[0].split('_')[-1]))
 
-    for ii in range(0, len(pix_nside)):
+    for ii in range(0, len(pix_nside))[:10]:
         ra, dec = ugali.utils.healpix.pixToAng(nside, pix_nside[ii])
     
         submit_job(ra, dec, pix_nside[ii], 0, mode) # TODO: mc_source_id (0 for real)
