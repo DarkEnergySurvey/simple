@@ -56,6 +56,7 @@ plots = os.listdir(save_dir)
 
 #candidate_list = fits.read(candidate_list)
 candidate_list = np.load(candidate_list)
+candidate_list = candidate_list[candidate_list['SIG'] > 5]
 candidate_list[::-1].sort(order='SIG')
 
 ################################################################################
@@ -145,9 +146,10 @@ def create_entry(candidate):
     if candidate_file not in plots:
         print('Plot not found; making plot for {}'.format(name))
         if 'N_MODEL' in candidate_list.dtype.names:
-            field_density = round(candidate['N_MODEL'] / (np.pi * (candidate['r'] * 60.)**2), 4) # field density (arcmin^-2)
+            field_density = round(candidate['N_MODEL'] / (np.pi * (candidate['R'] * 60.)**2), 4) # field density (arcmin^-2)
         logfile = '{}/candidate_{:0.2f}_{:0.2f}.log'.format(log_dir, ra, dec)
-        batch = 'csub -n {} -o {} --host all '.format(jobs, logfile) # testing condor updates
+        #batch = 'csub -n {} -o {} --host all '.format(jobs, logfile) # testing condor updates
+        batch = 'csub -n {} -o {} '.format(jobs, logfile) # testing condor updates
         if 'N_MODEL' in candidate_list.dtype.names:
             command = 'python {}/plotting/web_plot.py {:0.2f} {:0.2f} {:0.2f} {:0.2f} {:0.2f} {:0.4f}'.format(simple_dir, ra, dec, mod, sig, mc_source_id, field_density)
         else:
@@ -161,6 +163,7 @@ def create_entry(candidate):
     #if image_file not in plots:
     #    print('Image not found; retrieving image for {}'.format(name))
     #    image_url = simple.utils.query_image.retrieve_image(image_file, ra, dec, survey)
+    print('Retrieving image for {}'.format(name))
     image_url = simple.utils.query_image.retrieve_image(image_file, ra, dec, survey)
     image = '{}/{}'.format(save_dir, image_file)
     image_name = image.strip('.png')

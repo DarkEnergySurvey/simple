@@ -247,7 +247,8 @@ def cm_plot(ax, ra, dec, data, iso, g_radius, nbhd, type):
     ax.scatter(data[mag_dered_1][filter & annulus] - data[mag_dered_2][filter & annulus], data[mag_dered_1][filter & annulus], c='k', alpha=0.1, edgecolor='none', s=1)
 
     # Plot isochrone
-    ugali.utils.plotting.drawIsochrone(iso, lw=2, label='{} Gyr, z = {}'.format(iso.age, iso.metallicity))
+    #ugali.utils.plotting.drawIsochrone(iso, lw=2, label='{} Gyr, z = {}'.format(iso.age, iso.metallicity))
+    ax.plot(iso.color, iso.mag_1 + iso.distance_modulus, c='k', lw=1)
 
     # Plot objects in nbhd
     ax.scatter(data[mag_dered_1][filter & nbhd] - data[mag_dered_2][filter & nbhd], data[mag_dered_1][filter & nbhd], c='g', s=5, label='r < {:.3f}$^\circ$'.format(g_radius))
